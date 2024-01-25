@@ -1,0 +1,620 @@
+---
+title: "Denis Ostroushko - PUBH 7440 - HW1"
+format: pdf
+execute: 
+  warning: false
+  message: false 
+  echo: false 
+---
+
+```{r}
+library(tidyverse)
+
+options(scipen = 99999, 
+        knitr.kable.NA = '')
+```
+
+# Problem 1
+
+
+
+# Problem 2
+
+### 2 - A 
+
+According to given parameters, prior distribution of $\theta$ is given by $\Large \theta$ ~ $\Large N(0, 2)$
+
+And the distribution of data, random variable $Y$ is also normal, $\Large y| \theta$ ~  $\Large N(\theta, 2)$
+
+Using given derivation of posterior distribution, we obtain the distribution of $\theta$ given the observed values of data $y$. 
+
+Going forward, we fix $y$ = 4, we let $\large B = \frac{2}{2+2} = \frac{1}{2}$. 
+$\Large \theta|y$ ~ $\Large N(B \times \mu + (1-B) \times y, (1-B) \times \sigma^2) = N(\frac{1}{2} \times 0 + \frac{1}{2} \times 4, \frac{1}{2} \times 2) = N(2, 1)$. 
+
+So, $\Large \theta|y$ ~ $N(2, 1)$
+
+To plot likelihood of observing $y$= 4, I will use the distribution of data $y|\theta$, I will vary the value of $\theta$ and keep variance of $Y$ fixed at 2. 
+Since $\theta$ is centered at 0 with variance 2, I will obtain values that correspond to prior distribution of $\theta$
+
+```{r prior likelihood and posterior plot for 2-a}
+
+# prior density save data 
+
+prior_x = seq(from = 0 - 2*3, to = 0+2*3, by = 0.1)
+dnorm(
+  x = prior_x, 
+  mean = 0, 
+  sd = sqrt(2)
+) -> prior_plot_data 
+
+# posterior 
+post_x = seq(from = 2 - 3*1, to = 2+3*1, by = 0.1)
+dnorm(
+  x = post_x, 
+  mean = 2, 
+  sd = sqrt(1)
+) -> posterior_plot_data 
+
+# likelihood of Y given different parameters of Theta 
+y = 4 
+means = seq(from = 4 - 2*3, to = 4+2*3, by = 0.1)
+likelihood_y = dnorm(x = y, mean = means, sd = sqrt(2))
+
+# plotting data 
+
+plot_df <- 
+  data.frame(
+    x = c(prior_x, post_x, means), 
+    y = c(prior_plot_data, posterior_plot_data, likelihood_y), 
+    type = c(rep("Prior of Theta", length(prior_x)), 
+             rep("Posterior of Theta", length(post_x)), 
+             rep("Likelihood of Y=4", length(likelihood_y)))
+  )
+
+ggplot(data = plot_df, 
+       aes(x = x, y = y, color = type, group = type)) + 
+  theme_minimal() + 
+  geom_line() + 
+  labs(x = expression(paste("Values of  ", theta)), 
+       y = "Density", 
+       color = "Curve Type"
+  ) 
+
+```
+
+### 2 - B 
+
+When $\tau^2$ = 18, $\large B = \frac{2}{2  + 18} = \frac{1}{10}$. The resulting distributions are then 
+
+$\Large \theta$ ~ $N(0, 18)$
+
+$\Large y|\theta$ ~ $N(\theta, 2)$
+
+Assuming $y$= 4, $\Large \theta|y$ ~ $N(0.1 * 0 + 0.9 * y, 0.9 * 2) = N(3.6, 1.8)$
+
+Prior, marginal likelihood, and posterior distributions take on these shapes: 
+
+```{r prior likelihood and posterior plot for 2-b}
+
+# prior density save data 
+
+prior_x = seq(from = 0 - sqrt(18)*3, to = 0+sqrt(18)*3, by = 0.1)
+dnorm(
+  x = prior_x, 
+  mean = 0, 
+  sd = sqrt(18)
+) -> prior_plot_data 
+
+# posterior 
+post_x = seq(from = 3.6 - 10*sqrt(1.8), to = 3.6 + 10*sqrt(1.8), by = 0.1)
+dnorm(
+  x = post_x, 
+  mean = 3.6, 
+  sd = sqrt(1.8)
+) -> posterior_plot_data 
+
+# likelihood of Y given different parameters of Theta 
+y = 4 
+means = seq(from = 4 - 2*3, to = 4+2*3, by = 0.1)
+likelihood_y = dnorm(x = y, mean = means, sd = sqrt(2))
+
+# plotting data 
+
+plot_df <- 
+  data.frame(
+    x = c(prior_x, post_x, means), 
+    y = c(prior_plot_data, posterior_plot_data, likelihood_y), 
+    type = c(rep("Prior of Theta", length(prior_x)), 
+             rep("Posterior of Theta", length(post_x)), 
+             rep("Likelihood of Y=4", length(likelihood_y)))
+  )
+
+ggplot(data = plot_df, 
+       aes(x = x, y = y, color = type, group = type)) + 
+  theme_minimal() + 
+  geom_line() + 
+  labs(x = expression(paste("Values of ", theta)), 
+       y = "Density", 
+       color = "Curve Type"
+  ) 
+
+```
+
+# Problem 3 
+
+### 3 - A 
+
+The chance from picking a ball from bucket 2 is governed by a fair six-sided die. We pick from bucket 2 when we roll 5 or 6, so,
+$P(Draw \ from \ 2 ) = \frac{1}{3}$
+
+### 3 - B 
+
+Probability of drawing a blue ball is a weighted average of probabilities that correspond to the bucket that we draw from. 
+$P(Blue) = P(Draw \ from \ 1) \times P(Blue|Draw \ from \ 1) + P(Draw \ from \ 2) \times P(Blue|Draw \ from \ 2) = \frac{2}{3} \times \frac{17}{17 + 35} + \frac{1}{3} \times \frac{37}{37 + 23}$ = `r round(2/3 * 17/(17+35) + 1/3 * 37/(37+23), 2)`
+
+### 3 - C 
+
+We need to use Bayes Rule to find this probability from available data 
+
+$P(Draw \ from \ 2|Blue) = \frac{P(Draw \ from \ 2 \ and \ Blue)}{P(Blue)} = \frac{P(Blue | Draw \ from \ 2) \times P(Draw \ from \ 2)}{P(Blue)}$ = $\frac{\frac{37}{37+23} \times \frac{1}{3}}{0.42}$ = `r round((37/(37+23) * 1/3)/0.42, 2)`
+
+# Problem 4 
+
+```{r}
+
+# Preliminary work with the data 
+
+tab=read.table('Instructor Example Code/Data/PA_HD_1988_35-54.txt',sep='\t',
+               header=TRUE,
+               stringsAsFactors=FALSE)
+
+# subset just the total rows so that we can compare rural vs urban counties 
+tab=tab[tab$Notes=='Total',]
+
+# There are 67 total counties - remove a row that contains total PA data
+tab <- tab[!is.na(tab$County.Code), ]
+
+# define flag for analysis 
+tab$Urban = ifelse(tab$Population > 20000, "Yes", "No")
+     
+# In Instructor code Nr = number of races = 2, we have number of ubran/rural classes = 2 
+N_classes = length(unique(tab$Urban)) 
+# In Instructor code Ns = number of counties = 67, we have the same number
+N_counties = nrow(tab)
+
+# state wide average mortality rate 
+with(tab, sum(Deaths)/sum(Population)) -> state_wide_rate
+
+# calculate county specific death rate, and evalaute if it higher or lower than the state-wide average 
+
+tab <- 
+  tab %>% 
+  mutate(
+    state_death_rate = Deaths/Population, 
+    over_flag = ifelse(state_death_rate > state_wide_rate, 1, 0)
+  )
+
+# now we need to get the number of counties by class where we have the rate that is higher than the statewide average 
+tab %>% 
+  group_by(Urban) %>% 
+  summarise(n = n(), 
+            outcome = sum(over_flag), 
+            outcome_rate = sum(over_flag)/n()) -> summary_data 
+
+# now using data estimates of N and Outcomes, sample from non-informative prior beta distribution 
+ns = summary_data %>% select(n) %>% unlist() # order: Rural, Urban 
+ys = summary_data %>% select(outcome) %>% unlist() # same ordering appleis to this vector 
+
+# non-informative prior with parameters a = 1, b = 1
+a = 1
+b = 1
+
+# these are posterior distributions of proportion or the relative frequency of counties with death rate higher than the state-
+# wide mortality rate 
+
+set.seed(1)
+theta_rural = rbeta(10000, shape1 =  ys[1] + a, # this one is ALPHA parameter 
+                    shape2 = ns[1] - ys[1] + b # this one is BETA 
+                      )
+
+theta_urban = rbeta(10000, shape1 =  ys[2] + a, # this one is ALPHA parameter 
+                    shape2 = ns[2] - ys[2] + b # this one is BETA 
+                      )
+
+# take the difference and plot the distribution 
+```
+
+### 4 - A
+
+Among 10000 draws from estimated posterior distributions, there were `r length(which(theta_urban - theta_rural > 0))` cases 
+where the relative frequency of counties with higher than average mortality rate in the Urban class was higher than the 
+relative frequency of counties in the Rural class. This corresponds to the `r round(length(which(theta_urban - theta_rural > 0))/10000, 4)*100`% chance that the true rate of counties with higher than average mortality in the urban class is above that or 
+counties in the rural class. At the $\alpha = 0.05$ statistical significance level, we can conclude that the the rate of deaths in
+urban counties must be consistently lower
+
+```{r}
+
+# differnece in draws from posterior distributions 
+difference = theta_urban - theta_rural
+
+ggplot(data = data.frame(d = difference), 
+       aes(x = d)) + 
+  theme_minimal() + 
+  geom_histogram(color = 'black', fill = 'lightgrey', bins = 30) + 
+  geom_vline(xintercept = 0, color = "red", linewidth = 1, linetype = "dashed") + 
+  labs(title = "Distribution of differences in Urban vs Rural \ncounty relative frequencies of higher death rates", 
+       x = "Urban minus Rural Difference", 
+       y = "Count") 
+
+```
+
+### 4 - B 
+
+```{r}
+# data preliminary, need to work with the rate of death per 1,000
+# here we treat counties as data points, aggregate # deaths to a class levels and get a mortality rate, 
+# then we take mortality rate times 1,000 to get mortality rate per 1,000 people 
+
+tab %>% 
+  group_by(Urban) %>% 
+  summarise(n = sum(Population), 
+            y = sum(Deaths)) -> summary_data 
+
+ys = summary_data %>% select(y) %>% unlist()
+ns = summary_data %>% select(n) %>% unlist()
+
+n = 1000
+data_driven_mortality_rate_1000 = state_wide_rate * n 
+
+# common to sample means of poisson (or rates ) from gamma distribution, so that is what we do 
+# we obtain posterior lambda by taking data count of death within a county class plus prior rate as shape (ALPHA) parameter
+#                                     and number of people in the county class plus prior n as rate (BETA) parameter
+
+# we can also treat prior N as prior OFFSET Ns from data will be OFFSET's obtained from the data 
+
+set.seed(2)
+lambda_rural=rgamma(10000,ys[1]+data_driven_mortality_rate_1000,ns[1]+n)
+lambda_urban=rgamma(10000,ys[2]+data_driven_mortality_rate_1000,ns[2]+n)
+
+differ=lambda_urban-lambda_rural
+
+```
+
+Among 10000 draws from estimated posterior distributions, there were `r length(which(lambda_urban - lambda_rural > 0))` cases 
+where the death rate per 1,000 people in the urban counties was higher than the death rate per 1,000 in the rural counties. 
+This corresponds to the `r round(length(which(lambda_urban - lambda_rural > 0))/10000, 4)*100`% chance that the true rate of deaths per 1,000 is higher in the urban counties is higher than that of rural counties. 
+
+While this chance is higher than the traditional 5% frequentist cut off rate for the significance level, estimated chance is 
+still fairly slim. 
+
+```{r}
+ggplot(data = data.frame(d = differ), 
+       aes(x = d)) + 
+  theme_minimal() + 
+  geom_histogram(color = 'black', fill = 'lightgrey', bins = 30) + 
+  geom_vline(xintercept = 0, color = "red", linewidth = 1, linetype = "dashed") + 
+  labs(title = "Distribution of differences in Urban vs Rural \ncounty relative frequencies of higher death rates", 
+       x = "Urban minus Rural Difference", 
+       y = "Count") 
+```
+
+\newpage 
+
+# Appendix 
+
+**Increasing A, B to 12, 12** for 4-A
+
+```{r}
+
+# non-informative prior with parameters a = 1, b = 1
+set.seed(12)
+a = 12
+b = 12
+# Preliminary work with the data 
+
+tab=read.table('Instructor Example Code/Data/PA_HD_1988_35-54.txt',sep='\t',
+               header=TRUE,
+               stringsAsFactors=FALSE)
+
+# subset just the total rows so that we can compare rural vs urban counties 
+tab=tab[tab$Notes=='Total',]
+
+# There are 67 total counties - remove a row that contains total PA data
+tab <- tab[!is.na(tab$County.Code), ]
+
+# define flag for analysis 
+tab$Urban = ifelse(tab$Population > 20000, "Yes", "No")
+     
+# In Instructor code Nr = number of races = 2, we have number of ubran/rural classes = 2 
+N_classes = length(unique(tab$Urban)) 
+# In Instructor code Ns = number of counties = 67, we have the same number
+N_counties = nrow(tab)
+
+# state wide average mortality rate 
+with(tab, sum(Deaths)/sum(Population)) -> state_wide_rate
+
+# calculate county specific death rate, and evalaute if it higher or lower than the state-wide average 
+
+tab <- 
+  tab %>% 
+  mutate(
+    state_death_rate = Deaths/Population, 
+    over_flag = ifelse(state_death_rate > state_wide_rate, 1, 0)
+  )
+
+# now we need to get the number of counties by class where we have the rate that is higher than the statewide average 
+tab %>% 
+  group_by(Urban) %>% 
+  summarise(n = n(), 
+            outcome = sum(over_flag), 
+            outcome_rate = sum(over_flag)/n()) -> summary_data 
+
+# now using data estimates of N and Outcomes, sample from non-informative prior beta distribution 
+ns = summary_data %>% select(n) %>% unlist() # order: Rural, Urban 
+ys = summary_data %>% select(outcome) %>% unlist() # same ordering appleis to this vector 
+
+# these are posterior distributions of proportion or the relative frequency of counties with death rate higher than the state-
+# wide mortality rate 
+theta_rural = rbeta(10000, shape1 =  ys[1] + a, # this one is ALPHA parameter 
+                    shape2 = ns[1] - ys[1] + b # this one is BETA 
+                      )
+
+theta_urban = rbeta(10000, shape1 =  ys[2] + a, # this one is ALPHA parameter 
+                    shape2 = ns[2] - ys[2] + b # this one is BETA 
+                      )
+difference = theta_urban - theta_rural
+
+ggplot(data = data.frame(d = difference), 
+       aes(x = d)) + 
+  theme_minimal() + 
+  geom_histogram(color = 'black', fill = 'lightgrey', bins = 30) + 
+  geom_vline(xintercept = 0, color = "red", linewidth = 1, linetype = "dashed") + 
+  labs(title = "Distribution of differences in Urban vs Rural \ncounty relative frequencies of higher death rates", 
+       x = "Urban minus Rural Difference", 
+       y = "Count") 
+# take the difference and plot the distribution 
+```
+
+* New chance: `r round(length(which(theta_urban - theta_rural > 0))/10000, 4)*100`%
+
+* Estimated Difference: `r mean(theta_urban - theta_rural) %>% round(., 2)`
+
+* Estimated SD of distribution: `r sd(theta_urban - theta_rural) %>% round(., 2)`
+
+**Increasing A, B to 25, 25** for 4-A
+```{r}
+
+# non-informative prior with parameters a = 1, b = 1
+set.seed(123)
+a = 25
+b = 25
+# Preliminary work with the data 
+
+tab=read.table('Instructor Example Code/Data/PA_HD_1988_35-54.txt',sep='\t',
+               header=TRUE,
+               stringsAsFactors=FALSE)
+
+# subset just the total rows so that we can compare rural vs urban counties 
+tab=tab[tab$Notes=='Total',]
+
+# There are 67 total counties - remove a row that contains total PA data
+tab <- tab[!is.na(tab$County.Code), ]
+
+# define flag for analysis 
+tab$Urban = ifelse(tab$Population > 20000, "Yes", "No")
+     
+# In Instructor code Nr = number of races = 2, we have number of ubran/rural classes = 2 
+N_classes = length(unique(tab$Urban)) 
+# In Instructor code Ns = number of counties = 67, we have the same number
+N_counties = nrow(tab)
+
+# state wide average mortality rate 
+with(tab, sum(Deaths)/sum(Population)) -> state_wide_rate
+
+# calculate county specific death rate, and evalaute if it higher or lower than the state-wide average 
+
+tab <- 
+  tab %>% 
+  mutate(
+    state_death_rate = Deaths/Population, 
+    over_flag = ifelse(state_death_rate > state_wide_rate, 1, 0)
+  )
+
+# now we need to get the number of counties by class where we have the rate that is higher than the statewide average 
+tab %>% 
+  group_by(Urban) %>% 
+  summarise(n = n(), 
+            outcome = sum(over_flag), 
+            outcome_rate = sum(over_flag)/n()) -> summary_data 
+
+# now using data estimates of N and Outcomes, sample from non-informative prior beta distribution 
+ns = summary_data %>% select(n) %>% unlist() # order: Rural, Urban 
+ys = summary_data %>% select(outcome) %>% unlist() # same ordering appleis to this vector 
+
+# these are posterior distributions of proportion or the relative frequency of counties with death rate higher than the state-
+# wide mortality rate 
+theta_rural = rbeta(10000, shape1 =  ys[1] + a, # this one is ALPHA parameter 
+                    shape2 = ns[1] - ys[1] + b # this one is BETA 
+                      )
+
+theta_urban = rbeta(10000, shape1 =  ys[2] + a, # this one is ALPHA parameter 
+                    shape2 = ns[2] - ys[2] + b # this one is BETA 
+                      )
+difference = theta_urban - theta_rural
+
+ggplot(data = data.frame(d = difference), 
+       aes(x = d)) + 
+  theme_minimal() + 
+  geom_histogram(color = 'black', fill = 'lightgrey', bins = 30) + 
+  geom_vline(xintercept = 0, color = "red", linewidth = 1, linetype = "dashed") + 
+  labs(title = "Distribution of differences in Urban vs Rural \ncounty relative frequencies of higher death rates", 
+       x = "Urban minus Rural Difference", 
+       y = "Count") 
+# take the difference and plot the distribution 
+```
+
+
+* New chance: `r round(length(which(theta_urban - theta_rural > 0))/10000, 4)*100`%
+
+* Estimated Difference: `r mean(theta_urban - theta_rural) %>% round(., 2)`
+
+* Estimated SD of distribution: `r sd(theta_urban - theta_rural) %>% round(., 2)`
+
+**Increasing A, B to 100, 100** for 4-A
+```{r}
+
+# non-informative prior with parameters a = 1, b = 1
+set.seed(123)
+a = 100
+b = 100
+# Preliminary work with the data 
+
+tab=read.table('Instructor Example Code/Data/PA_HD_1988_35-54.txt',sep='\t',
+               header=TRUE,
+               stringsAsFactors=FALSE)
+
+# subset just the total rows so that we can compare rural vs urban counties 
+tab=tab[tab$Notes=='Total',]
+
+# There are 67 total counties - remove a row that contains total PA data
+tab <- tab[!is.na(tab$County.Code), ]
+
+# define flag for analysis 
+tab$Urban = ifelse(tab$Population > 20000, "Yes", "No")
+     
+# In Instructor code Nr = number of races = 2, we have number of ubran/rural classes = 2 
+N_classes = length(unique(tab$Urban)) 
+# In Instructor code Ns = number of counties = 67, we have the same number
+N_counties = nrow(tab)
+
+# state wide average mortality rate 
+with(tab, sum(Deaths)/sum(Population)) -> state_wide_rate
+
+# calculate county specific death rate, and evalaute if it higher or lower than the state-wide average 
+
+tab <- 
+  tab %>% 
+  mutate(
+    state_death_rate = Deaths/Population, 
+    over_flag = ifelse(state_death_rate > state_wide_rate, 1, 0)
+  )
+
+# now we need to get the number of counties by class where we have the rate that is higher than the statewide average 
+tab %>% 
+  group_by(Urban) %>% 
+  summarise(n = n(), 
+            outcome = sum(over_flag), 
+            outcome_rate = sum(over_flag)/n()) -> summary_data 
+
+# now using data estimates of N and Outcomes, sample from non-informative prior beta distribution 
+ns = summary_data %>% select(n) %>% unlist() # order: Rural, Urban 
+ys = summary_data %>% select(outcome) %>% unlist() # same ordering appleis to this vector 
+
+# these are posterior distributions of proportion or the relative frequency of counties with death rate higher than the state-
+# wide mortality rate 
+theta_rural = rbeta(10000, shape1 =  ys[1] + a, # this one is ALPHA parameter 
+                    shape2 = ns[1] - ys[1] + b # this one is BETA 
+                      )
+
+theta_urban = rbeta(10000, shape1 =  ys[2] + a, # this one is ALPHA parameter 
+                    shape2 = ns[2] - ys[2] + b # this one is BETA 
+                      )
+difference = theta_urban - theta_rural
+
+ggplot(data = data.frame(d = difference), 
+       aes(x = d)) + 
+  theme_minimal() + 
+  geom_histogram(color = 'black', fill = 'lightgrey', bins = 30) + 
+  geom_vline(xintercept = 0, color = "red", linewidth = 1, linetype = "dashed") + 
+  labs(title = "Distribution of differences in Urban vs Rural \ncounty relative frequencies of higher death rates", 
+       x = "Urban minus Rural Difference", 
+       y = "Count") 
+# take the difference and plot the distribution 
+```
+
+
+* New chance: `r round(length(which(theta_urban - theta_rural > 0))/10000, 4)*100`%
+
+* Estimated Difference: `r mean(theta_urban - theta_rural) %>% round(., 2)`
+
+* Estimated SD of distribution: `r sd(theta_urban - theta_rural) %>% round(., 2)`
+
+
+**Increasing A, B to 200, 200** for 4-A
+```{r}
+
+# non-informative prior with parameters a = 1, b = 1
+set.seed(123)
+a = 200
+b = 200
+# Preliminary work with the data 
+
+tab=read.table('Instructor Example Code/Data/PA_HD_1988_35-54.txt',sep='\t',
+               header=TRUE,
+               stringsAsFactors=FALSE)
+
+# subset just the total rows so that we can compare rural vs urban counties 
+tab=tab[tab$Notes=='Total',]
+
+# There are 67 total counties - remove a row that contains total PA data
+tab <- tab[!is.na(tab$County.Code), ]
+
+# define flag for analysis 
+tab$Urban = ifelse(tab$Population > 20000, "Yes", "No")
+     
+# In Instructor code Nr = number of races = 2, we have number of ubran/rural classes = 2 
+N_classes = length(unique(tab$Urban)) 
+# In Instructor code Ns = number of counties = 67, we have the same number
+N_counties = nrow(tab)
+
+# state wide average mortality rate 
+with(tab, sum(Deaths)/sum(Population)) -> state_wide_rate
+
+# calculate county specific death rate, and evalaute if it higher or lower than the state-wide average 
+
+tab <- 
+  tab %>% 
+  mutate(
+    state_death_rate = Deaths/Population, 
+    over_flag = ifelse(state_death_rate > state_wide_rate, 1, 0)
+  )
+
+# now we need to get the number of counties by class where we have the rate that is higher than the statewide average 
+tab %>% 
+  group_by(Urban) %>% 
+  summarise(n = n(), 
+            outcome = sum(over_flag), 
+            outcome_rate = sum(over_flag)/n()) -> summary_data 
+
+# now using data estimates of N and Outcomes, sample from non-informative prior beta distribution 
+ns = summary_data %>% select(n) %>% unlist() # order: Rural, Urban 
+ys = summary_data %>% select(outcome) %>% unlist() # same ordering appleis to this vector 
+
+# these are posterior distributions of proportion or the relative frequency of counties with death rate higher than the state-
+# wide mortality rate 
+theta_rural = rbeta(10000, shape1 =  ys[1] + a, # this one is ALPHA parameter 
+                    shape2 = ns[1] - ys[1] + b # this one is BETA 
+                      )
+
+theta_urban = rbeta(10000, shape1 =  ys[2] + a, # this one is ALPHA parameter 
+                    shape2 = ns[2] - ys[2] + b # this one is BETA 
+                      )
+difference = theta_urban - theta_rural
+
+ggplot(data = data.frame(d = difference), 
+       aes(x = d)) + 
+  theme_minimal() + 
+  geom_histogram(color = 'black', fill = 'lightgrey', bins = 30) + 
+  geom_vline(xintercept = 0, color = "red", linewidth = 1, linetype = "dashed") + 
+  labs(title = "Distribution of differences in Urban vs Rural \ncounty relative frequencies of higher death rates", 
+       x = "Urban minus Rural Difference", 
+       y = "Count") 
+# take the difference and plot the distribution 
+```
+
+
+* New chance: `r round(length(which(theta_urban - theta_rural > 0))/10000, 4)*100`%
+
+* Estimated Difference: `r mean(theta_urban - theta_rural) %>% round(., 2)`
+
+* Estimated SD of distribution: `r sd(theta_urban - theta_rural) %>% round(., 2)`

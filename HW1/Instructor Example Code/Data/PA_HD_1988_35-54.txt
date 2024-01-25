@@ -1,0 +1,203 @@
+"Notes"	"County"	"County Code"	"Race"	"Race Code"	Deaths	Population	Crude Rate
+	"Adams County, PA"	"42001"	"Black or African American"	"2054-5"	0	114	0.0 (Unreliable)
+	"Adams County, PA"	"42001"	"White"	"2106-3"	10	8827	113.3 (Unreliable)
+"Total"	"Adams County, PA"	"42001"			10	8941	111.8 (Unreliable)
+	"Allegheny County, PA"	"42003"	"Black or African American"	"2054-5"	40	13463	297.1
+	"Allegheny County, PA"	"42003"	"White"	"2106-3"	165	136051	121.3
+"Total"	"Allegheny County, PA"	"42003"			205	149514	137.1
+	"Armstrong County, PA"	"42005"	"Black or African American"	"2054-5"	0	64	0.0 (Unreliable)
+	"Armstrong County, PA"	"42005"	"White"	"2106-3"	12	8485	141.4 (Unreliable)
+"Total"	"Armstrong County, PA"	"42005"			12	8549	140.4 (Unreliable)
+	"Beaver County, PA"	"42007"	"Black or African American"	"2054-5"	1	918	108.9 (Unreliable)
+	"Beaver County, PA"	"42007"	"White"	"2106-3"	23	20308	113.3
+"Total"	"Beaver County, PA"	"42007"			24	21226	113.1
+	"Bedford County, PA"	"42009"	"Black or African American"	"2054-5"	0	18	0.0 (Unreliable)
+	"Bedford County, PA"	"42009"	"White"	"2106-3"	7	5621	124.5 (Unreliable)
+"Total"	"Bedford County, PA"	"42009"			7	5639	124.1 (Unreliable)
+	"Berks County, PA"	"42011"	"Black or African American"	"2054-5"	2	1028	194.6 (Unreliable)
+	"Berks County, PA"	"42011"	"White"	"2106-3"	20	37476	53.4
+"Total"	"Berks County, PA"	"42011"			22	38504	57.1
+	"Blair County, PA"	"42013"	"Black or African American"	"2054-5"	1	112	892.9 (Unreliable)
+	"Blair County, PA"	"42013"	"White"	"2106-3"	18	14659	122.8 (Unreliable)
+"Total"	"Blair County, PA"	"42013"			19	14771	128.6 (Unreliable)
+	"Bradford County, PA"	"42015"	"Black or African American"	"2054-5"	0	18	0.0 (Unreliable)
+	"Bradford County, PA"	"42015"	"White"	"2106-3"	9	7273	123.7 (Unreliable)
+"Total"	"Bradford County, PA"	"42015"			9	7291	123.4 (Unreliable)
+	"Bucks County, PA"	"42017"	"Black or African American"	"2054-5"	4	1568	255.1 (Unreliable)
+	"Bucks County, PA"	"42017"	"White"	"2106-3"	53	67518	78.5
+"Total"	"Bucks County, PA"	"42017"			57	69086	82.5
+	"Butler County, PA"	"42019"	"Black or African American"	"2054-5"	0	94	0.0 (Unreliable)
+	"Butler County, PA"	"42019"	"White"	"2106-3"	23	18111	127.0
+"Total"	"Butler County, PA"	"42019"			23	18205	126.3
+	"Cambria County, PA"	"42021"	"Black or African American"	"2054-5"	1	446	224.2 (Unreliable)
+	"Cambria County, PA"	"42021"	"White"	"2106-3"	20	18225	109.7
+"Total"	"Cambria County, PA"	"42021"			21	18671	112.5
+	"Cameron County, PA"	"42023"	"Black or African American"	"2054-5"	0	0	0.0 (Unreliable)
+	"Cameron County, PA"	"42023"	"White"	"2106-3"	0	689	0.0 (Unreliable)
+"Total"	"Cameron County, PA"	"42023"			0	689	0.0 (Unreliable)
+	"Carbon County, PA"	"42025"	"Black or African American"	"2054-5"	0	8	0.0 (Unreliable)
+	"Carbon County, PA"	"42025"	"White"	"2106-3"	10	6324	158.1 (Unreliable)
+"Total"	"Carbon County, PA"	"42025"			10	6332	157.9 (Unreliable)
+	"Centre County, PA"	"42027"	"Black or African American"	"2054-5"	1	241	414.9 (Unreliable)
+	"Centre County, PA"	"42027"	"White"	"2106-3"	11	11521	95.5 (Unreliable)
+"Total"	"Centre County, PA"	"42027"			12	11762	102.0 (Unreliable)
+	"Chester County, PA"	"42029"	"Black or African American"	"2054-5"	3	2514	119.3 (Unreliable)
+	"Chester County, PA"	"42029"	"White"	"2106-3"	26	46104	56.4
+"Total"	"Chester County, PA"	"42029"			29	48618	59.6
+	"Clarion County, PA"	"42031"	"Black or African American"	"2054-5"	0	13	0.0 (Unreliable)
+	"Clarion County, PA"	"42031"	"White"	"2106-3"	5	4530	110.4 (Unreliable)
+"Total"	"Clarion County, PA"	"42031"			5	4543	110.1 (Unreliable)
+	"Clearfield County, PA"	"42033"	"Black or African American"	"2054-5"	0	13	0.0 (Unreliable)
+	"Clearfield County, PA"	"42033"	"White"	"2106-3"	8	9012	88.8 (Unreliable)
+"Total"	"Clearfield County, PA"	"42033"			8	9025	88.6 (Unreliable)
+	"Clinton County, PA"	"42035"	"Black or African American"	"2054-5"	0	4	0.0 (Unreliable)
+	"Clinton County, PA"	"42035"	"White"	"2106-3"	7	4078	171.7 (Unreliable)
+"Total"	"Clinton County, PA"	"42035"			7	4082	171.5 (Unreliable)
+	"Columbia County, PA"	"42037"	"Black or African American"	"2054-5"	0	21	0.0 (Unreliable)
+	"Columbia County, PA"	"42037"	"White"	"2106-3"	18	6841	263.1 (Unreliable)
+"Total"	"Columbia County, PA"	"42037"			18	6862	262.3 (Unreliable)
+	"Crawford County, PA"	"42039"	"Black or African American"	"2054-5"	0	96	0.0 (Unreliable)
+	"Crawford County, PA"	"42039"	"White"	"2106-3"	11	9837	111.8 (Unreliable)
+"Total"	"Crawford County, PA"	"42039"			11	9933	110.7 (Unreliable)
+	"Cumberland County, PA"	"42041"	"Black or African American"	"2054-5"	1	355	281.7 (Unreliable)
+	"Cumberland County, PA"	"42041"	"White"	"2106-3"	21	23241	90.4
+"Total"	"Cumberland County, PA"	"42041"			22	23596	93.2
+	"Dauphin County, PA"	"42043"	"Black or African American"	"2054-5"	7	3481	201.1 (Unreliable)
+	"Dauphin County, PA"	"42043"	"White"	"2106-3"	24	24559	97.7
+"Total"	"Dauphin County, PA"	"42043"			31	28040	110.6
+	"Delaware County, PA"	"42045"	"Black or African American"	"2054-5"	4	5472	73.1 (Unreliable)
+	"Delaware County, PA"	"42045"	"White"	"2106-3"	58	53491	108.4
+"Total"	"Delaware County, PA"	"42045"			62	58963	105.2
+	"Elk County, PA"	"42047"	"Black or African American"	"2054-5"	0	3	0.0 (Unreliable)
+	"Elk County, PA"	"42047"	"White"	"2106-3"	8	4109	194.7 (Unreliable)
+"Total"	"Elk County, PA"	"42047"			8	4112	194.6 (Unreliable)
+	"Erie County, PA"	"42049"	"Black or African American"	"2054-5"	3	1198	250.4 (Unreliable)
+	"Erie County, PA"	"42049"	"White"	"2106-3"	33	29302	112.6
+"Total"	"Erie County, PA"	"42049"			36	30500	118.0
+	"Fayette County, PA"	"42051"	"Black or African American"	"2054-5"	1	440	227.3 (Unreliable)
+	"Fayette County, PA"	"42051"	"White"	"2106-3"	28	16098	173.9
+"Total"	"Fayette County, PA"	"42051"			29	16538	175.4
+	"Forest County, PA"	"42053"	"Black or African American"	"2054-5"	0	0	0.0 (Unreliable)
+	"Forest County, PA"	"42053"	"White"	"2106-3"	0	554	0.0 (Unreliable)
+"Total"	"Forest County, PA"	"42053"			0	554	0.0 (Unreliable)
+	"Franklin County, PA"	"42055"	"Black or African American"	"2054-5"	0	329	0.0 (Unreliable)
+	"Franklin County, PA"	"42055"	"White"	"2106-3"	9	14143	63.6 (Unreliable)
+"Total"	"Franklin County, PA"	"42055"			9	14472	62.2 (Unreliable)
+	"Fulton County, PA"	"42057"	"Black or African American"	"2054-5"	0	9	0.0 (Unreliable)
+	"Fulton County, PA"	"42057"	"White"	"2106-3"	0	1629	0.0 (Unreliable)
+"Total"	"Fulton County, PA"	"42057"			0	1638	0.0 (Unreliable)
+	"Greene County, PA"	"42059"	"Black or African American"	"2054-5"	0	26	0.0 (Unreliable)
+	"Greene County, PA"	"42059"	"White"	"2106-3"	2	4537	44.1 (Unreliable)
+"Total"	"Greene County, PA"	"42059"			2	4563	43.8 (Unreliable)
+	"Huntingdon County, PA"	"42061"	"Black or African American"	"2054-5"	0	469	0.0 (Unreliable)
+	"Huntingdon County, PA"	"42061"	"White"	"2106-3"	2	5284	37.9 (Unreliable)
+"Total"	"Huntingdon County, PA"	"42061"			2	5753	34.8 (Unreliable)
+	"Indiana County, PA"	"42063"	"Black or African American"	"2054-5"	1	79	1265.8 (Unreliable)
+	"Indiana County, PA"	"42063"	"White"	"2106-3"	6	9704	61.8 (Unreliable)
+"Total"	"Indiana County, PA"	"42063"			7	9783	71.6 (Unreliable)
+	"Jefferson County, PA"	"42065"	"Black or African American"	"2054-5"	0	7	0.0 (Unreliable)
+	"Jefferson County, PA"	"42065"	"White"	"2106-3"	7	5221	134.1 (Unreliable)
+"Total"	"Jefferson County, PA"	"42065"			7	5228	133.9 (Unreliable)
+	"Juniata County, PA"	"42067"	"Black or African American"	"2054-5"	0	1	0.0 (Unreliable)
+	"Juniata County, PA"	"42067"	"White"	"2106-3"	4	2468	162.1 (Unreliable)
+"Total"	"Juniata County, PA"	"42067"			4	2469	162.0 (Unreliable)
+	"Lackawanna County, PA"	"42069"	"Black or African American"	"2054-5"	1	141	709.2 (Unreliable)
+	"Lackawanna County, PA"	"42069"	"White"	"2106-3"	38	23936	158.8
+"Total"	"Lackawanna County, PA"	"42069"			39	24077	162.0
+	"Lancaster County, PA"	"42071"	"Black or African American"	"2054-5"	2	1016	196.9 (Unreliable)
+	"Lancaster County, PA"	"42071"	"White"	"2106-3"	45	46146	97.5
+"Total"	"Lancaster County, PA"	"42071"			47	47162	99.7
+	"Lawrence County, PA"	"42073"	"Black or African American"	"2054-5"	1	246	406.5 (Unreliable)
+	"Lawrence County, PA"	"42073"	"White"	"2106-3"	15	10522	142.6 (Unreliable)
+"Total"	"Lawrence County, PA"	"42073"			16	10768	148.6 (Unreliable)
+	"Lebanon County, PA"	"42075"	"Black or African American"	"2054-5"	0	112	0.0 (Unreliable)
+	"Lebanon County, PA"	"42075"	"White"	"2106-3"	23	13492	170.5
+"Total"	"Lebanon County, PA"	"42075"			23	13604	169.1
+	"Lehigh County, PA"	"42077"	"Black or African American"	"2054-5"	0	744	0.0 (Unreliable)
+	"Lehigh County, PA"	"42077"	"White"	"2106-3"	34	33641	101.1
+"Total"	"Lehigh County, PA"	"42077"			34	34385	98.9
+	"Luzerne County, PA"	"42079"	"Black or African American"	"2054-5"	0	622	0.0 (Unreliable)
+	"Luzerne County, PA"	"42079"	"White"	"2106-3"	63	36596	172.1
+"Total"	"Luzerne County, PA"	"42079"			63	37218	169.3
+	"Lycoming County, PA"	"42081"	"Black or African American"	"2054-5"	0	282	0.0 (Unreliable)
+	"Lycoming County, PA"	"42081"	"White"	"2106-3"	21	13419	156.5
+"Total"	"Lycoming County, PA"	"42081"			21	13701	153.3
+	"Mc Kean County, PA"	"42083"	"Black or African American"	"2054-5"	0	131	0.0 (Unreliable)
+	"Mc Kean County, PA"	"42083"	"White"	"2106-3"	8	5397	148.2 (Unreliable)
+"Total"	"Mc Kean County, PA"	"42083"			8	5528	144.7 (Unreliable)
+	"Mercer County, PA"	"42085"	"Black or African American"	"2054-5"	2	544	367.6 (Unreliable)
+	"Mercer County, PA"	"42085"	"White"	"2106-3"	25	13109	190.7
+"Total"	"Mercer County, PA"	"42085"			27	13653	197.8
+	"Mifflin County, PA"	"42087"	"Black or African American"	"2054-5"	0	17	0.0 (Unreliable)
+	"Mifflin County, PA"	"42087"	"White"	"2106-3"	6	5348	112.2 (Unreliable)
+"Total"	"Mifflin County, PA"	"42087"			6	5365	111.8 (Unreliable)
+	"Monroe County, PA"	"42089"	"Black or African American"	"2054-5"	0	213	0.0 (Unreliable)
+	"Monroe County, PA"	"42089"	"White"	"2106-3"	7	10666	65.6 (Unreliable)
+"Total"	"Monroe County, PA"	"42089"			7	10879	64.3 (Unreliable)
+	"Montgomery County, PA"	"42091"	"Black or African American"	"2054-5"	4	4973	80.4 (Unreliable)
+	"Montgomery County, PA"	"42091"	"White"	"2106-3"	72	75981	94.8
+"Total"	"Montgomery County, PA"	"42091"			76	80954	93.9
+	"Montour County, PA"	"42093"	"Black or African American"	"2054-5"	0	6	0.0 (Unreliable)
+	"Montour County, PA"	"42093"	"White"	"2106-3"	4	1983	201.7 (Unreliable)
+"Total"	"Montour County, PA"	"42093"			4	1989	201.1 (Unreliable)
+	"Northampton County, PA"	"42095"	"Black or African American"	"2054-5"	0	554	0.0 (Unreliable)
+	"Northampton County, PA"	"42095"	"White"	"2106-3"	27	28231	95.6
+"Total"	"Northampton County, PA"	"42095"			27	28785	93.8
+	"Northumberland County, PA"	"42097"	"Black or African American"	"2054-5"	0	43	0.0 (Unreliable)
+	"Northumberland County, PA"	"42097"	"White"	"2106-3"	17	11205	151.7 (Unreliable)
+"Total"	"Northumberland County, PA"	"42097"			17	11248	151.1 (Unreliable)
+	"Perry County, PA"	"42099"	"Black or African American"	"2054-5"	0	7	0.0 (Unreliable)
+	"Perry County, PA"	"42099"	"White"	"2106-3"	7	5270	132.8 (Unreliable)
+"Total"	"Perry County, PA"	"42099"			7	5277	132.7 (Unreliable)
+	"Philadelphia County, PA"	"42101"	"Black or African American"	"2054-5"	136	61687	220.5
+	"Philadelphia County, PA"	"42101"	"White"	"2106-3"	155	96797	160.1
+"Total"	"Philadelphia County, PA"	"42101"			291	158484	183.6
+	"Pike County, PA"	"42103"	"Black or African American"	"2054-5"	0	35	0.0 (Unreliable)
+	"Pike County, PA"	"42103"	"White"	"2106-3"	4	2888	138.5 (Unreliable)
+"Total"	"Pike County, PA"	"42103"			4	2923	136.8 (Unreliable)
+	"Potter County, PA"	"42105"	"Black or African American"	"2054-5"	0	1	0.0 (Unreliable)
+	"Potter County, PA"	"42105"	"White"	"2106-3"	2	1945	102.8 (Unreliable)
+"Total"	"Potter County, PA"	"42105"			2	1946	102.8 (Unreliable)
+	"Schuylkill County, PA"	"42107"	"Black or African American"	"2054-5"	0	155	0.0 (Unreliable)
+	"Schuylkill County, PA"	"42107"	"White"	"2106-3"	22	17233	127.7
+"Total"	"Schuylkill County, PA"	"42107"			22	17388	126.5
+	"Snyder County, PA"	"42109"	"Black or African American"	"2054-5"	0	32	0.0 (Unreliable)
+	"Snyder County, PA"	"42109"	"White"	"2106-3"	8	4172	191.8 (Unreliable)
+"Total"	"Snyder County, PA"	"42109"			8	4204	190.3 (Unreliable)
+	"Somerset County, PA"	"42111"	"Black or African American"	"2054-5"	0	15	0.0 (Unreliable)
+	"Somerset County, PA"	"42111"	"White"	"2106-3"	16	9222	173.5 (Unreliable)
+"Total"	"Somerset County, PA"	"42111"			16	9237	173.2 (Unreliable)
+	"Sullivan County, PA"	"42113"	"Black or African American"	"2054-5"	0	1	0.0 (Unreliable)
+	"Sullivan County, PA"	"42113"	"White"	"2106-3"	2	621	322.1 (Unreliable)
+"Total"	"Sullivan County, PA"	"42113"			2	622	321.5 (Unreliable)
+	"Susquehanna County, PA"	"42115"	"Black or African American"	"2054-5"	0	11	0.0 (Unreliable)
+	"Susquehanna County, PA"	"42115"	"White"	"2106-3"	9	4864	185.0 (Unreliable)
+"Total"	"Susquehanna County, PA"	"42115"			9	4875	184.6 (Unreliable)
+	"Tioga County, PA"	"42117"	"Black or African American"	"2054-5"	0	9	0.0 (Unreliable)
+	"Tioga County, PA"	"42117"	"White"	"2106-3"	7	4627	151.3 (Unreliable)
+"Total"	"Tioga County, PA"	"42117"			7	4636	151.0 (Unreliable)
+	"Union County, PA"	"42119"	"Black or African American"	"2054-5"	0	383	0.0 (Unreliable)
+	"Union County, PA"	"42119"	"White"	"2106-3"	4	4175	95.8 (Unreliable)
+"Total"	"Union County, PA"	"42119"			4	4558	87.8 (Unreliable)
+	"Venango County, PA"	"42121"	"Black or African American"	"2054-5"	0	53	0.0 (Unreliable)
+	"Venango County, PA"	"42121"	"White"	"2106-3"	7	7180	97.5 (Unreliable)
+"Total"	"Venango County, PA"	"42121"			7	7233	96.8 (Unreliable)
+	"Warren County, PA"	"42123"	"Black or African American"	"2054-5"	0	12	0.0 (Unreliable)
+	"Warren County, PA"	"42123"	"White"	"2106-3"	7	5540	126.4 (Unreliable)
+"Total"	"Warren County, PA"	"42123"			7	5552	126.1 (Unreliable)
+	"Washington County, PA"	"42125"	"Black or African American"	"2054-5"	2	676	295.9 (Unreliable)
+	"Washington County, PA"	"42125"	"White"	"2106-3"	39	23696	164.6
+"Total"	"Washington County, PA"	"42125"			41	24372	168.2
+	"Wayne County, PA"	"42127"	"Black or African American"	"2054-5"	0	56	0.0 (Unreliable)
+	"Wayne County, PA"	"42127"	"White"	"2106-3"	6	4562	131.5 (Unreliable)
+"Total"	"Wayne County, PA"	"42127"			6	4618	129.9 (Unreliable)
+	"Westmoreland County, PA"	"42129"	"Black or African American"	"2054-5"	0	742	0.0 (Unreliable)
+	"Westmoreland County, PA"	"42129"	"White"	"2106-3"	54	44256	122.0
+"Total"	"Westmoreland County, PA"	"42129"			54	44998	120.0
+	"Wyoming County, PA"	"42131"	"Black or African American"	"2054-5"	0	7	0.0 (Unreliable)
+	"Wyoming County, PA"	"42131"	"White"	"2106-3"	4	3490	114.6 (Unreliable)
+"Total"	"Wyoming County, PA"	"42131"			4	3497	114.4 (Unreliable)
+	"York County, PA"	"42133"	"Black or African American"	"2054-5"	1	1094	91.4 (Unreliable)
+	"York County, PA"	"42133"	"White"	"2106-3"	35	40986	85.4
+"Total"	"York County, PA"	"42133"			36	42080	85.6
+"Total"					1670	1354268	123.3
