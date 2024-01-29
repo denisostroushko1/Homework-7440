@@ -16,7 +16,18 @@ options(scipen = 99999,
 
 # Problem 1
 
+### 1 - A 
 
+According to a naive Google search, the chance of winning a lottery is about 1 in 300,000,000. We will use this as a prior 
+chance of winning the lottery. We are playing the lottery for the first time, so we do not have data to make a guess about a 
+chance of winning the lottery that is specific to us. But, if you are *feeling lucky*, you might say that if you were to play the lottery, then the chance of winning for you could be about 1 in 100,000,000. This means that the chance of winning the lottery on the fist try for someone who is feeling lucky and plays the lottery for the first time is between 1 in 100,000,000 and 1 in 300,000,000. 
+
+### 1 - B 
+
+Suppose that you are a good team that made it to the world series and won 65% of games through the regular season and the play-offs. But, suppose that you play the first game away, and the chance of winning such a game historically has been 45%. 
+
+This means that for such a team the chance of winning the first game in the world series will be somehwere between 
+45% and 65%. 
 
 # Problem 2
 
@@ -28,7 +39,7 @@ And the distribution of data, random variable $Y$ is also normal, $\Large y| \th
 
 Using given derivation of posterior distribution, we obtain the distribution of $\theta$ given the observed values of data $y$. 
 
-Going forward, we fix $y$ = 4, we let $\large B = \frac{2}{2+2} = \frac{1}{2}$. 
+Going forward, we fix $y$ = 4, we let $\large B = \frac{2}{2+2} = \frac{1}{2}$. Then, 
 $\Large \theta|y$ ~ $\Large N(B \times \mu + (1-B) \times y, (1-B) \times \sigma^2) = N(\frac{1}{2} \times 0 + \frac{1}{2} \times 4, \frac{1}{2} \times 2) = N(2, 1)$. 
 
 So, $\Large \theta|y$ ~ $N(2, 1)$
@@ -36,11 +47,17 @@ So, $\Large \theta|y$ ~ $N(2, 1)$
 To plot likelihood of observing $y$= 4, I will use the distribution of data $y|\theta$, I will vary the value of $\theta$ and keep variance of $Y$ fixed at 2. 
 Since $\theta$ is centered at 0 with variance 2, I will obtain values that correspond to prior distribution of $\theta$
 
+Desired plots for prior, likelihood, and posterior are shown in @fig-2-a
+
 ```{r prior likelihood and posterior plot for 2-a}
+#| label: fig-2-a
+#| fig-cap: "Plots for problem 2-A"
 
 # prior density save data 
 
-prior_x = seq(from = 0 - 2*3, to = 0+2*3, by = 0.1)
+scope = 6
+
+prior_x = seq(from = 0 - 2*scope, to = 0+2*scope, by = 0.1)
 dnorm(
   x = prior_x, 
   mean = 0, 
@@ -48,7 +65,7 @@ dnorm(
 ) -> prior_plot_data 
 
 # posterior 
-post_x = seq(from = 2 - 3*1, to = 2+3*1, by = 0.1)
+post_x = seq(from = 2 - scope*1, to = 2+scope*1, by = 0.1)
 dnorm(
   x = post_x, 
   mean = 2, 
@@ -57,7 +74,7 @@ dnorm(
 
 # likelihood of Y given different parameters of Theta 
 y = 4 
-means = seq(from = 4 - 2*3, to = 4+2*3, by = 0.1)
+means = seq(from = 4 - 2*scope, to = 4+2*scope, by = 0.1)
 likelihood_y = dnorm(x = y, mean = means, sd = sqrt(2))
 
 # plotting data 
@@ -92,13 +109,16 @@ $\Large y|\theta$ ~ $N(\theta, 2)$
 
 Assuming $y$= 4, $\Large \theta|y$ ~ $N(0.1 * 0 + 0.9 * y, 0.9 * 2) = N(3.6, 1.8)$
 
-Prior, marginal likelihood, and posterior distributions take on these shapes: 
+Prior, marginal likelihood, and posterior distributions take on different shapes, given in @fig-2-b
 
 ```{r prior likelihood and posterior plot for 2-b}
+#| label: fig-2-b
+#| fig-cap: "Plots for problem 2-B"
+
 
 # prior density save data 
 
-prior_x = seq(from = 0 - sqrt(18)*3, to = 0+sqrt(18)*3, by = 0.1)
+prior_x = seq(from = 0 - sqrt(18)*scope, to = 0+sqrt(18)*scope, by = 0.1)
 dnorm(
   x = prior_x, 
   mean = 0, 
@@ -106,7 +126,7 @@ dnorm(
 ) -> prior_plot_data 
 
 # posterior 
-post_x = seq(from = 3.6 - 10*sqrt(1.8), to = 3.6 + 10*sqrt(1.8), by = 0.1)
+post_x = seq(from = 3.6 - scope*sqrt(1.8), to = 3.6 + scope*sqrt(1.8), by = 0.1)
 dnorm(
   x = post_x, 
   mean = 3.6, 
@@ -115,7 +135,7 @@ dnorm(
 
 # likelihood of Y given different parameters of Theta 
 y = 4 
-means = seq(from = 4 - 2*3, to = 4+2*3, by = 0.1)
+means = seq(from = 4 - sqrt(18)*scope, to = 4+sqrt(18)*scope, by = 0.1)
 likelihood_y = dnorm(x = y, mean = means, sd = sqrt(2))
 
 # plotting data 
@@ -139,6 +159,16 @@ ggplot(data = plot_df,
   ) 
 
 ```
+
+The main difference from part A stems from the differences in prior distribution of $\theta$. Larger variance of the prior distribution makes our beliefs about possible values of $\theta$ less certain, or less informative. 
+
+@fig-2-a shows that the 'width' of prior and posterior distributions is similar. We can also see that the posterior distribution 
+is being 'pulled' towards the likelihood of observing $y$=4. I suspect that due to the higher amount of information contained in the prior distribution, we have an updated distribution of potential values of $\theta$, which still resembles prior. 
+
+On the other hand, @fig-2-b shows what happens if we set a less informative prior. Visually we can see that once we have observed the value $y=$4, this is our best guess now. I suspect, as we keep sampling values of $y$, we will have a distribution centered somewhere where the actual population mean for $Y$ would be. 
+
+Given this, I suspect that a frequencies statistician would prefer the method we used in part B, because the prior knowledge of 
+$\theta$ would not have a strong influence on the final analysis results after sampling more and more values of $Y$. 
 
 # Problem 3 
 
@@ -230,9 +260,11 @@ Among 10000 draws from estimated posterior distributions, there were `r length(w
 where the relative frequency of counties with higher than average mortality rate in the Urban class was higher than the 
 relative frequency of counties in the Rural class. This corresponds to the `r round(length(which(theta_urban - theta_rural > 0))/10000, 4)*100`% chance that the true rate of counties with higher than average mortality in the urban class is above that or 
 counties in the rural class. At the $\alpha = 0.05$ statistical significance level, we can conclude that the the rate of deaths in
-urban counties must be consistently lower
+urban counties must be consistently lower. Distribution of potential differences is shown on @fig-4-a.
 
 ```{r}
+#| label: fig-4-a
+#| fig-cap: "Problem 4-A supporting plot"
 
 # differnece in draws from posterior distributions 
 difference = theta_urban - theta_rural
@@ -280,14 +312,22 @@ differ=lambda_urban-lambda_rural
 
 ```
 
+For this problem, I used data driven approach. I estimated death rate for the entire state of PA from the data, and set it to 
+the deaths per 1,000 scale. 
+
 Among 10000 draws from estimated posterior distributions, there were `r length(which(lambda_urban - lambda_rural > 0))` cases 
 where the death rate per 1,000 people in the urban counties was higher than the death rate per 1,000 in the rural counties. 
-This corresponds to the `r round(length(which(lambda_urban - lambda_rural > 0))/10000, 4)*100`% chance that the true rate of deaths per 1,000 is higher in the urban counties is higher than that of rural counties. 
+This corresponds to the `r round(length(which(lambda_urban - lambda_rural > 0))/10000, 4)*100`% chance that the true rate of deaths
+per 1,000 is higher in the urban counties is higher than that of rural counties. 
 
 While this chance is higher than the traditional 5% frequentist cut off rate for the significance level, estimated chance is 
-still fairly slim. 
+still fairly slim. Distribution of differences supporting our decision is on @fig-4-b.
 
 ```{r}
+#| label: fig-4-b
+#| fig-cap: "Problem 4-B supporting plot"
+
+
 ggplot(data = data.frame(d = differ), 
        aes(x = d)) + 
   theme_minimal() + 
@@ -298,9 +338,22 @@ ggplot(data = data.frame(d = differ),
        y = "Count") 
 ```
 
+### 4 - C 
+
+The two analyses yield similar results. Both lead to the conclusion that the death rates associated with the heart disease are 
+lower in the urban counties when compared with the rural counties. 
+
+I think that analysis employed in part B is more appropriate, as it looks at the actual death rates, because this analysis reflects the reality more accurately. 
+
+While the binomial model tells us that there are less counties with less than average death rates in the urban category, 
+less extreme conclusions from the Poisson model tell us that those differences to the average death rate must be small. 
+
 \newpage 
 
 # Appendix 
+
+In this section I reproduce results from problem A with different priors. I want to see the impact of prior choice on the 
+analysis results. 
 
 **Increasing A, B to 12, 12** for 4-A
 
