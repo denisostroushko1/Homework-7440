@@ -22,4 +22,17 @@ Homework for Spring 2024 PUBH 7440 at the University of Minnesota.
   
 # HW3 
 
-* 
+* Statistical Concepts: 
+  + Gibbs sampling technique: impute suppressed values of small death counts for counties in PA and estimate posterior distribution of 
+    parameter $\lambda$ for poisson distribution 
+  + derivation of a full hierarchical model given data likelihood, prior distribution of the parameter, and model for suppressed/censored values of the data (which we need for the posterior distribution)
+  + interpretation of the prior and posterior parameters of poisson and gamma distributions 
+  
+* Implementation via R code: 
+  + iterative Gibbs sampling procedure for sampling suppressed/censored data and sampling parameters from the posterior distribution based 
+    on imputed data 
+  + mapping of age-adjusted death rates by county using `maps` objects 
+
+* Packages: 
+  + `maps`: update to `maptools`: easy framework for importing maps to R and plotting shapes/outlines 
+    - example contains map of PA counties

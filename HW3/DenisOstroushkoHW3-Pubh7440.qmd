@@ -10,6 +10,7 @@ execute:
 ```{r}
 library(tidyverse)
 library(sp)
+library(kableExtra)
 
 options(scipen = 99999, 
         knitr.kable.NA = '')
@@ -17,6 +18,9 @@ options(scipen = 99999,
 
 
 # Problem 1
+
+I am attaching a derivation of the conditional posterior distribution for $\large lambda_{i\alpha}$ at the end of the document as a 
+hand-written part. I am showing how I obtain a posterior gamma distribution based on the distribution of $Y_{i\alpha}$ and prior distribution of $\large \lambda_{i\alpha}$. Resulting distribution is $Gamma(Y_{0\alpha} + Y_{i\alpha}, n_{0\alpha} + n_{i\alpha})$. 
 
 # Problem 2 
 
@@ -31,6 +35,26 @@ This way we can control the value of total country population, and though $\pi_{
 
 # Problem 4 
 
+In order to impute missing/suppresed values of $Y_{i\alpha}$ we need to use a truncated left tail of a poisson distribution with 
+corresponding parameter $n_{i\alpha} \lambda_{i\alpha}$. We will set a maximum value at the tail equal to 10, meaning that for 
+our imputations we will be sampling integers from 0 to 10 from poisson distributions. In order to do that, we follow these steps: 
+
+1. For each county for each group age, determing a parameter for the poisson distribution, refer to it as $\Lambda_{i\alpha}$. 
+
+2. For each county for each age group, determine quantile corresponding to value of 10 under $\Lambda_{i\alpha}$, call this quantile $q$
+  - use `ppois()` to get this quantile 
+  
+3. Sample a number from a uniform distribution between 0 and $q$. This will be between 0 and some number less than or equal to 1 always. 
+  - use `runif(n=1, min = 0, max = .)`
+  
+4. Using inverse CDF of a poisson distribution with parameter $\Lambda_{i\alpha}$, obtain a value correspoding to a randomly sampled quantile 
+  - use `qpois()` for this step
+  
+5. Impute missing value with sampled values between 0 and 10. 
+
+6. Using imputed data, obtain posterior estiamtes on the number of death and population size and sample new rates from 
+ $Gamma(Y_{0\alpha} + Y_{i\alpha}, n_{0\alpha} + n_{i\alpha})$. 
+
 # Problem 5 
 
 We want to learn about the death rates in each county in each age group. Recall that $\large \lambda_{i\alpha}$ represents mortality 
@@ -43,11 +67,30 @@ In the framework of our analysis, we treat population size for age group $\alpha
 According to the *Problem \ 1* statement, the likelihood for observed data is $Y_{i\alpha}$~$Pois(n_{i\alpha}\lambda_{i\alpha})$, and 
 the prior distribution of the parameter of interest is $\lambda_{i\alpha}$~$Gamma(n_{0\alpha}, Y_{0\alpha})$. 
 
-So, $\large p(\lambda_{i\alpha} | Y_{i\alpha}, n_{i\alpha}, Y_{0\alpha}, n_{0\alpha}) \propto$
+Additionally, because of the suppressed data, we need to specify likelihood of these censored $Y$ values. 
+
+So, $\large p(\lambda_{i\alpha} | Y_{i\alpha}, n_{i\alpha}, Y_{0\alpha}, n_{0\alpha}) \propto \Pi_{observed \ death} Pois(n_{i\alpha}\lambda_{i\alpha}) \times \Pi_{suppresed \ death} F(10 | n_{i\alpha}\lambda_{i\alpha}) \times Gamma(Y_{0\alpha}, n_{0\alpha})$
 
 # Problem 6 
 
-```{r}
+Gibbs sampler outline: 
+
+1. Initiate $\lambda_{i\alpha}$ at 75, 250, 1000 deaths per 100,000 for each age group respectively 
+
+2. Set prior guess at the population size at each age group within each county with total $n_0 = 10,000$ and corresponding $\pi_{\alpha}$
+
+3. Set prior guess at the death number for each age group using using prior population size and prior death rate
+
+4. Begin Gibbs Sampling. I am using 10,000 iterations. 
+
+5. Impute the data: 
+  - at iteration 1, impute data using process described in *Problem 4* and prior guesses of $\lambda_{i\alpha}$
+  - at iterations 2, 3, $\dots$,10,000 use most recent sampled value of $\lambda_{i\alpha}$
+
+6. Using imputed (complete) data get parameters for posterior distribution of $\lambda_{i\alpha}$ and sample new values for the 
+  next iteration of gibbs sampling 
+
+```{r data preparation}
 
 stroke=read.table('2016_PA_stroke_total.txt',sep='\t',
                   stringsAsFactors=FALSE,header=TRUE)
@@ -81,11 +124,9 @@ stroke_clean$n_0 <- rep(global_age_proportions*n0, 67)
 
 ```
 
-```{r gibbs sampler }
+Code for execution of the sampler is given below. I wrote my own version of R code for this taks: 
 
-### figure out how to sample suppressed or censored values of Y 
-#### limit of detection here is 10 
-#### we need to find a CDF value of 10 under poisson distribution with a given parameter 
+```{r gibbs sampler , eval = F, echo=T}
 
 reps = 10000
 
@@ -93,10 +134,12 @@ results <- cbind(matrix(data = NA,
                         nrow = nrow(stroke_clean), 
                         ncol = reps), 
                  stroke_clean %>% select(county, age.group)
-                 )
+                 ) # empty matrix for results 
 
-results[,1] <- stroke_clean$lambda_0
+results[,1] <- stroke_clean$lambda_0 # itiate sampler with prior guesses of lambdas 
  
+set.seed(178921)
+
 for(i in 2:reps){
   
   if(i %% 1000 == 0){print(i)}
@@ -146,7 +189,7 @@ which(!is.na(stroke_clean$deaths))
 
 hist(check_res$difference, na.rm = T)
 
-C = 2
+C = 3
 
 plot_test_df <- data.frame(x = results[C,1000:10000] %>% unlist())
 
@@ -172,8 +215,6 @@ stoke_clean_f <-
       from_sim_median = apply(results %>% select(-age.group, -county), 1, median)
     ) 
   )
-
-head(stoke_clean_f)
 
 stoke_clean_f$age_specific_post <- stoke_clean_f$from_sim_median * stoke_clean_f$p_0
 stoke_clean_f$age_specific <- stoke_clean_f$ratio * stoke_clean_f$p_0
@@ -220,11 +261,13 @@ par(mar=c(0,0,0,10),cex=1)
 dev.off()
 ```
 
+@fig-map  is the resulting map
+
 ```{r include final map}
 #| label: fig-map 
 #| fig-cap: "Final Map of Rates"
 #| fig-align: left
-#| fig-width: 12
+#| fig-width: 11
 #| fig-height: 8
 
 
