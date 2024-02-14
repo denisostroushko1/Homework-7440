@@ -1,0 +1,233 @@
+---
+title: "Denis Ostroushko - PUBH 7440 - HW3"
+format: pdf
+execute: 
+  warning: false
+  message: false 
+  echo: false 
+---
+
+```{r}
+library(tidyverse)
+library(sp)
+
+options(scipen = 99999, 
+        knitr.kable.NA = '')
+```
+
+
+# Problem 1
+
+# Problem 2 
+
+In this version of the Gamma distribution parametrization, the mean is given by $\large \frac{\alpha}{\beta}$, or $\large \frac{Y_{0\alpha}}{n_{0\alpha}}$, which is the death rate we want to analyze. Therefore, the whole estimated Gamma distribution is 
+'centered' at the estimate death rate, and the distribution provides expected variation around the point estimate $\large \frac{Y_{0\alpha}}{n_{0\alpha}}$. 
+
+# Problem 3 
+
+This makes sense because we will preserve the distribution of age groups within a county which was observed in the data. 
+Death rate will be based on a proportional population for age group $\alpha$, according to values of parameter $\lambda_{0\alpha}$. 
+This way we can control the value of total country population, and though $\pi_{0\alpha}$ we control the number of people in each age group. 
+
+# Problem 4 
+
+# Problem 5 
+
+We want to learn about the death rates in each county in each age group. Recall that $\large \lambda_{i\alpha}$ represents mortality 
+rate associated with stroke in each county $i = 1, 2, \dots, 67$ in each age group $\alpha = 1, 2, 3$. In the Bayesian data analysis 
+framework, we want to obtain a posterior distribution of each parameter $\large \lambda_{i\alpha}$ given observed death rates, or 
+death counts (the data) $Y_{i\alpha}$ and population size corresponding to an age group in the county $i$. 
+
+In the framework of our analysis, we treat population size for age group $\alpha$ in county $i$ as a constant value. 
+
+According to the *Problem \ 1* statement, the likelihood for observed data is $Y_{i\alpha}$~$Pois(n_{i\alpha}\lambda_{i\alpha})$, and 
+the prior distribution of the parameter of interest is $\lambda_{i\alpha}$~$Gamma(n_{0\alpha}, Y_{0\alpha})$. 
+
+So, $\large p(\lambda_{i\alpha} | Y_{i\alpha}, n_{i\alpha}, Y_{0\alpha}, n_{0\alpha}) \propto$
+
+# Problem 6 
+
+```{r}
+
+stroke=read.table('2016_PA_stroke_total.txt',sep='\t',
+                  stringsAsFactors=FALSE,header=TRUE)
+
+stroke_clean <- 
+  stroke %>% 
+  select(County, Age.Group, Deaths, Population, Crude.Rate) %>% 
+  {colnames(.) <- tolower(colnames(.)); 
+  . # pass back the data frame with nice column names 
+  } %>% 
+  rename(crude.rate.100k = crude.rate)
+
+stroke_clean$ratio <- with(stroke_clean, deaths/population)
+## let n_0 for prior population size be 1000
+n0 = 10000
+
+stroke_clean %>% 
+  group_by(age.group) %>% 
+  summarise(n_in_group = sum(population)) %>% 
+  ungroup() %>% 
+  mutate(p_in_group = n_in_group/sum(n_in_group)) %>% 
+  select(p_in_group) %>% 
+  unlist() -> global_age_proportions
+
+
+lam0=c(75,250,1000)/100000 ## these are 
+
+stroke_clean$lambda_0 <- rep(lam0, 67)
+stroke_clean$p_0 <- rep(global_age_proportions, 67)
+stroke_clean$n_0 <- rep(global_age_proportions*n0, 67)
+
+```
+
+```{r gibbs sampler }
+
+### figure out how to sample suppressed or censored values of Y 
+#### limit of detection here is 10 
+#### we need to find a CDF value of 10 under poisson distribution with a given parameter 
+
+reps = 10000
+
+results <- cbind(matrix(data = NA, 
+                        nrow = nrow(stroke_clean), 
+                        ncol = reps), 
+                 stroke_clean %>% select(county, age.group)
+                 )
+
+results[,1] <- stroke_clean$lambda_0
+ 
+for(i in 2:reps){
+  
+  if(i %% 1000 == 0){print(i)}
+  # impute missing values of Y using inverse CDF approach 
+    # use previous estimates of lambda parameters to get rate for the poisson distribution 
+    results[,(i-1)] * stroke_clean$population -> poisson_lambdas_iter
+    
+    ppois(10, poisson_lambdas_iter) -> limits_detection_iter
+    
+    # using these numbers between 0 and somewhere less than 1, sample from uniform distribution 
+    runif(n = length(limits_detection_iter), min = 0, max = limits_detection_iter) -> sampled_u 
+    
+    # get imputed values by putting unifrom random samples into 'inverse' CDF 
+    qpois(sampled_u, lambda = poisson_lambdas_iter) -> imp 
+    
+    # get final imputed vector of the observed data 
+    stroke_clean$deaths -> final_ys_iter
+    final_ys_iter[which(is.na(final_ys_iter))] <- imp[which(is.na(final_ys_iter))]
+    
+  # now work with prior n0 Y0 and observed n_ia Y_ia to get samples for parameters lambda 
+    
+    pop = stroke_clean$population
+    
+    rgamma(n = nrow(stroke_clean), 
+    #       shape = final_ys_iter + results[,(i-1)]*pop,  # old version 
+           shape = final_ys_iter + with(stroke_clean, lambda_0 * n_0), 
+           scale = 1/with(stroke_clean, population + n_0)
+           ) -> results[,i]
+}
+
+write_rds(results, "gibbs results.rds")
+
+```
+
+```{r test out the resutls, eval = F }
+
+data.frame(
+  from_data = stroke_clean$ratio, 
+  from_sim_mean =   apply(results %>% select(-age.group, -county), 1, mean), 
+  from_sim_median = apply(results %>% select(-age.group, -county), 1, median)
+) %>% 
+  mutate(difference = from_data - from_sim_mean) -> check_res
+
+summary(check_res$difference, na.rm = T)
+
+which(!is.na(stroke_clean$deaths))
+
+hist(check_res$difference, na.rm = T)
+
+C = 2
+
+plot_test_df <- data.frame(x = results[C,1000:10000] %>% unlist())
+
+ggplot(data = plot_test_df, 
+       aes(x = x)) + 
+  geom_histogram(color = "black", fill = "grey", bins = 100) + 
+  geom_vline(xintercept = stroke_clean$ratio[C])
+
+
+```
+
+# Problem 7 
+
+```{r import results back }
+
+results <- readRDS("gibbs results.rds")
+
+stoke_clean_f <- 
+  cbind(
+    stroke_clean, 
+    data.frame(
+      from_sim_mean =   apply(results %>% select(-age.group, -county), 1, mean), 
+      from_sim_median = apply(results %>% select(-age.group, -county), 1, median)
+    ) 
+  )
+
+head(stoke_clean_f)
+
+stoke_clean_f$age_specific_post <- stoke_clean_f$from_sim_median * stoke_clean_f$p_0
+stoke_clean_f$age_specific <- stoke_clean_f$ratio * stoke_clean_f$p_0
+
+stoke_clean_f %>% 
+  group_by(county) %>% 
+  summarise(
+    deaths = sum(deaths), 
+    population = sum(population), 
+    age_adjusted_rate = sum(age_specific) * 100000, 
+    age_adjusted_rate_post = sum(age_specific_post) * 100000
+  ) -> rates_data
+
+aa.med = rates_data$age_adjusted_rate_post / 100000
+
+```
+
+```{R for development purposes, eval = F}
+
+library(sp)
+library(maps)
+library(RColorBrewer)
+rd <- load('penn.rdata')
+#         penn
+
+Ns=67 
+ncols=7
+cols=brewer.pal(ncols,'RdYlBu')[ncols:1]
+tcuts=quantile(aa.med*100000,1:(ncols-1)/ncols)
+tcolb=array(rep(aa.med*100000,each=ncols-1) > tcuts,
+            dim=c(ncols-1,Ns))
+tcol =apply(tcolb,2,sum)+1
+
+png('PAmap.png',height=1200,width=1400)
+par(mar=c(0,0,0,10),cex=1)
+    plot(penn,col=cols[tcol],border='lightgray',lwd=.5)
+    legend('right',inset=c(-.15,0),xpd=TRUE,
+           legend=c(paste(
+           c('Below',round(tcuts[-(ncols-1)],0),'Over'),
+           c(' ',rep( ' - ',ncols-2),' '),
+           c(round(tcuts,0),round(tcuts[ncols-1],0)),sep='')),
+           fill=cols,title='Deaths per 100,000',bty='n',cex=1.5,
+           border='lightgray')
+dev.off()
+```
+
+```{r include final map}
+#| label: fig-map 
+#| fig-cap: "Final Map of Rates"
+#| fig-align: left
+#| fig-width: 12
+#| fig-height: 8
+
+
+knitr::include_graphics('PAmap.png')
+
+```

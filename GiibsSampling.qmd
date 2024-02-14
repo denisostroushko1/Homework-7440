@@ -1,0 +1,83 @@
+---
+title: "Denis Ostroushko - PUBH 7440 - HW1"
+format: pdf
+execute: 
+  warning: false
+  message: false 
+  echo: false 
+---
+
+```{r}
+library(tidyverse)
+
+options(scipen = 99999, 
+        knitr.kable.NA = '')
+```
+
+```{r}
+
+############
+#Get Data
+############
+set.seed(525)
+mu.true=0
+sig2.true=1
+n=30
+Y=rnorm(n,mu.true,sqrt(sig2.true)) # just get 30 random values 
+
+############
+#Set up priors
+############
+theta=0
+tau2=100000 #proper, but not very informative prior for mu
+
+a=0.001
+b=0.001  #common noninformative prior for sig2
+
+############
+#Initialize Gibbs Sampler
+############
+nits=10000
+mu=sig2=rep(NA,nits)
+mu[1]=10000 #mean(Y)    #seems like logical initial values      
+sig2[1]=200 #var(Y).    sigma 2 is a variance that governs distribution of Y values 
+
+#############
+#Gibbs Sampler
+#############
+for(it in 2:nits){
+  #########
+  #update mu
+  ########
+     # tau 2 always remains the same, 
+     # mean Y always remians the same 
+     # n reamins the same 
+     # theta is mean of prior 
+  
+      # so, mean gets updated with a value of previous sigma for Y | parameters 
+      # standard error for the mean gets updated with previous sigma as well 
+  
+  # note: mean gets calculated exactly 
+  mumean=(tau2*mean(Y) + sig2[it-1]/n * theta)/(tau2 + sig2[it-1]/n)
+  
+  # note, values of mu is randomly sampled from the normal distribution using updated mean and updated variance 
+  muvar =(tau2 * sig2[it-1]/n) / (tau2 + sig2[it-1]/n)
+  mu[it]=rnorm(1,mumean,sqrt(muvar))
+
+  #########
+  #update sig2
+  #########
+    # now we update sigma itself, it is sampled from the 
+  sig2[it]=1/rgamma(1,n/2+a,sum( (Y-mu[it])^2 )/2 + b)
+}
+
+burnin=1:100
+
+par(mfrow=c(2,3))
+plot(exp(mu[-burnin]),type='l'); abline(h=exp(mu.true),col=2)
+plot(exp(sqrt(sig2[-burnin])),type='l'); abline(h=exp(sqrt(sig2.true)),col=2)
+plot(exp(mu[-burnin]+sig2[-burnin]/2),type='l'); abline(h=exp(mu.true+sig2.true/2),col=2)
+hist(exp(mu[-burnin]),breaks=100,freq=FALSE)
+hist(exp(sqrt(sig2[-burnin])),breaks=100,freq=FALSE)
+hist(exp(mu[-burnin]+sig2[-burnin]/2),breaks=100,freq=FALSE)
+```

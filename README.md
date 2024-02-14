@@ -19,3 +19,7 @@ Homework for Spring 2024 PUBH 7440 at the University of Minnesota.
   
 * Packages: 
   + No new packages for Bayesian data analysis were introduced yet 
+  
+# HW3 
+
+* 
