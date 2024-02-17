@@ -1,0 +1,492 @@
+---
+title: "Gibbs Sampling Examples"
+format: html
+toc: true
+execute: 
+  echo: false 
+  warning: false 
+  message: false 
+---
+
+```{r}
+library(tidyverse)
+library(gganimate)
+library(magick)
+library(transformr)
+library(kableExtra)
+```
+
+# Introduction 
+
+# Estimating Mean and Variance of Normally Distributed Random Variables 
+
+Why use gibbs sampler 
+
+### Non-Informative priors for unknown parameters
+
+```{r}
+set.seed(525)
+mu.true=0 ## these are true parameters that we need to estimate using data Y 
+sig2.true=1
+
+n=30
+Y=rnorm(n = n,
+        mean = mu.true,
+        sd = sqrt(sig2.true)
+        )
+```
+
+
+**Estimates using classical Frequentist estimates:** 
+
+* Estimate for true $\mu = 0$ given by $\bar{X}$ = `r round(mean(Y), 4)`
+
+* For future comparison, for a sample size of size $n = 30$, $Var(\bar{X})$ = `r round(var(Y)/n, 4)`, yielding a standard error equal to 
+`r round(sqrt(var(Y)/n), 4)`
+
+* Estimate for true variance $\sigma^2 = 1$ given by $\bar{S^2}$ = `r round(var(Y), 4)`
+
+
+
+```{r gibbs sampler 1}
+############
+#Set up priors
+############
+theta=0
+tau2=100000 #proper, but not very informative prior for mu; we assume that mean is distributed around 
+  # zero, but with huge variance 
+  # variance is huge => prior is non informative 
+
+a=0.001
+b=0.001  #common noninformative prior for sig2, this will be some gamma 
+
+
+############
+#Initialize Gibbs Sampler
+############
+nits=10000 # will use 10,000 steps/iterations to get posterior distributions of Mean and Variance of Distribution wehre Y came from 
+
+mu=sig2=rep(NA,nits)
+
+### these are extremely wrong, but because the 
+### problem is relatively simple, so this does not matter in the end 
+
+## these are just our point estimate~guesses at what the true parameters are 
+mu[1]=10000 #mean(Y)    #seems like logical initial values      
+sig2[1]=200 #var(Y)
+
+
+############
+# this is the sampler now 
+
+for(it in 2:nits){
+  #########
+  #update mu
+  ########
+  mumean=(tau2*mean(Y) + sig2[it-1]/n * theta)/(tau2 + sig2[it-1]/n) # calculate updated mean of mu distribution 
+    # recall: mu is the mean of distribution that generated values of Y 
+    # but, in Bayes inference, we need to get distribution of MU - true mean of Y 
+    # we need to get distribution of values of MU 
+    # this parameter is the mean of distribution of MU 
+  
+    # how we calculated it?? we use proportional argument and derive by hand what 
+    # parameters distribution of mu must have 
+    # it depends of observed mean of Y, 
+    # prior assumed variance (standard error) of MU distribution,  
+    # prior assumed mean of MU distribution, 
+  
+    # most recent estimate of the variance of Y
+  
+  muvar =(tau2 * sig2[it-1]/n) / (tau2 + sig2[it-1]/n)
+    # now we need to estimate variance of distirbution of MU 
+    # again, it is expressed as some formula that we derived by hand 
+  
+  mu[it]=rnorm(1,mumean,sqrt(muvar))
+    # now using updated values of parameters of distribution of MU, get one value of MU, and save it 
+    # these values will eventually form posterior sampling distributions of MU, which we will do inference on 
+  
+  #########
+  #update sig2
+  #########
+  
+  # same idea, no reason to comment on this 
+  sig2[it]=1/rgamma(1,n/2+a,sum( (Y-mu[it])^2 )/2 + b)
+  
+  
+}
+
+burnin=1:100
+```
+
+```{r}
+mu_f <- mu[-burnin]
+sig2_f <- sig2[-burnin]
+```
+
+**Parameters for Bayesian inference:**
+
+* mean of $\mu$ is 0 
+
+* variance of $\mu$ is 10,000 
+
+* $\alpha$ = $\beta$ = 0.001 for $\sigma^2$
+
+**Estimates using Bayesian inference:**
+
+* Estimate for true $\mu = 0$ given by mean of estimated posterior distribution using 10,000 draws: `r round(mean(mu_f), 4)`
+
+* Standard error of the mean is the standard deviation of the posterior distribution: `r round(sd(mu_f), 4)`
+
+* Estimate for true variance $\sigma^2 = 1$ given by the mean of the posterior distribution for  $\sigma^2$, which is `r round(mean(sig2_f), 2)`
+
+
+```{r}
+#| label: fig-ex1
+#| fig-cap: "Black: Mean posterior; Blue: Mean prior; Red: Likelihood of observed data under estiamted parameters"
+
+
+ggplot(data = data.frame(x = mu_f), 
+       aes(x = x)) + 
+  theme_classic() + 
+  geom_density() + 
+  geom_density(data = data.frame(y = rnorm(n = 10000, mean = theta, sd = sqrt(tau2))),
+               aes(x = y), 
+               color = "blue") + 
+  geom_density(data = data.frame(y = Y),
+               aes(x = y), 
+               color = "red") + 
+  scale_x_continuous(limits = c(-2, 2))
+```
+
+
+### Slightly more informative priors 
+
+```{r gibbs sampler 2}
+############
+#Set up priors
+############
+theta=2
+tau2=1 #proper, but not very informative prior for mu; we assume that mean is distributed around 
+  # zero, but with huge variance 
+  # variance is huge => prior is non informative 
+
+a=200
+b=100  #common noninformative prior for sig2, this will be some gamma 
+
+
+############
+#Initialize Gibbs Sampler
+############
+nits=10000 # will use 10,000 steps/iterations to get posterior distributions of Mean and Variance of Distribution wehre Y came from 
+
+mu=sig2=rep(NA,nits)
+
+### these are extremely wrong, but because the 
+### problem is relatively simple, so this does not matter in the end 
+
+## these are just our point estimate~guesses at what the true parameters are 
+mu[1]=10000 #mean(Y)    #seems like logical initial values      
+sig2[1]=200 #var(Y)
+
+
+############
+# this is the sampler now 
+
+for(it in 2:nits){
+  #########
+  #update mu
+  ########
+  mumean=(tau2*mean(Y) + sig2[it-1]/n * theta)/(tau2 + sig2[it-1]/n) # calculate updated mean of mu distribution 
+    # recall: mu is the mean of distribution that generated values of Y 
+    # but, in Bayes inference, we need to get distribution of MU - true mean of Y 
+    # we need to get distribution of values of MU 
+    # this parameter is the mean of distribution of MU 
+  
+    # how we calculated it?? we use proportional argument and derive by hand what 
+    # parameters distribution of mu must have 
+    # it depends of observed mean of Y, 
+    # prior assumed variance (standard error) of MU distribution,  
+    # prior assumed mean of MU distribution, 
+  
+    # most recent estimate of the variance of Y
+  
+  muvar =(tau2 * sig2[it-1]/n) / (tau2 + sig2[it-1]/n)
+    # now we need to estimate variance of distirbution of MU 
+    # again, it is expressed as some formula that we derived by hand 
+  
+  mu[it]=rnorm(1,mumean,sqrt(muvar))
+    # now using updated values of parameters of distribution of MU, get one value of MU, and save it 
+    # these values will eventually form posterior sampling distributions of MU, which we will do inference on 
+  
+  #########
+  #update sig2
+  #########
+  
+  # same idea, no reason to comment on this 
+  sig2[it]=1/rgamma(1,n/2+a,sum( (Y-mu[it])^2 )/2 + b)
+  
+  
+}
+
+burnin=1:100
+```
+
+**Parameters for Bayesian inference:**
+
+* mean of $\mu$ is 2
+
+* variance of $\mu$ is 1
+
+* $\alpha$ = 200, $\beta$ = 100 for $\sigma^2$
+
+**Estimates using Bayesian inference:**
+
+* Estimate for true $\mu = 0$ given by mean of estimated posterior distribution using 10,000 draws: `r round(mean(mu_f), 4)`
+
+* Standard error of the mean is the standard deviation of the posterior distribution: `r round(sd(mu_f), 4)`
+
+* Estimate for true variance $\sigma^2 = 1$ given by the mean of the posterior distribution for  $\sigma^2$, which is `r round(mean(sig2_f), 2)`
+
+
+```{r}
+#| label: fig-ex2
+#| fig-cap: "Black: Mean posterior; Blue: Mean prior; Red: Likelihood of observed data under estiamted parameters"
+
+
+ggplot(data = data.frame(x = mu_f), 
+       aes(x = x)) + 
+  theme_classic() + 
+  geom_density() + 
+  geom_density(data = data.frame(y = rnorm(n = 10000, mean = theta, sd = sqrt(tau2))),
+               aes(x = y), 
+               color = "blue") + 
+  geom_density(data = data.frame(y = Y),
+               aes(x = y), 
+               color = "red") 
+
+```
+
+### Very more informative priors 
+
+```{r gibbs sampler 3}
+############
+#Set up priors
+############
+theta=2
+tau2=0.25 #proper, but not very informative prior for mu; we assume that mean is distributed around 
+  # zero, but with huge variance 
+  # variance is huge => prior is non informative 
+
+a=500
+b=1500  #common noninformative prior for sig2, this will be some gamma 
+
+
+############
+#Initialize Gibbs Sampler
+############
+nits=10000 # will use 10,000 steps/iterations to get posterior distributions of Mean and Variance of Distribution wehre Y came from 
+
+mu=sig2=rep(NA,nits)
+
+### these are extremely wrong, but because the 
+### problem is relatively simple, so this does not matter in the end 
+
+## these are just our point estimate~guesses at what the true parameters are 
+mu[1]=10000 #mean(Y)    #seems like logical initial values      
+sig2[1]=200 #var(Y)
+
+
+############
+# this is the sampler now 
+
+for(it in 2:nits){
+  #########
+  #update mu
+  ########
+  mumean=(tau2*mean(Y) + sig2[it-1]/n * theta)/(tau2 + sig2[it-1]/n) # calculate updated mean of mu distribution 
+    # recall: mu is the mean of distribution that generated values of Y 
+    # but, in Bayes inference, we need to get distribution of MU - true mean of Y 
+    # we need to get distribution of values of MU 
+    # this parameter is the mean of distribution of MU 
+  
+    # how we calculated it?? we use proportional argument and derive by hand what 
+    # parameters distribution of mu must have 
+    # it depends of observed mean of Y, 
+    # prior assumed variance (standard error) of MU distribution,  
+    # prior assumed mean of MU distribution, 
+  
+    # most recent estimate of the variance of Y
+  
+  muvar =(tau2 * sig2[it-1]/n) / (tau2 + sig2[it-1]/n)
+    # now we need to estimate variance of distirbution of MU 
+    # again, it is expressed as some formula that we derived by hand 
+  
+  mu[it]=rnorm(1,mumean,sqrt(muvar))
+    # now using updated values of parameters of distribution of MU, get one value of MU, and save it 
+    # these values will eventually form posterior sampling distributions of MU, which we will do inference on 
+  
+  #########
+  #update sig2
+  #########
+  
+  # same idea, no reason to comment on this 
+  sig2[it]=1/rgamma(1,n/2+a,sum( (Y-mu[it])^2 )/2 + b)
+  
+  
+}
+
+burnin=1:100
+```
+
+
+**Parameters for Bayesian inference:**
+
+* mean of $\mu$ is 2
+
+* variance of $\mu$ is 0.25
+
+* $\alpha$ = 500, $\beta$ = 1500 for $\sigma^2$
+
+**Estimates using Bayesian inference:**
+
+* Estimate for true $\mu = 0$ given by mean of estimated posterior distribution using 10,000 draws: `r round(mean(mu_f), 4)`
+
+* Standard error of the mean is the standard deviation of the posterior distribution: `r round(sd(mu_f), 4)`
+
+* Estimate for true variance $\sigma^2 = 1$ given by the mean of the posterior distribution for  $\sigma^2$, which is `r round(mean(sig2_f), 2)`
+
+```{r}
+#| label: fig-ex3
+#| fig-cap: "Black: Mean posterior; Blue: Mean prior; Red: Likelihood of observed data under estiamted parameters"
+
+
+ggplot(data = data.frame(x = mu_f), 
+       aes(x = x)) + 
+  theme_classic() + 
+  geom_density() + 
+  geom_density(data = data.frame(y = rnorm(n = 10000, mean = theta, sd = sqrt(tau2))),
+               aes(x = y), 
+               color = "blue") + 
+  geom_density(data = data.frame(y = Y),
+               aes(x = y), 
+               color = "red") 
+
+```
+
+
+# Estimating Age-Adjusted County-Level Mortality Rates in PA
+
+### Model 
+
+### Challenges 
+
+### Use of Gibbs 
+
+### Results 
+
+```{r data preparation}
+
+stroke=read.table('2016_PA_stroke_total.txt',sep='\t',
+                  stringsAsFactors=FALSE,header=TRUE)
+
+stroke_clean <- 
+  stroke %>% 
+  select(County, Age.Group, Deaths, Population, Crude.Rate) %>% 
+  {colnames(.) <- tolower(colnames(.)); 
+  . # pass back the data frame with nice column names 
+  } %>% 
+  rename(crude.rate.100k = crude.rate)
+
+stroke_clean$ratio <- with(stroke_clean, deaths/population)
+## let n_0 for prior population size be 1000
+n0 = 10000
+
+stroke_clean %>% 
+  group_by(age.group) %>% 
+  summarise(n_in_group = sum(population)) %>% 
+  ungroup() %>% 
+  mutate(p_in_group = n_in_group/sum(n_in_group)) %>% 
+  select(p_in_group) %>% 
+  unlist() -> global_age_proportions
+
+
+lam0=c(75,250,1000)/100000 ## these are 
+
+stroke_clean$lambda_0 <- rep(lam0, 67)
+stroke_clean$p_0 <- rep(global_age_proportions, 67)
+stroke_clean$n_0 <- rep(global_age_proportions*n0, 67)
+
+```
+
+```{r gibbs sampler , echo=F}
+
+reps = 10000
+
+results <- cbind(matrix(data = NA, 
+                        nrow = nrow(stroke_clean), 
+                        ncol = reps), 
+                 stroke_clean %>% select(county, age.group)
+                 ) # empty matrix for results 
+
+results[,1] <- stroke_clean$lambda_0 # itiate sampler with prior guesses of lambdas 
+ 
+set.seed(178921)
+
+for(i in 2:reps){
+  # impute missing values of Y using inverse CDF approach 
+    # use previous estimates of lambda parameters to get rate for the poisson distribution 
+    results[,(i-1)] * stroke_clean$population -> poisson_lambdas_iter
+    
+    ppois(10, poisson_lambdas_iter) -> limits_detection_iter
+    
+    # using these numbers between 0 and somewhere less than 1, sample from uniform distribution 
+    runif(n = length(limits_detection_iter), min = 0, max = limits_detection_iter) -> sampled_u 
+    
+    # get imputed values by putting unifrom random samples into 'inverse' CDF 
+    qpois(sampled_u, lambda = poisson_lambdas_iter) -> imp 
+    
+    # get final imputed vector of the observed data 
+    stroke_clean$deaths -> final_ys_iter
+    final_ys_iter[which(is.na(final_ys_iter))] <- imp[which(is.na(final_ys_iter))]
+    
+  # now work with prior n0 Y0 and observed n_ia Y_ia to get samples for parameters lambda 
+    
+    pop = stroke_clean$population
+    
+    rgamma(n = nrow(stroke_clean), 
+    #       shape = final_ys_iter + results[,(i-1)]*pop,  # old version 
+           shape = final_ys_iter + with(stroke_clean, lambda_0 * n_0), 
+           scale = 1/with(stroke_clean, population + n_0)
+           ) -> results[,i]
+}
+
+```
+
+```{r}
+
+stoke_clean_f <- 
+  cbind(
+    stroke_clean, 
+    data.frame(
+      from_sim_mean =   apply(results %>% select(-age.group, -county), 1, mean), 
+      from_sim_median = apply(results %>% select(-age.group, -county), 1, median)
+    ) 
+  )
+
+stoke_clean_f$age_specific_post <- stoke_clean_f$from_sim_median * stoke_clean_f$p_0
+stoke_clean_f$age_specific <- stoke_clean_f$ratio * stoke_clean_f$p_0
+
+stoke_clean_f %>% 
+  group_by(county) %>% 
+  summarise(
+    deaths = sum(deaths), 
+    population = sum(population), 
+    age_adjusted_rate = sum(age_specific) * 100000, 
+    age_adjusted_rate_post = sum(age_specific_post) * 100000
+  ) -> rates_data
+
+rates_data %>% 
+  head() %>% 
+  kable(col.names = c("County", "Deaths", "Population", "Crude Rate", "Est. Rate"))
+
+```

@@ -91,7 +91,7 @@ hist(exp(mu[-burnin]+sig2[-burnin]/2),breaks=100,freq=FALSE)
 dev.off()
 
 ## after filtering out bad burn in values, we get a symmetric normal distribution of the parameter MU: 
-#     which goverens distirubiton of values of Y 
+#     which governs distribution of values of Y 
 mu_f <- mu[-burnin]
 hist(mu_f)  
 summary(mu_f)
@@ -105,7 +105,7 @@ summary(sig2_f)
 mean(sig2_f)
 median(sig2_f)
 
-### recall: true values of MU and SIGMA for distirbution of Y were 0 and 1 respectively 
+### recall: true values of MU and SIGMA for distribution of Y were 0 and 1 respectively 
 ### this is what we get here, which is great. 
 
 ##### In slides, week2_lecture1: page 22 shows how we get formulas for updating mu and sigma values 
