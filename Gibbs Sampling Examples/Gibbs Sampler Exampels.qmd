@@ -149,13 +149,12 @@ ggplot(data = data.frame(x = mu_f),
        aes(x = x)) + 
   theme_classic() + 
   geom_density() + 
+  geom_density(aes(color = "Posterior")) + 
   geom_density(data = data.frame(y = rnorm(n = 10000, mean = theta, sd = sqrt(tau2))),
-               aes(x = y), 
-               color = "blue") + 
+               aes(x = y, color = "Prior")) + 
   geom_density(data = data.frame(y = Y),
-               aes(x = y), 
-               color = "red") + 
-  scale_x_continuous(limits = c(-2, 2))
+               aes(x = y, color = "Data Density")) + 
+  xlim(-5, 5)
 ```
 
 
@@ -257,12 +256,11 @@ ggplot(data = data.frame(x = mu_f),
        aes(x = x)) + 
   theme_classic() + 
   geom_density() + 
+  geom_density(aes(color = "Posterior")) + 
   geom_density(data = data.frame(y = rnorm(n = 10000, mean = theta, sd = sqrt(tau2))),
-               aes(x = y), 
-               color = "blue") + 
+               aes(x = y, color = "Prior")) + 
   geom_density(data = data.frame(y = Y),
-               aes(x = y), 
-               color = "red") 
+               aes(x = y, color = "Data Density"))
 
 ```
 
@@ -273,12 +271,12 @@ ggplot(data = data.frame(x = mu_f),
 #Set up priors
 ############
 theta=2
-tau2=0.25 #proper, but not very informative prior for mu; we assume that mean is distributed around 
+tau2=0.03 #proper, but not very informative prior for mu; we assume that mean is distributed around 
   # zero, but with huge variance 
   # variance is huge => prior is non informative 
 
-a=500
-b=1500  #common noninformative prior for sig2, this will be some gamma 
+a=100
+b=1000  #common noninformative prior for sig2, this will be some gamma 
 
 
 ############
@@ -363,16 +361,23 @@ burnin=1:100
 ggplot(data = data.frame(x = mu_f), 
        aes(x = x)) + 
   theme_classic() + 
-  geom_density() + 
+  geom_density(aes(color = "Posterior")) + 
   geom_density(data = data.frame(y = rnorm(n = 10000, mean = theta, sd = sqrt(tau2))),
-               aes(x = y), 
-               color = "blue") + 
+               aes(x = y, color = "Prior")) + 
   geom_density(data = data.frame(y = Y),
-               aes(x = y), 
-               color = "red") 
+               aes(x = y, color = "Data Density")) 
 
 ```
 
+
+
+```{r}
+ggplot(data = data.frame(mu = mu_f, sig = sig2_f), 
+       aes(x = mu_f, y = sig2_f)) + 
+  theme_classic() + 
+  geom_point()
+
+```
 
 # Estimating Age-Adjusted County-Level Mortality Rates in PA
 
@@ -422,6 +427,8 @@ stroke_clean$n_0 <- rep(global_age_proportions*n0, 67)
 
 reps = 10000
 
+imputed <- rep(NA, reps)
+
 results <- cbind(matrix(data = NA, 
                         nrow = nrow(stroke_clean), 
                         ncol = reps), 
@@ -444,6 +451,8 @@ for(i in 2:reps){
     
     # get imputed values by putting unifrom random samples into 'inverse' CDF 
     qpois(sampled_u, lambda = poisson_lambdas_iter) -> imp 
+    
+    imputed[i] <- imp[1]
     
     # get final imputed vector of the observed data 
     stroke_clean$deaths -> final_ys_iter
@@ -484,9 +493,76 @@ stoke_clean_f %>%
     age_adjusted_rate = sum(age_specific) * 100000, 
     age_adjusted_rate_post = sum(age_specific_post) * 100000
   ) -> rates_data
+```
+
+```{r}
+
+stroke_clean %>% head(3) %>% 
+  select(-ratio, -lambda_0, -p_0, -n_0) %>% 
+  kable(col.names = c("County", "Age Group", "Deaths", "Population", "Crude Rate"))
 
 rates_data %>% 
   head() %>% 
   kable(col.names = c("County", "Deaths", "Population", "Crude Rate", "Est. Rate"))
+
+```
+
+### Visualize rates for One Conty 
+
+```{r}
+
+stoke_clean_f %>% filter(county == "Susquehanna County, PA" , age.group == "85+ years") -> work_d
+
+work_d %>%
+  select(county, age.group, deaths, population, lambda_0, ratio, from_sim_mean) %>% 
+  kable(col.names = c("County", "Age Group", "Deaths", "Population", "Prior Rate","Data-Estimate", "Posterior Rate"), 
+        digits = 2)
+```
+
+
+```{r}
+
+
+## from_sim_mean is one we estiamted using MCMC
+## ratio is the one we estimated from the data 
+## lambda_0 is the prior 
+
+samples = 100000
+
+ggplot(data = data.frame(x = rgamma(n = samples, shape = with(work_d, n_0 * lambda_0), scale = 1/work_d$n_0)), 
+       aes(x = x)) + 
+  theme_classic() + 
+  geom_density(aes(color = "prior")) + 
+  geom_density(data = data.frame(x = rgamma(n = samples, shape = with(work_d, (n_0+population) * from_sim_mean), 
+                                            scale = 1/(with(work_d, (n_0+population))))), 
+               aes(x = x, color = "posterior")) + 
+  
+  geom_density(data = data.frame(x = rgamma(n = samples, shape = with(work_d, (population) * ratio), 
+                                            scale = 1/(with(work_d, (population))))), 
+               aes(x = x, color = "data"))
+
+```
+
+### How did we handle missing values 
+
+```{r}
+
+stoke_clean_f %>% head(1) %>% 
+  mutate(val = age_specific_post * population) %>% 
+  select(val) %>% unlist() -> rate_poisson
+
+stoke_clean_f %>% head(1) %>% 
+  mutate(val = lambda_0 * population) %>% 
+  select(val) %>% unlist() -> rate_poisson_null
+
+ggplot(data = data.frame(x = rpois(n = 10000, lambda = rate_poisson)), 
+       aes(x = x)) + 
+  theme_classic() + 
+  geom_histogram(fill = "grey", alpha = 0.5, color = "black") + 
+  geom_vline(color = "red", xintercept = 10, linetype = "dashed") + 
+  geom_histogram(data = data.frame(y = imputed), fill = "blue", aes(x = y), alpha = 0.5, color = "black") + 
+  
+  geom_vline(color = "orange", xintercept = rate_poisson, linewidth = 1) + 
+  geom_vline(color = "black", xintercept = rate_poisson_null, linewidth = 1) 
 
 ```

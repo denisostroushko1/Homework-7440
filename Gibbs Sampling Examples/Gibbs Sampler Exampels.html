@@ -60,6 +60,8 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#challenges" id="toc-challenges" class="nav-link" data-scroll-target="#challenges">Challenges</a></li>
   <li><a href="#use-of-gibbs" id="toc-use-of-gibbs" class="nav-link" data-scroll-target="#use-of-gibbs">Use of Gibbs</a></li>
   <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
+  <li><a href="#visualize-rates-for-one-conty" id="toc-visualize-rates-for-one-conty" class="nav-link" data-scroll-target="#visualize-rates-for-one-conty">Visualize rates for One Conty</a></li>
+  <li><a href="#how-did-we-handle-missing-values" id="toc-how-did-we-handle-missing-values" class="nav-link" data-scroll-target="#how-did-we-handle-missing-values">How did we handle missing values</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -190,6 +192,44 @@ ul.task-list li input[type="checkbox"] {
 <thead>
 <tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">County</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Age Group</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deaths</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Population</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Crude Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Adams County, PA</td>
+<td style="text-align: left;">65-74 years</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">11402</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Adams County, PA</td>
+<td style="text-align: left;">75-84 years</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">5763</td>
+<td style="text-align: right;">260.3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Adams County, PA</td>
+<td style="text-align: left;">85+ years</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">2694</td>
+<td style="text-align: right;">1002.2</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+<div class="cell-output-display">
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">County</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">Deaths</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">Population</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">Crude Rate</th>
@@ -243,6 +283,52 @@ ul.task-list li input[type="checkbox"] {
 </table>
 
 
+</div>
+</div>
+</section>
+<section id="visualize-rates-for-one-conty" class="level3">
+<h3 class="anchored" data-anchor-id="visualize-rates-for-one-conty">Visualize rates for One Conty</h3>
+<div class="cell">
+<div class="cell-output-display">
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">County</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Age Group</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deaths</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Population</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Prior Rate</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Data-Estimate</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Posterior Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Susquehanna County, PA</td>
+<td style="text-align: left;">85+ years</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">991</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Gibbs-Sampler-Exampels_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="how-did-we-handle-missing-values" class="level3">
+<h3 class="anchored" data-anchor-id="how-did-we-handle-missing-values">How did we handle missing values</h3>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="Gibbs-Sampler-Exampels_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
