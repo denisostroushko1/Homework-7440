@@ -371,6 +371,8 @@ apply(summary_z_ia, 1, length_unique) %>%
 
 ```{r checking results of M-H version 2, eval = F}
 
+z_ia <- 
+
 View(beta_0a)
 View(z_ia) 
 View(sigma_0a)
@@ -441,7 +443,7 @@ ggplot(data = data.frame(beta0 = plotting,
 
 #### beta0 a = 3
 # after 25,000 burnin it looks okay 
-plotting = beta_0a[3,][-(1:25000)]
+plotting = beta_0a[3,][-burnin]
 
 length(which(
   plotting[1:(length(plotting)-1)] != 
@@ -507,11 +509,15 @@ ggplot(data = data.frame(sigma20 = plotting,
 # comment: 2/20/24 
 #   did not update at all, 
 
+results <- readRDS("MH results2.rds")
+
+z_ia <- results$lambdas[,-(1:25000)]
+
 summary_z_ia = z_ia[,-burnin]
 
 ## some updated, but not good at all 
 length_unique = function(x){length(unique(x))}
-apply(summary_z_ia, 1, length_unique) /reps -> rates 
+apply(summary_z_ia, 1, length_unique) / 100000 -> rates 
 
 View(data.frame(rates))
 summary(rates)
