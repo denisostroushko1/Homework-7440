@@ -7,13 +7,103 @@ execute:
   echo: false 
 ---
 
+```{r local helper, eval= F}
+rm(list = ls())
+i = 2
+```
+
 ```{r}
 library(tidyverse)
 library(kableExtra)
+library(gridExtra)
 
 options(scipen = 99999, 
         knitr.kable.NA = '')
 ```
+
+# Problem 1 
+
+### Prerequisites
+
+In this assignment we analyze stroke-related mortality rates at the county-age-group levels in PA. 
+
+We have 67 counties, $i = 1, 2, \dots, 67$, and three age groups $a=1,2,3$ within each county
+
+We assume that the number of observed death in county $i$ and age group $a$ is distributed by a Poisson distribution with 
+parameter $n_{ia} \lambda_{ia}$, where $log \lambda_{ia} = \beta_{0a} + z_{ia}$. 
+
+So, the death rate for each county and age group is some function of an average effect for a given age group and an age-group-and-county
+specific random effect. 
+
+Given that Poisson distribution parameter is a function of two random variables, we can write pmf of $Y_{ia}$ as: 
+
+\begin{align*}
+Y_{ia} &= \frac{e^{- (n_{ia} e^{\beta_{0a} + z_{ia}}) } \times (n_{ia} e^{\beta_{0a} + z_{ia}})^{Y_{ia}}}{Y_{ia}!}
+\end{align*}
+
+As mentioned previously, $\beta_{0a}$ and $z_{ia}$ are random variable {because Bayesian Analysis framework}, and therefore they have 
+prior distributions: 
+
+$\beta_{0a} | \mu = 0, \tau^2_a$ ~ $N(0, \tau^2_a)$, where $\tau^2_a = 10,000$. This equation represents three prior distributions for each age group subject to analysis. They all have identical prior distributions. 
+
+$z_{ia} | \mu = 0, \sigma^2_a$ ~ $N(0, \sigma^2_a)$, where $\sigma^2_a$ is also a random variable that has it's own prior distribution. 
+Note that each county and age group (201 total data points) each have their own random effect. But, within an age group $a$, all random variables $z_{i, a = a}$ have the the same prior distribution with variance $\sigma^2_{a = a}$
+
+$\sigma^2_a$~$IG(0.001, 0.001)$, so variance comes from a non-informative Inverse Gamma (IG) distribution. 
+
+**Suppressed values of deaths with county and age-groups levels**
+
+* Note: I am reusing the description of the imputation procedure given in HW3, only changing max value from 10 to 9
+
+In order to impute missing/suppressed values of $Y_{i\alpha}$ we need to use a truncated left tail of a poisson distribution with 
+corresponding parameter $n_{i\alpha} \lambda_{i\alpha}$. We will set a maximum value at the tail equal to 9, meaning that for 
+our imputations we will be sampling integers from 0 to 9 from poisson distributions. In order to do that, we follow these steps: 
+
+1. For each county for each group age, determine a parameter for the poisson distribution, refer to it as $\Lambda_{i\alpha}$. 
+
+2. For each county for each age group, determine quantile corresponding to value of 10 under $\Lambda_{i\alpha}$, call this quantile $q$
+  - use `ppois()` to get this quantile 
+  
+3. Sample a number from a uniform distribution between 0 and $q$. This will be between 0 and some number less than or equal to 1 always. 
+  - use `runif(n=1, min = 0, max = .)`
+  
+4. Using inverse CDF of a poisson distribution with parameter $\Lambda_{i\alpha}$, obtain a value corresponding to a randomly sampled quantile 
+  - use `qpois()` for this step
+  
+5. Impute missing value with sampled values between 0 and 9 
+
+### Full hirerachical model 
+
+\begin{align*}
+  p(\beta_{0a}, z_{ia}, \sigma^2_{0a} | \textbf{Y})   \propto &
+  \Pi_{i,a} \left[ Pois(Y_{ia} | n_{ia} * exp(\beta_{0a} + z_{ia})) \right]   \hspace{1cm} \textcolor{blue}{full \ data \ likelihood} \\ 
+  & Norm(\beta_{0a} | 0, \tau^2_a) \hspace{2cm} \textcolor{blue}{prior \ for \ \beta_{0a}} \\
+  & Norm(z_{ia} | 0, \sigma^2_a) \hspace{2cm} \textcolor{blue}{prior \ for \ z_{ia}} \\ 
+  & IG(\sigma^2_a | 0.001, 0.001) \hspace{1.5cm} \textcolor{blue}{prior \ for \ \sigma^2_a}
+\end{align*}
+
+# Problem 2 
+
+### Full conditional for $\beta_{0a}$
+
+### Full conditional for $z_{ia}$
+
+### Full conditional for $\sigma^2_{a}$
+
+# Problem 3
+
+Code to fit the model and obtain posterior distributions for parameters of interest is attached in the appendix after comparison with 
+the HW3 results. 
+
+To fit the model, I used the following parameters and candidate densities: 
+
+* Assume a symmetric candidate density $\beta_0$ ~ $Norm(\beta_0^{`}, q)$ where $q=0.075$
+
+* Assume a symmetric candidate density $z_{ia}$ ~ $Norm(z_{ia}^{`}, q_{ia})$ where $q_{ia}$ is proportional to the data-driven
+  point estimate for the county-specific effect on the observed log-rate of stroke related mortality rate 
+  
+* Assume an asymmetric candidate density $\sigma^2_a$ ~ $IG(q, q * \sigma^{`2}_a)$, where q = 3 and $\sigma^{`2}_a$ is the 
+  most recent updated value of $\sigma^2_a$ from the Metropolis-Hastings iteration 
 
 ```{r data preparation}
 
@@ -54,7 +144,7 @@ stroke_clean$n_0 <- rep(global_age_proportions*n0, 67)
 
 set.seed(182)
 
-reps = 100000
+reps = 10000
 
 lambda_ia <- 
   cbind(
@@ -103,6 +193,7 @@ stroke_clean %>%
 z_ia <- 
   cbind(
     zi_guess, 
+   # rep(0, length(zi_guess)), 
     matrix(data = NA, 
            nrow =   length(zi_guess), 
            ncol = (reps-1)
@@ -122,9 +213,9 @@ tau2 = 10000
 a = 0.001
 b = 0.001 
 
-q_norm_b  = 0.05
-# q_norm_zi = 0.05
-q_norm_zi = abs(zi_guess) # make it such that the step size for each z_ia is poportional to its data-driven estiamte
+q_norm_b  = 0.075
+# q_norm_zi = 0.005
+q_norm_zi = abs(zi_guess)*5 # make it such that the step size for each z_ia is poportional to its data-driven estiamte
 #                             ratio is 1/1
 q_ig = 1
 
@@ -244,140 +335,17 @@ res <- list(lambda_ia,
 names(res) <- c("lambdas", "sigmas", "zs", "betas")
 
 write_rds(x = res, 
-          file = "MH results2.rds"
+          file = "./MHresults/MH results7.rds"
           )
 ```
 
-```{r checking results of M-H version 1, eval = F}
+<!-- ************************************************
+EVALUDATE RESULTS OF METROPOLIS HASTINGS SAMPLER 
+************************************************--> 
+
+```{r checking Beta results of M-H version 2, eval = F}
 
 View(beta_0a)
-View(z_ia) 
-View(sigma_0a)
-View(lambda_ia)
-
-      
-      ########
-      # BETA 0 a = 1
-
-burnin = 1:1000
-
-plotting = beta_0a[1,][-burnin]
-
-length(which(
-  plotting[1:(length(plotting)-1)] != 
-  plotting[2:(length(plotting))]
-)) / (length(plotting)-1)
-
-### 
-# comment: 2/20/24 
-#   converged, but there are too many rejections 
-#   last mean for after burnin:  -7.19
-#   acceptance rate after burnin: 0.08056451 -- too low 
-
-ggplot(data = data.frame(beta0 = plotting, 
-                         n = 1:length(plotting)), 
-       aes(x = n, 
-           y = beta0)) + 
-  theme_classic() + 
-  geom_line() + 
-  geom_hline(yintercept = mean(plotting), color = "red", linewidth = 1)
-
-### checking other beta_0
-
-#### beta0 a = 2
-plotting = beta_0a[2,][-burnin]
-
-length(which(
-  plotting[1:(length(plotting)-1)] != 
-  plotting[2:(length(plotting))]
-)) / (length(plotting)-1)
-
-#### beta0 a = 3
-plotting = beta_0a[3,][-burnin]
-
-length(which(
-  plotting[1:(length(plotting)-1)] != 
-  plotting[2:(length(plotting))]
-)) / (length(plotting)-1)
-
-###############
-# SIGMA2 
-plotting = sigma_0a[1,][-burnin]
-
-length(which(
-  plotting[1:(length(plotting)-1)] != 
-  plotting[2:(length(plotting))]
-)) / (length(plotting)-1)
-
-mean(plotting)
-
-### 
-# comment: 2/20/24 
-#   did not converge, also there are too many rejections 
-#   last mean for after burnin:  1.59593
-#   acceptance rate after burnin: 0.2466941 -- too low 
-
-ggplot(data = data.frame(sigma20 = plotting, 
-                         n = 1:length(plotting)), 
-       aes(x = n, 
-           y = sigma20)) + 
-  theme_classic() + 
-  geom_line() + 
-  geom_hline(yintercept = mean(plotting), color = "red", linewidth = 1) + 
-  ylim(0, 2)
-
-### checking other beta_0
-
-#### beta0 a = 2
-plotting = sigma_0a[2,][-burnin]
-
-length(which(
-  plotting[1:(length(plotting)-1)] != 
-  plotting[2:(length(plotting))]
-)) / (length(plotting)-1)
-
-#### beta0 a = 3
-plotting = sigma_0a[3,][-burnin]
-
-length(which(
-  plotting[1:(length(plotting)-1)] != 
-  plotting[2:(length(plotting))]
-)) / (length(plotting)-1)
-
-############
-# Z_ia 
-
-plotting = z_ia[1,][-burnin]
-
-length(which(
-  plotting[1:(length(plotting)-1)] != 
-  plotting[2:(length(plotting))]
-)) / (length(plotting)-1)
-
-mean(plotting)
-
-### 
-# comment: 2/20/24 
-#   did not update at all, 
-
-summary_z_ia = z_ia[,-burnin]
-
-## some updated, but not good at all 
-length_unique = function(x){length(unique(x))}
-apply(summary_z_ia, 1, length_unique) %>% 
-  unique()
-
-```
-
-```{r checking results of M-H version 2, eval = F}
-
-z_ia <- 
-
-View(beta_0a)
-View(z_ia) 
-View(sigma_0a)
-View(lambda_ia)
-
       
 # new parameters 
 # reps = 100000
@@ -395,7 +363,7 @@ View(lambda_ia)
       ########
       # BETA 0 a = 1
 
-burnin = 1:10000
+burnin = 1:1000
 
 plotting = beta_0a[1,][-burnin]
 
@@ -432,6 +400,7 @@ length(which(
 )) / (length(plotting)-1) ## decent
 
 mean(plotting)
+summary(plotting)
 
 ggplot(data = data.frame(beta0 = plotting, 
                          n = 1:length(plotting)), 
@@ -460,15 +429,21 @@ ggplot(data = data.frame(beta0 = plotting,
   geom_line() + 
   geom_hline(yintercept = mean(plotting), color = "red", linewidth = 1) -> p
 
+hist(plotting)
+```
+
+```{r checking Sigma results of M-H version 2, eval = F}
+
+#         View(sigma_0a)
+
 ###############
 # SIGMA2 
 plotting = sigma_0a[1,][-burnin]
-plotting = log(plotting)
 
 length(which(
   plotting[1:(length(plotting)-1)] != 
   plotting[2:(length(plotting))]
-)) / (length(plotting)-1) ## too low 
+)) / (length(plotting)-1) ## too low for results 2, higher for results 4 
 
 mean(plotting)
 
@@ -482,10 +457,64 @@ ggplot(data = data.frame(sigma20 = plotting,
 
 ## they look fine but the log plot in the one that really needs to be assessd I think 
 
+##########
+plotting = sigma_0a[2,][-burnin]
+
+length(which(
+  plotting[1:(length(plotting)-1)] != 
+  plotting[2:(length(plotting))]
+)) / (length(plotting)-1) ## too low for results 2, higher for results 4 
+
+mean(plotting)
+
+ggplot(data = data.frame(sigma20 = plotting, 
+                         n = 1:length(plotting)), 
+       aes(x = n, 
+           y = sigma20)) + 
+  theme_classic() + 
+  geom_line() + 
+  geom_hline(yintercept = mean(plotting), color = "red", linewidth = 1) -> p
+
+##########
+plotting = sigma_0a[3,][-burnin]
+
+length(which(
+  plotting[1:(length(plotting)-1)] != 
+  plotting[2:(length(plotting))]
+)) / (length(plotting)-1) ## too low for results 2, higher for results 4 
+
+mean(plotting)
+
+ggplot(data = data.frame(sigma20 = plotting, 
+                         n = 1:length(plotting)), 
+       aes(x = n, 
+           y = sigma20)) + 
+  theme_classic() + 
+  geom_line() + 
+  geom_hline(yintercept = mean(plotting), color = "red", linewidth = 1) -> p
+```
+
+```{r evaluate z_ia, eval = F}
+
+### 
+# comment: 2/20/24 
+#   did not update at all, 
+length_unique = function(x){length(unique(x))}
+
+apply(z_ia, 1, length_unique) / length(z_ia[1,]) -> rates_no_burnin
+summary(rates_no_burnin)
+
+summary_z_ia = z_ia[,-burnin]
+apply(summary_z_ia, 1, length_unique) / length(summary_z_ia[1,]) -> rates_w_burnin
+summary(rates_w_burnin)
+
+mean_zia   = apply(summary_z_ia, 1, mean)
+median_zia = apply(summary_z_ia, 1, median)
+
 ############
 # Z_ia 
 
-plotting = z_ia[1,][-burnin]
+plotting = summary_z_ia[1,]
 
 length(which(
   plotting[1:(length(plotting)-1)] != 
@@ -493,6 +522,7 @@ length(which(
 )) / (length(plotting)-1) ## all updated all the time 
 
 mean(plotting) 
+summary(plotting)
 
 ggplot(data = data.frame(sigma20 = plotting, 
                          n = 1:length(plotting)), 
@@ -504,33 +534,21 @@ ggplot(data = data.frame(sigma20 = plotting,
 ## plot looks good, but the acceptance rate is like 1, so all the time 
 
 
-
-### 
-# comment: 2/20/24 
-#   did not update at all, 
-
-results <- readRDS("MH results2.rds")
-
-z_ia <- results$lambdas[,-(1:25000)]
-
-summary_z_ia = z_ia[,-burnin]
-
-## some updated, but not good at all 
-length_unique = function(x){length(unique(x))}
-apply(summary_z_ia, 1, length_unique) / 100000 -> rates 
-
-View(data.frame(rates))
-summary(rates)
-
-hist(rates)
-
 ```
+
+<!--
+************************************************
+PRESENT THE RESULTS
+************************************************
+-->
 
 ```{r analyze results }
 
-results <- readRDS("MH results2.rds")
+results <- readRDS("MHresults/MH results7.rds")
 
-lambdas <- results$lambdas[,-(1:25000)]
+dim(results$lambdas)[2] -> length_of_res
+
+lambdas <- results$lambdas[,-(1:length_of_res/10)]
 
 final_lambdas <- apply(lambdas, MARGIN = 1, FUN = mean)
 
@@ -542,17 +560,78 @@ stroke_clean %>%
   
   group_by(county) %>% 
   summarise(
-    deaths = sum(deaths), 
+    deaths = sum(deaths, na.rm = T), 
     population = sum(population), 
-    crude_rate_100k = sum(deaths) / sum(population) * 100000, 
+    crude_rate_100k = sum(deaths, na.rm = T) / sum(population) * 100000, 
     age_adj_rate_100k = sum(model_lambdas * age_weight) * 100000
   ) -> rates_data 
 
 aa.med = rates_data$age_adj_rate_100k / 100000
 
+```
+
+### Results for $\beta_{0a}$
+
+@fig-beta0-sum shows posterior distributions for the age-group overall effect on deaths associated with stroke. Since $\log \lambda_{ia}=\beta_{0a} + z_{ia}$, presented values are on the logarithmic scale. We can make an observation that as overall age increases, the age-group overall 'average' death rate increases, which is something that we would expect to observe. 
+
+All posterior distributions have a nice symmetric shape, fitting a normal candidate distribution. 
+
+```{r BETA posterior summary }
+#| label: fig-beta0-sum
+#| fig-cap: "Posterior Distribtuions of Beta0 for the three age groups"
+#| fig-width: 14
+#| fig-height: 6
 
 
 
+results <- readRDS("MHresults/MH results6.rds")
+
+dim(results$betas)[2] -> length_of_res
+
+betas <- results$betas[,-(1:length_of_res/10)]
+
+betas %>% t() %>% data.frame()-> betas_df
+
+grid.arrange(
+  ggplot(data = betas_df, 
+         aes(x = b0a1)) + 
+    theme_classic() + 
+    geom_histogram(bins = 50, color = "black", fill = "lightgrey") + 
+    geom_vline(xintercept = mean(betas_df$b0a1), color = "red", linewidth = 1, linetype = "dashed") + 
+    labs(x = "Beta0 for Age group of 65-74 years", 
+         title = paste0("Posterior Average: ", round(mean(betas_df$b0a1), 2), 
+                        "\nPosterior Std. Deviation: ", round(sd(betas_df$b0a1), 2), 
+                        "\nExponentiated Average: ", round(exp(mean(betas_df$b0a1)), 4)
+                        )
+         ),
+  
+  ggplot(data = betas_df, 
+         aes(x = b0a2)) + 
+    theme_classic() + 
+    geom_histogram(bins = 50, color = "black", fill = "lightgrey") + 
+    geom_vline(xintercept = mean(betas_df$b0a2), color = "red", linewidth = 1, linetype = "dashed") + 
+    labs(x = "Beta0 for Age group of 75-84 years", 
+         title = paste0("Posterior Average: ", round(mean(betas_df$b0a2), 2), 
+                        "\nPosterior Std. Deviation: ", round(sd(betas_df$b0a2), 2), 
+                        "\nExponentiated Average: ", round(exp(mean(betas_df$b0a2)), 4)
+                        )
+         ),
+  
+  ggplot(data = betas_df, 
+         aes(x = b0a3)) + 
+    theme_classic() + 
+    geom_histogram(bins = 50, color = "black", fill = "lightgrey") + 
+    geom_vline(xintercept = mean(betas_df$b0a3), color = "red", linewidth = 1, linetype = "dashed") + 
+    labs(x = "Beta0 for Age group of 85+ years", 
+         title = paste0("Posterior Average: ", round(mean(betas_df$b0a3), 2), 
+                        "\nPosterior Std. Deviation: ", round(sd(betas_df$b0a3), 2), 
+                        "\nExponentiated Average: ", round(exp(mean(betas_df$b0a3)), 4)
+                        )
+         ), 
+  
+  nrow = 1, 
+  ncol = 3
+)
 ```
 
 ```{R for development purposes, eval = F}
@@ -571,7 +650,7 @@ tcolb=array(rep(aa.med*100000,each=ncols-1) > tcuts,
             dim=c(ncols-1,Ns))
 tcol =apply(tcolb,2,sum)+1
 
-png('PAmap.png',height=1200,width=1400)
+png('PAmapHW4.png',height=600,width=1000)
 par(mar=c(0,0,0,10),cex=1)
     plot(penn,col=cols[tcol],border='lightgray',lwd=.5)
     legend('right',inset=c(-.15,0),xpd=TRUE,
@@ -584,17 +663,312 @@ par(mar=c(0,0,0,10),cex=1)
 dev.off()
 ```
 
-@fig-map  is the resulting map
+@fig-map  presents county-specific age-adjusted rates. Overall, the map looks similar to what we observed under the Poisson-Gamma model (HW3). 
 
 ```{r include final map}
 #| label: fig-map 
 #| fig-cap: "Final Map of Rates"
-#| fig-align: left
-#| fig-width: 11
-#| fig-height: 8
+#| fig-align: center
 
-
-knitr::include_graphics('PAmap.png')
+knitr::include_graphics('PAmapHW4.png')
 
 ```
+
+\newpage
+
+# Appendix 
+
+### Comparison with Poisson-Gamma model 
+
+@fig-comp-hw3 shows the differences for the county specific estimates between the two approaches. It it evident that under my analysis, 
+mixed-effects regression model tends to estimate much higher stroke related mortality rates for counties with smaller population size. 
+
+In some cases the differences are as high as 20%. I suspect that the primary difference between the results are due to the use of random effects. 
+
+
+
+```{r import results back }
+
+readRDS(
+  paste0(
+    substr(
+      getwd(), 
+      1, 
+      nchar(getwd()) - nchar("HW4 - Part 1")
+    ), 
+    "HW3/gibbs results.rds"
+  )
+) -> results_HW3
+
+
+stoke_clean_f <- 
+  cbind(
+    stroke_clean, 
+    data.frame(
+      from_sim_mean =   apply(results_HW3 %>% select(-age.group, -county), 1, mean), 
+      from_sim_median = apply(results_HW3 %>% select(-age.group, -county), 1, median)
+    ) 
+  )
+
+stoke_clean_f$age_specific_post <- stoke_clean_f$from_sim_median * stoke_clean_f$p_0
+stoke_clean_f$age_specific <- stoke_clean_f$ratio * stoke_clean_f$p_0
+
+stoke_clean_f %>% 
+  group_by(county) %>% 
+  summarise(
+    deaths = sum(deaths), 
+    population = sum(population), 
+    age_adjusted_rate = sum(age_specific) * 100000, 
+    age_adjusted_rate_post = sum(age_specific_post) * 100000
+  ) -> rates_data_hw3 
+
+```
+
+```{r}
+#| label: fig-comp-hw3
+#| fig-cap: "Comparion of Age Adjusted Rates Uisng Mixed-Effects Regression Model (HW4) and Poisson-Gamma Model (HW3)"
+#| fig-height: 5
+#| fig-width: 12
+
+
+comp_rates <- 
+  left_join(
+    x = rates_data %>% select(county, deaths, population, crude_rate_100k, age_adj_rate_100k) %>% 
+      rename(age_adj_rate_100k_hw4 = age_adj_rate_100k), 
+    y = rates_data_hw3 %>% select(county, age_adjusted_rate_post) %>% rename(age_adj_rate_100k_hw3 = age_adjusted_rate_post), 
+    by = "county"
+  ) %>% 
+  mutate(rate_difference = age_adj_rate_100k_hw4 - age_adj_rate_100k_hw3)
+grid.arrange(
+  ggplot(data = comp_rates, 
+         aes(x = population, y = rate_difference)) + 
+    theme_classic() + 
+    geom_hline(yintercept = 0, color = "red", alpha = 0.5, linewidth = 1, linetype = "dashed") + 
+    geom_point() + 
+    geom_smooth() + 
+    labs(x = "Total County Population", 
+         y = "Est. Rate per 100K HW4 - \n    Est. Rate per 100K HW3", 
+         title = "Regression Model with Random Effects \n Tends to Estiamte Higher Rates in Smaller Counties \n Compared to Poisson-Gamma Model") , 
+
+  ggplot(data = comp_rates, 
+         aes(x = population, y = (age_adj_rate_100k_hw4 / age_adj_rate_100k_hw3)-1)) + 
+    theme_classic() + 
+    geom_hline(yintercept = 0, color = "red", alpha = 0.5, linewidth = 1, linetype = "dashed") + 
+    geom_point() + 
+    geom_smooth() + 
+    labs(x = "Total County Population", 
+         y = "Est. Rate per 100K HW4 - \n    Est. Rate per 100K HW3 % Difference", 
+         title = "Regression Model with Random Effects \n Tends to Estiamte Higher Rates in Smaller Counties \n Compared to Poisson-Gamma Model") +
+    scale_y_continuous(labels = function(x){round(x * 100) %>% paste0(., "%")}), 
+  nrow = 1
+)
+```
+
+### Metropolis-Hastings Sampling Algorithm R-code 
+
+```{r , eval = F, echo = T }
+
+set.seed(182)
+
+reps = 10000
+
+lambda_ia <-  ## this is a 201 x 10,000 matrix that will 
+              ## track updates for each county-age group Lambda
+              ## each row has 10,000 entries - 
+              ## to collect 10,000 metropolis updates 
+              ## I initiated algorithm with lambda = 
+              ## 75, 250, 1000 death per 100,000 people 
+  cbind(
+    stroke_clean %>% select(lambda_0) %>% unlist(), 
+    matrix(data = NA, 
+           nrow =   stroke_clean %>% select(lambda_0) %>% unlist() %>% length(), 
+           ncol = (reps-1)
+             )
+  )
+## get guesses for beta_oa as the group average from data 
+# first, if there are missing values, impute with prior guess for lambda0
+
+stroke_clean %>% 
+  mutate(final_y = ifelse(is.na(deaths), lambda_0 * population, deaths), 
+         log_rate = log(final_y/population)
+         ) %>% 
+  group_by(age.group) %>% 
+  summarize(b0a = mean(log_rate)) %>% 
+  ungroup() %>% 
+  select(b0a) %>% 
+  unlist() -> boa_guess ## my guess for Beta 0 is data driven 
+
+beta_0a <- 
+  cbind(
+    boa_guess, 
+    matrix(data = NA, 
+           nrow =   3, 
+           ncol = (reps-1)
+             )
+  ) ## these are some pretty bad guesses for the betas, but it will work for now 
+
+## get initial guesses for z_ia as the difference between observed Y minus age_group average 
+# first, if there are missing values, impute with prior guess for lambda0
+
+stroke_clean %>% 
+  mutate(final_y = ifelse(is.na(deaths), lambda_0 * population, deaths), 
+         log_rate = log(final_y/population)
+         ) %>% 
+  group_by(age.group) %>% 
+  mutate(b0a = mean(log_rate)) %>% 
+  ungroup() %>% 
+  mutate(z_ia = log_rate -b0a) %>%
+  select(z_ia) %>%  
+  unlist() -> zi_guess ## initial values for random effects z_ia are also data driven 
+
+z_ia <- 
+  cbind(
+    zi_guess, 
+    matrix(data = NA, 
+           nrow =   length(zi_guess), 
+           ncol = (reps-1)
+             )
+  ) 
+
+sigma_0a <- 
+  cbind(
+    c(10,10,10), 
+    matrix(data = NA, 
+           nrow =   3, 
+           ncol = (reps-1)
+             )
+  )## iniitiate sigma 2 for three age groups at 1,1,1. Not sure if these values even matter 
+
+tau2 = 10000 
+a = 0.001
+b = 0.001 
+
+q_norm_b  = 0.05
+# q_norm_zi = 0.005
+q_norm_zi = abs(zi_guess)*5 # make it such that the step size for each z_ia is poportional to its data-driven estiamte
+#                             ratio is 1/1
+q_ig = 1
+
+n = 67
+
+for(i in 2:reps){
+  
+  if(i %% 1000 == 0){print(i)}
+  ######################
+  # DATA IMPUTATION STEP 
+  ######################
+  
+  lambda_ia[,(i-1)] * stroke_clean$population -> poisson_lambdas_iter
+  
+  ppois(9.5, poisson_lambdas_iter) -> limits_detection_iter 
+  
+  # using these numbers between 0 and somewhere less than 1, sample from uniform distribution 
+  runif(n = length(limits_detection_iter), min = 0, max = limits_detection_iter) -> sampled_u 
+  
+  # get imputed values by putting unifrom random samples into 'inverse' CDF 
+  qpois(sampled_u, lambda = poisson_lambdas_iter) -> imp 
+  
+  # get final imputed vector of the observed data 
+  stroke_clean$deaths -> final_ys_iter
+  final_ys_iter[which(is.na(final_ys_iter))] <- imp[which(is.na(final_ys_iter))]
+  
+  ############
+  # UPDATE sigma_a
+  
+  # sample new sigma from the candidate density 
+  sig_proposed = 1/rgamma(n = 3, q_ig, q_ig * sigma_0a[,(i-1)]) # values 1,2,3 correspond 
+          ## to young, mid, old age groups 
+  
+  for(SIGMA in 1:3){
+    
+    s_prop = sig_proposed[SIGMA]
+    s_curr = sigma_0a[,(i-1)][SIGMA]
+    # identify what rows of random effects to grab 
+    z_rows <- seq(from = SIGMA, 
+                    to = length(final_ys_iter) - (3- SIGMA), 
+                    length.out = 67)
+    
+    # data for ratio 
+    z_ia[z_rows, (i-1)] -> random_effs
+    
+    (s_prop/s_curr)^(2*q_ig - a - n/2) * 
+      
+      exp(-1/2 * sum(random_effs^2) * (1/s_prop - 1/s_curr)) * 
+      
+      exp(-b * ((1/s_prop - 1/s_curr))) * 
+      
+      exp(q_ig * (s_prop/s_curr - s_curr/s_prop)) -> ratio 
+    
+    sigma_0a[,(i)][SIGMA] <- ifelse(ratio > runif(1), s_prop, s_curr)
+    
+  }
+  
+  ############
+  # UPDATE Z_ia
+  
+  b_0a = beta_0a[,(i-1)]
+  b_0a_calc = rep(b_0a, n)
+  
+  sig2 = sigma_0a[,(i)]
+  sig2_calc = rep(sig2, n)
+  
+  z_ia_curr = z_ia[,(i-1)]
+  z_ia_prop = rnorm(n = n*3, mean = z_ia_curr, sd = q_norm_zi)
+  
+  (-stroke_clean$population * 
+        (exp(b_0a_calc + z_ia_prop) + exp(b_0a_calc +z_ia_curr ))
+      ) + 
+    
+    (final_ys_iter*(z_ia_prop - z_ia_curr)) + 
+    
+    (-1/(2 * sig2_calc) * (z_ia_prop^2 - z_ia_curr^2)) -> ratio 
+  
+  z_ia[,i] <- ifelse(exp(ratio) > runif(n = length(ratio)), z_ia_prop, z_ia_curr)
+  ############
+  # UPDATE B_0a
+  
+  for(POP in 1:3){
+    
+    most_recent_beta0a <- beta_0a[POP, (i-1)] 
+    sampled_beta0a <- rnorm(n = 1, mean = most_recent_beta0a, sd = q_norm_b)
+    
+    POP_rows <- seq(from = POP, 
+                    to = length(final_ys_iter) - (3- POP), 
+                    length.out = 67)
+    
+    Y_ipop = final_ys_iter[POP_rows]
+    n_ipo = stroke_clean$population[POP_rows]
+    z_ia_calc = z_ia[,i][POP_rows]
+    
+    ratio  <- 
+      (sum(Y_ipop) * (sampled_beta0a - most_recent_beta0a)) + 
+      
+      (sum(n_ipo * exp(z_ia_calc)) * (exp(most_recent_beta0a) - exp(sampled_beta0a)) ) + 
+      
+      (-1/(2 * tau2) * (sampled_beta0a^2 - most_recent_beta0a^2))
+    
+    beta_0a[POP, (i)] <- ifelse(exp(ratio) > runif(n=1), sampled_beta0a, 
+                                most_recent_beta0a) 
+  }
+  
+  ## update lambda based on beta and zeta 
+  beta_0a_for_lambda = rep(beta_0a[,i], n)
+  
+  lambda_ia[,(i)] = exp(beta_0a_for_lambda + z_ia[,i])
+  
+}
+
+res <- list(lambda_ia, 
+                   sigma_0a, 
+                   z_ia, 
+                   beta_0a
+                   )
+
+names(res) <- c("lambdas", "sigmas", "zs", "betas")
+
+write_rds(x = res, 
+          file = "./MHresults/MH results7.rds"
+          )
+```
+
 

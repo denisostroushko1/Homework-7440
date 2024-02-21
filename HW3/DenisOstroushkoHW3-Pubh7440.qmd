@@ -274,3 +274,13 @@ dev.off()
 knitr::include_graphics('PAmap.png')
 
 ```
+
+# Appendix 
+
+### Comparison with Poisson-Gamma model 
+
+```{r }
+
+
+
+```
