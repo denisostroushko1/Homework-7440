@@ -76,19 +76,67 @@ our imputations we will be sampling integers from 0 to 9 from poisson distributi
 
 \begin{align*}
   p(\beta_{0a}, z_{ia}, \sigma^2_{0a} | \textbf{Y})   \propto &
-  \Pi_{i,a} \left[ Pois(Y_{ia} | n_{ia} * exp(\beta_{0a} + z_{ia})) \right]   \hspace{1cm} \textcolor{blue}{full \ data \ likelihood} \\ 
-  & Norm(\beta_{0a} | 0, \tau^2_a) \hspace{2cm} \textcolor{blue}{prior \ for \ \beta_{0a}} \\
-  & Norm(z_{ia} | 0, \sigma^2_a) \hspace{2cm} \textcolor{blue}{prior \ for \ z_{ia}} \\ 
-  & IG(\sigma^2_a | 0.001, 0.001) \hspace{1.5cm} \textcolor{blue}{prior \ for \ \sigma^2_a}
+  \Pi_{i,a} \left[ Pois(Y_{ia} | n_{ia} * exp(\beta_{0a} + z_{ia})) \right]   \times \hspace{1cm} \textcolor{blue}{full \ data \ likelihood} \\
+  & I(Y_{ia} < 10)^{1-d_{ia}} \times \hspace{4cm} \textcolor{blue}{add \ information \ about \ censoring \ of \ Y_{ia}} \\
+  & Norm(\beta_{0a} | 0, \tau^2_a) \times \hspace{4cm} \textcolor{blue}{prior \ for \ \beta_{0a}} \\
+  & Norm(z_{ia} | 0, \sigma^2_a) \times \hspace{4cm} \textcolor{blue}{prior \ for \ z_{ia}} \\ 
+  & IG(\sigma^2_a | 0.001, 0.001) \times \hspace{3.5cm} \textcolor{blue}{prior \ for \ \sigma^2_a}
 \end{align*}
 
 # Problem 2 
 
 ### Full conditional for $\beta_{0a}$
 
+* Term $\beta_{0a}$ appears in the likelihood of the data and its own prior distribution. Other parameters of the hierarchical model 
+are treated as constants with respect to $\beta_{0a}$. 
+
+Full conditional for $\beta_{0a}$, holding $a$ fixed. This full conditional generalizes to three terms for each age group: 
+
+\begin{align*}
+p(\beta_{0a} | . ) & \propto \Pi_{i,a} \left[ Pois(Y_{ia} | n_{ia} * exp(\beta_{0a} + z_{ia})) \right] \times Norm(\beta_{0a} | 0, \tau^2_a) \\ 
+& \propto exp(-\sum_{i} n_{ia} exp(\beta_{0a}+z_{ia})) \times exp(\sum_{i} Y_{ia} (\beta_{0a} + z_{ia})) \times exp(-\frac{1}{2} * \frac{\beta_{0a}^2}{\tau^2_{a}}) 
+\end{align*}
+
+I do not recognize this kernel as a known distribution, so we are not able to use Gibbs sampling technique to obtain posterior distribution of $\beta_{0a}$. We will use Metropolis algorithm to obtain samples for the posterior distribution. More on this later, but we will use Metropolis update because we assume a symmetric candidate density for $\beta_{ia}$
+
 ### Full conditional for $z_{ia}$
 
+* Term $z_{ia}$ appears in the likelihood of the data and its own prior distribution. Other parameters of the hierarchical model 
+
+are treated as constants with respect to $z_{ia}$. 
+Since each $z_{ia}$ is specific to its county and age group, we will use pmf of $Y_{ia}$ given by the Poisson distribution instead of the full likelihood of $Y_{ia}$ for age group $a$, which is different from the full conditional of $\beta_{0a}$. 
+
+This derivation gives a general version of a full conditional distribution for county $i$ and age group $a$, we obtain 201 posterior distributions in our analysis. 
+
+\begin{align*}
+p(z_{ia} | .) & \propto Pois(Y_{ia} | n_{ia} * exp(\beta_{0a} + z_{ia})) * Norm(z_{ia} | 0, \sigma^2_a) \\ 
+& \propto exp(-n_{ia} * exp(\beta_{0a} + z_{ia})) \times exp(Y_{ia} * (\beta_{0a} + z_{ia})) \times exp(-\frac{1}{2} \frac{z_{ia}^2}{\sigma^2_a})
+\end{align*}
+
+
+I do not recognize this kernel as a known distribution, so we are not able to use Gibbs sampling technique to obtain posterior distribution of $z_{ia}$. We will use Metropolis algorithm to obtain samples for the posterior distribution. More on this later, but we will use Metropolis update because we assume a symmetric candidate density for $z_{ia}$
+
+
 ### Full conditional for $\sigma^2_{a}$
+
+* Term $\sigma^2_{a}$ appears in the prior distribution of random effects $z_{ia}$. All other models terms are treated as constants with respect to $\sigma^2_{a}$, and will make up a normalizing constant for the proper density of the full conditional distribution. 
+
+* Because $\sigma^2_a$ appears in each of 67 $z_{ia}$ for a given age group $a$, we need to use a joint likelihood of random effects. 
+Assuming independence of $z_{ia}$, we can obtain join prior distribution as a product of 67 prior densities. 
+
+* Similar to $\beta_{0a}$, we derive a general form of the full conditional distribution for this parameter. In our analysis, we will obtain three posterior distributions for $\sigma^2_a$ for each age group. 
+
+* Inverse Gamma is a conjugate prior to a normal distribution, so we should expect to obtain an Inverse Gamma posterior distribution. 
+We will therefore use Gibbs sampling to get samples of $\sigma^2_a$
+
+Full conditional: 
+
+\begin{align*}
+p(\sigma^2_a | . ) & \propto \prod_{i} \frac{1}{\sqrt{2\pi\sigma^2_a}} exp(-\frac{1}{2\sigma^2_a} \sum_i z_{ia}^2) \times  (\sigma^2_a)^{-a-1} exp(-b/\sigma^2_a) \\
+& \propto (\sigma^2_a)^{-n/2-a-1} \times exp(-(b + \frac{1}{2}\sum_i z_{ia}^2) * 1/\sigma^2_a)
+\end{align*}
+
+Full conditional for $\sigma^2_a$ is proportional to the kernel of the Inverse Gamma with parameters $\alpha = n/2 + a$ and $\beta=$ $\large b + \frac{1}{2} \sum_i z_{ia}^2$
 
 # Problem 3
 
@@ -101,9 +149,33 @@ To fit the model, I used the following parameters and candidate densities:
 
 * Assume a symmetric candidate density $z_{ia}$ ~ $Norm(z_{ia}^{`}, q_{ia})$ where $q_{ia}$ is proportional to the data-driven
   point estimate for the county-specific effect on the observed log-rate of stroke related mortality rate 
-  
-* Assume an asymmetric candidate density $\sigma^2_a$ ~ $IG(q, q * \sigma^{`2}_a)$, where q = 3 and $\sigma^{`2}_a$ is the 
-  most recent updated value of $\sigma^2_a$ from the Metropolis-Hastings iteration 
+
+**Ratio for Updates** $\beta_{0a}$
+
+Using full conditional for $\beta_{0a}$, and omitting candidate density due to symmetrical property, we obtain the 
+following equation to test each proposed sample for acceptance/rejection: 
+
+\begin{align*}
+r(\beta^{\star}_{0a}) &= exp(-\frac{1}{2\tau^2_a}((\beta^{\star}_{0a})^2 - (\beta^{`}_{0a})^2)) \times \\
+& exp(\sum_{i}Y_{ia}(\beta^{\star}_{0a} - \beta^{`}_{0a})) \times
+exp([\sum_i n_{ia} exp(z_{ia})] * (exp(\beta^{`}_{0a}) - exp(\beta^{\star}_{0a})))
+\end{align*}
+
+**Ratio for Updates** $z_{ia}$
+
+Using full conditional for $z_{ia}$, and omitting candidate density due to symmetrical property, we obtain the 
+following equation to test each proposed sample for acceptance/rejection. Recall that each $z_{ia}$ is specific to the 
+county-age-group level, so we do not aggregate the data, like with the $\beta_{0a}$ example. 
+
+\begin{align*}
+r(z_{ia}^{\star}) & = exp(-n_{ia} (exp(\beta_{0a} + z_{ia}^{\star}) + exp(\beta_{0a} + z_{ia}^{`}))) \times \\ 
+& exp(Y_{ia} ( z_{ia}^{\star} - z_{ia}^{`})) \times exp(-\frac{1}{2\sigma^2_{a}} ( (z_{ia}^{\star})^2 - (z_{ia}^{`})^2))
+\end{align*}
+
+
+**Ratios for Update** $\sigma^2_{a}$ is not needed because we use Gibbs sampling 
+
+**Notes for the derivation** are attached at the end of the document after the code section 
 
 ```{r data preparation}
 
@@ -139,10 +211,9 @@ stroke_clean$n_0 <- rep(global_age_proportions*n0, 67)
 
 ```
 
-
 ```{r M-H sampling, eval = F }
 
-set.seed(182)
+set.seed(1234)
 
 reps = 10000
 
@@ -246,30 +317,31 @@ for(i in 2:reps){
   # UPDATE sigma_a
   
   # sample new sigma from the candidate density 
-  sig_proposed = 1/rgamma(n = 3, q_ig, q_ig * sigma_0a[,(i-1)]) # values 1,2,3 correspond to young, mid, old age groups 
-  
+  ## sample new values of sigma from posterior 
+
+
   for(SIGMA in 1:3){
-    
-    s_prop = sig_proposed[SIGMA]
-    s_curr = sigma_0a[,(i-1)][SIGMA]
-    # identify what rows of random effects to grab 
-    z_rows <- seq(from = SIGMA, 
-                    to = length(final_ys_iter) - (3- SIGMA), 
+
+    # s_prop = sig_proposed[SIGMA]
+    # s_curr = sigma_0a[,(i-1)][SIGMA]
+    # identify what rows of random effects to grab
+    z_rows <- seq(from = SIGMA,
+                    to = length(final_ys_iter) - (3- SIGMA),
                     length.out = 67)
-    
-    # data for ratio 
+
+    # data for ratio
     z_ia[z_rows, (i-1)] -> random_effs
-    
-    (s_prop/s_curr)^(2*q_ig - a - n/2) * 
-      
-      exp(-1/2 * sum(random_effs^2) * (1/s_prop - 1/s_curr)) * 
-      
-      exp(-b * ((1/s_prop - 1/s_curr))) * 
-      
-      exp(q_ig * (s_prop/s_curr - s_curr/s_prop)) -> ratio 
-    
-    sigma_0a[,(i)][SIGMA] <- ifelse(ratio > runif(1), s_prop, s_curr)
-    
+
+    # (s_prop/s_curr)^(2*q_ig - a - n/2) *
+    # 
+    #   exp(-1/2 * sum(random_effs^2) * (1/s_prop - 1/s_curr)) *
+    # 
+    #   exp(-b * ((1/s_prop - 1/s_curr))) *
+    # 
+    #   exp(q_ig * (s_prop/s_curr - s_curr/s_prop)) -> ratio
+
+    sigma_0a[,(i)][SIGMA] = 1 / rgamma(n = 1, n/2 + a, sum(random_effs^2)/2+b )
+
   }
   
   ############
@@ -686,7 +758,6 @@ mixed-effects regression model tends to estimate much higher stroke related mort
 In some cases the differences are as high as 20%. I suspect that the primary difference between the results are due to the use of random effects. 
 
 
-
 ```{r import results back }
 
 readRDS(
@@ -766,18 +837,13 @@ grid.arrange(
 
 ### Metropolis-Hastings Sampling Algorithm R-code 
 
-```{r , eval = F, echo = T }
+```{r eval = F, echo = T }
 
-set.seed(182)
+set.seed(1234)
 
 reps = 10000
 
-lambda_ia <-  ## this is a 201 x 10,000 matrix that will 
-              ## track updates for each county-age group Lambda
-              ## each row has 10,000 entries - 
-              ## to collect 10,000 metropolis updates 
-              ## I initiated algorithm with lambda = 
-              ## 75, 250, 1000 death per 100,000 people 
+lambda_ia <- 
   cbind(
     stroke_clean %>% select(lambda_0) %>% unlist(), 
     matrix(data = NA, 
@@ -796,7 +862,7 @@ stroke_clean %>%
   summarize(b0a = mean(log_rate)) %>% 
   ungroup() %>% 
   select(b0a) %>% 
-  unlist() -> boa_guess ## my guess for Beta 0 is data driven 
+  unlist() -> boa_guess
 
 beta_0a <- 
   cbind(
@@ -818,32 +884,33 @@ stroke_clean %>%
   mutate(b0a = mean(log_rate)) %>% 
   ungroup() %>% 
   mutate(z_ia = log_rate -b0a) %>%
-  select(z_ia) %>%  
-  unlist() -> zi_guess ## initial values for random effects z_ia are also data driven 
+  select(z_ia) %>% 
+  unlist() -> zi_guess
 
 z_ia <- 
   cbind(
     zi_guess, 
+   # rep(0, length(zi_guess)), 
     matrix(data = NA, 
            nrow =   length(zi_guess), 
            ncol = (reps-1)
              )
-  ) 
+  ) ## these are some pretty bad guesses for the z_i's, but it will work for now 
 
 sigma_0a <- 
   cbind(
-    c(10,10,10), 
+    c(1,1,1), 
     matrix(data = NA, 
            nrow =   3, 
            ncol = (reps-1)
              )
-  )## iniitiate sigma 2 for three age groups at 1,1,1. Not sure if these values even matter 
+  )## these are some pretty bad guesses for the z_i's, but it will work for now 
 
 tau2 = 10000 
 a = 0.001
 b = 0.001 
 
-q_norm_b  = 0.05
+q_norm_b  = 0.075
 # q_norm_zi = 0.005
 q_norm_zi = abs(zi_guess)*5 # make it such that the step size for each z_ia is poportional to its data-driven estiamte
 #                             ratio is 1/1
@@ -876,31 +943,31 @@ for(i in 2:reps){
   # UPDATE sigma_a
   
   # sample new sigma from the candidate density 
-  sig_proposed = 1/rgamma(n = 3, q_ig, q_ig * sigma_0a[,(i-1)]) # values 1,2,3 correspond 
-          ## to young, mid, old age groups 
-  
+  ## sample new values of sigma from posterior 
+
+
   for(SIGMA in 1:3){
-    
-    s_prop = sig_proposed[SIGMA]
-    s_curr = sigma_0a[,(i-1)][SIGMA]
-    # identify what rows of random effects to grab 
-    z_rows <- seq(from = SIGMA, 
-                    to = length(final_ys_iter) - (3- SIGMA), 
+
+    # s_prop = sig_proposed[SIGMA]
+    # s_curr = sigma_0a[,(i-1)][SIGMA]
+    # identify what rows of random effects to grab
+    z_rows <- seq(from = SIGMA,
+                    to = length(final_ys_iter) - (3- SIGMA),
                     length.out = 67)
-    
-    # data for ratio 
+
+    # data for ratio
     z_ia[z_rows, (i-1)] -> random_effs
-    
-    (s_prop/s_curr)^(2*q_ig - a - n/2) * 
-      
-      exp(-1/2 * sum(random_effs^2) * (1/s_prop - 1/s_curr)) * 
-      
-      exp(-b * ((1/s_prop - 1/s_curr))) * 
-      
-      exp(q_ig * (s_prop/s_curr - s_curr/s_prop)) -> ratio 
-    
-    sigma_0a[,(i)][SIGMA] <- ifelse(ratio > runif(1), s_prop, s_curr)
-    
+
+    # (s_prop/s_curr)^(2*q_ig - a - n/2) *
+    # 
+    #   exp(-1/2 * sum(random_effs^2) * (1/s_prop - 1/s_curr)) *
+    # 
+    #   exp(-b * ((1/s_prop - 1/s_curr))) *
+    # 
+    #   exp(q_ig * (s_prop/s_curr - s_curr/s_prop)) -> ratio
+
+    sigma_0a[,(i)][SIGMA] = 1 / rgamma(n = 1, n/2 + a, sum(random_effs^2)/2+b )
+
   }
   
   ############
@@ -947,8 +1014,7 @@ for(i in 2:reps){
       
       (-1/(2 * tau2) * (sampled_beta0a^2 - most_recent_beta0a^2))
     
-    beta_0a[POP, (i)] <- ifelse(exp(ratio) > runif(n=1), sampled_beta0a, 
-                                most_recent_beta0a) 
+    beta_0a[POP, (i)] <- ifelse(exp(ratio) > runif(n=1), sampled_beta0a, most_recent_beta0a) 
   }
   
   ## update lambda based on beta and zeta 
