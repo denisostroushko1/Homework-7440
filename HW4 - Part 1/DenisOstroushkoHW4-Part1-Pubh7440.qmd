@@ -215,7 +215,7 @@ stroke_clean$n_0 <- rep(global_age_proportions*n0, 67)
 
 set.seed(1234)
 
-reps = 20000
+reps = 50000
 
 lambda_ia <- 
   cbind(
