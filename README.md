@@ -27,7 +27,7 @@ Homework for Spring 2024 PUBH 7440 at the University of Minnesota.
     parameter $\lambda$ for poisson distribution 
   + derivation of a full hierarchical model given data likelihood, prior distribution of the parameter, and model for suppressed/censored values of the data (which we need for the posterior distribution)
   + interpretation of the prior and posterior parameters of poisson and gamma distributions 
-  
+  + PDF file contains derivation steps
 * Implementation via R code: 
   + iterative Gibbs sampling procedure for sampling suppressed/censored data and sampling parameters from the posterior distribution based 
     on imputed data 
@@ -36,3 +36,18 @@ Homework for Spring 2024 PUBH 7440 at the University of Minnesota.
 * Packages: 
   + `maps`: update to `maptools`: easy framework for importing maps to R and plotting shapes/outlines 
     - example contains map of PA counties
+
+# HW4 
+
+* Statistical Concepts: 
+  + Metropolis–Hastings algorithm with imputation of suppressed values of small death counts for counties in PA and estimate posterior distribution of in a hierarchical model. Model for stroke related death rates included three levels of parameters. 
+  + derivation of a full hierarchical model given data likelihood, prior distribution of the parameter, and model for suppressed/censored values of the data (which we need for the posterior distribution)
+  + derivation of acceptance-rejection ratio equations to evaluate proposed values. 
+  + Vectorization of proposed candidate values acceptance/rejection procedure for faster algorithm completion time. 
+  + PDF file contains derivation steps
+  
+* Implementation via R code: 
+  + iterative univariate Metropolis Hastings Sampling blended with Gibbs sampling for parameters with conjugate prior distributions
+  + mapping of age-adjusted death rates by county using `maps` objects 
+
+
