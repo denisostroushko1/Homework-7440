@@ -42,13 +42,13 @@ Y_{ia} &= \frac{e^{- (n_{ia} e^{\theta_{0a}}) } \times (n_{ia} e^{\theta_{0a}})^
 
 As mentioned previously, $\theta_{0a}$ is a random variable {because Bayesian Analysis framework}, and therefore it has a prior distributions: 
 
-$\theta_{ia} | \beta_{0a}, \sigma^2_a$ ~ $N(\beta_{0a}, \sigma^2_a)$. This equation represents 201 distributions for each county. Within an age group, log death rates for the county ar iid normal random variables. 
+$\theta_{ia} | \beta_{0a}, \sigma^2_a$ ~ $N(\beta_{0a}, \sigma^2_a)$. This equation represents 201 distributions for each county. Within an age group, log death rates for across counties are iid normal random variables. 
 
-$\beta_{0a} | \mu = 0, \tau^2_a$ ~ $N(0, \tau^2_a)$, where $\tau^2 = 10,000$. So, the prior distribution of the average log death rate of a given age group is non-informative. 
+$\beta_{0a} | \mu = 0, \tau^2_a$ ~ $N(0, \tau^2_a)$, where $\tau^2 = 10,000$. So, the prior distribution of the average of log death rates of a given age group is non-informative. 
 
 $\sigma^2_a$~$IG(0.001, 0.001)$, so variance comes from a non-informative Inverse Gamma (IG) distribution. 
 
-**For suppressed values of deaths with county and age-groups levels:** refer to HW4- Part 1 for the imputation scheme. 
+**For suppressed values of deaths with county and age-groups levels** refer to HW4- Part 1 for the imputation scheme. 
 
 ### Full hirerachical model 
 
@@ -65,7 +65,7 @@ $\sigma^2_a$~$IG(0.001, 0.001)$, so variance comes from a non-informative Invers
 
 ### Full conditional for $\beta_{0a}$
 
-* Term $\beta_{0a}$ appears in the distribution of $\theta_{ia}$ as the mean, and in its own distribution. 
+Term $\beta_{0a}$ appears in the distribution of $\theta_{ia}$ as the mean, and in its own distribution. 
 Note, $\beta_{0a}$ is the mean for the age group, and is the average log death rate for a given age group. 
 Therefore, we need to consider a joint likelihood function for 67 iid $\theta_{ia}$. 
 
@@ -81,7 +81,7 @@ I do not recognize this kernel as a known distribution, so we are not able to us
 
 ### Full conditional for $\theta_{ia}$
 
-* Term $\theta_{ia}$ appears in the likelihood of the data and its own prior distribution. Other parameters of the hierarchical model  are treated as constants with respect to $\theta_{ia}$. 
+Term $\theta_{ia}$ appears in the likelihood of the data and its own prior distribution. Other parameters of the hierarchical model  are treated as constants with respect to $\theta_{ia}$. 
 
 This derivation gives a general version of a full conditional distribution for county $i$ and age group $a$, we obtain 201 posterior distributions in our analysis. 
 
@@ -122,6 +122,10 @@ To fit the model, I used the following parameters and candidate densities:
 * Assume a symmetric candidate density $\beta_0$ ~ $Norm(\beta_0^{`}, q)$ where $q=1$
 
 * Assume a symmetric candidate density $\theta_{ia}$ ~ $Norm(\theta_{ia}^{`}, q_{ia})$ where $q_{ia} = 1$ 
+
+* Will use 50,000 iterations for the loop to obtain posterior samples, and will use iterations 1 to 10,000 as burnin. These iterations will be discarded and will not contribute to the final distribution. 
+  + I suspect that working with rejection rates and optimizing $q$ and $q_{ia}$ for my algorithm will result in a more efficient 
+    sampling procedure and will reduce the number of replications required. 
 
 **Ratio for Updates** $\beta_{0a}$
 
@@ -554,7 +558,7 @@ par(mar=c(0,0,0,10),cex=1)
 dev.off()
 ```
 
-@fig-map  presents county-specific age-adjusted rates using regression with age as a predictor. Overall, the map looks similar to what we observed under the Poisson-Gamma model (HW3). @fig-map-p1 shows results obtained in part 1, 
+@fig-map  presents county-specific age-adjusted mortality rates per 100,000 using regression with age as a predictor. Overall, the map looks similar to what we observed under the Poisson-Gamma model (HW3). @fig-map-p1 shows results obtained in part 1, 
 using mixed effects regression adjustment for age. The two maps appear very similar. 
 
 ```{r include final map}
@@ -575,7 +579,7 @@ knitr::include_graphics(paste0(gsub("Part 2", "Part 1", getwd()), '/PAmapHW4.png
 
 ```
 
-@fig-lambda-sum presents posterior distribution for the average log-death rate for each group. Top row represents estimates obtained from part 1 , and bottom row are part 2 estimates (this HW). Recall: part 2 is regression for age adjustment, and part 1 is regression for age adjustment with county specific random effects. 
+@fig-beta0-sum-comp presents posterior distribution for the average log-death rate for each group. Top row represents estimates obtained from part 1 , and bottom row are part 2 estimates (this HW). 
 
 Overall, the two models produce similar posterior distributions for all $\beta_{0a}$. It is quite notable that posterior distributions from part 1 are less smooth. I am not sure why this happens, it could be due to the fact that 
 the model is more complex. It also could be due to the fact that my algorithm are not tuned for optimal convergence. 
@@ -769,7 +773,7 @@ ggplot(data = data.frame(part_1 = aa.med_p1,
 
 ### Metropolis Hastings Code 
 
-```{r M-H sampling viz, eval = F, echo = T }
+```{r , eval = F, echo = T }
 
 set.seed(1234)
 
