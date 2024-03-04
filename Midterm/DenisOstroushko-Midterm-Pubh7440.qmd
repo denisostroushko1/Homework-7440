@@ -1,0 +1,651 @@
+---
+title: "Denis Ostroushko - PUBH 7440 - HW4 - Part 2"
+format: pdf
+execute: 
+  warning: false
+  message: false 
+  echo: false 
+header-includes: \usepackage{pdfpages}
+---
+
+
+```{r local helper, eval= F}
+rm(list = ls())
+i = 2
+burnin = 1:10000
+```
+
+```{r}
+library(tidyverse)
+library(kableExtra)
+library(gridExtra)
+
+options(scipen = 99999, 
+        knitr.kable.NA = '')
+```
+
+```{r read and prepare the data }
+
+load('midterm_data.rdata')
+
+Y_g1 <- mdata$Y[,1]
+Y_g2 <- mdata$Y[,2]
+
+n_g1 <- mdata$n[,1]
+n_g2 <- mdata$n[,2]
+
+birth_data <- 
+  data.frame(
+    county_id = rep(1:length(Y_g1), 2), 
+    group_r = c(rep(1, length(Y_g1)), rep(2, length(Y_g1))), 
+    y = c(Y_g1, Y_g2), 
+    n = c(n_g1, n_g2)
+  )
+
+```
+
+# Problem 1 
+
+# Problem 2 
+
+# Problem 3 
+
+```{r M-H and Gibbs updates loop, eval=F}
+
+expit <- function(x){exp(x)/(1 + exp(x))}
+
+reps = 50000
+
+beta_0r <-
+  cbind(
+    matrix(c(0,0), nrow = 2, ncol = 1), 
+    matrix(NA, nrow = 2, ncol = reps - 1)
+  )
+  
+sigma_0r <-
+  cbind(
+    matrix(c(1,1), nrow = 2, ncol = 1), 
+    matrix(NA, nrow = 2, ncol = reps - 1)
+  )
+
+theta_ir <- 
+  cbind(
+    matrix(c(0,0), nrow = nrow(birth_data), ncol = 1), 
+    matrix(NA, nrow = nrow(birth_data), ncol = reps - 1)
+  )
+
+pi_ir <- expit(theta_ir)
+  
+
+######## candidate density variances 
+beta_q = c(0.05, 0.15)
+theta_q = 0.05
+
+######## parameters of priors 
+tau2 = 10000
+a = 0.001
+b = 0.001
+
+
+set.seed(123)
+for(i in 2:reps){
+  
+  if(i %% 1000 == 0){print(i)}
+  ##########
+  # update beta_0r 
+  
+  current_beta_0r <- beta_0r[,(i-1)]
+  proposed_beta_0r <- rnorm(n = 2, mean = current_beta_0r, sd = beta_q)
+  
+  sigma_0r_calc <- sigma_0r[,(i-1)]
+  
+  theta_ir_calc <- theta_ir[,(i-1)]
+  n = length(theta_ir_calc)/2
+  theta_i1 <- sum(theta_ir_calc[1:n])
+  theta_i2 <- sum(theta_ir_calc[(n+1):length(theta_ir_calc)])
+  theta_ir_beta_calc <- c(theta_i1, theta_i2)
+  
+  log_ratio <- 
+    theta_ir_beta_calc/sigma_0r_calc * (proposed_beta_0r - current_beta_0r) - 
+    1/2 * (n/sigma_0r_calc + 1/tau2) * (proposed_beta_0r^2 - current_beta_0r^2)
+  
+  beta_0r[,i] <- ifelse(exp(log_ratio) > runif(n = 2, min = 0, max = 1), proposed_beta_0r, current_beta_0r)
+  
+  #########
+  # update sigma 
+  
+  betas_long <- c(rep(beta_0r[1,i], n), rep(beta_0r[2,i], n))
+  
+  (theta_ir_calc - betas_long)^2 -> theta_beta_sq_diff
+  
+  theta_ir_sigma_calc <- c(
+    
+    sum(theta_beta_sq_diff[1:n]),
+    sum(theta_beta_sq_diff[(n+1): length(theta_beta_sq_diff)])
+    
+  )
+  
+  sigma_0r[,i] <- 1/rgamma(n = 2, n/2 + a, 1/2 * theta_ir_sigma_calc + b)
+  
+  ########
+  # update theta ir 
+  
+  current_theta_ir <- theta_ir[,(i-1)]
+  proposed_theta_ir <- rnorm(n = length(current_theta_ir), mean = current_theta_ir, sd = theta_q)
+    
+  log_ratio <- 
+    birth_data$y * (proposed_theta_ir - current_theta_ir) - 
+    birth_data$n * (log(1 + exp(proposed_theta_ir)) - log(1 + exp(current_theta_ir))) - 
+    1/2 * ( (proposed_theta_ir - betas_long)^2 - (current_theta_ir - betas_long)^2 )
+  
+  theta_ir[,i] <- ifelse(exp(log_ratio) > runif(n = length(current_theta_ir)), 
+                         proposed_theta_ir, 
+                         current_theta_ir)
+  
+  ##########
+  # get pi from theta ir 
+  pi_ir[,i] <- expit(theta_ir[,i])
+}
+
+results <- list(pi_ir, theta_ir, beta_0r, sigma_0r)
+names(results) <- c('pi_ir', 'theta_ir', 'beta_0r', 'sigma_0r')
+write_rds(results, "midterm_res.rds")
+
+```
+
+```{r functions for results validation, eval = F}
+
+acceptance_ratio <- function(x){
+  mean(x[1:length(x)-1] == x[2:length(x)])
+}
+
+```
+
+### Betas 
+
+```{r evaluate results for BETAs, eval = F}
+
+beta_0r_f <- beta_0r[, -burnin]
+###########
+# BETA 1
+
+beta_01 <- beta_0r_f[1,]
+summary(beta_01)
+
+acceptance_ratio(beta_01)
+
+ggplot(data = data.frame(beta = beta_01, i = 1:length(beta_01)), 
+       aes(x = i, y = beta)) + 
+  theme_minimal() + 
+  geom_line() + 
+  geom_hline(yintercept = mean(beta_01), color = "red") + 
+  geom_smooth(color = "blue", alpha = 0.25, se = T)
+
+
+###########
+# BETA 2
+#### beta is the mean of logit deaths 
+
+beta_02 <- beta_0r_f[2,]
+summary(beta_02)
+
+acceptance_ratio(beta_02)
+
+ggplot(data = data.frame(beta = beta_02, i = 1:length(beta_02)), 
+       aes(x = i, y = beta)) + 
+  theme_minimal() + 
+  geom_line() + 
+  geom_hline(yintercept = mean(beta_02), color = "red") + 
+  geom_smooth(color = "blue", alpha = 0.25, se = T)
+
+
+###### 
+# compare data estimates with the data 
+
+birth_data %>% 
+  group_by(group_r) %>% 
+  summarise(log((sum(y)/sum(n)) / (1 - sum(y)/sum(n)))) %>% 
+  ungroup() %>% 
+  mutate(
+    est = apply(beta_0r_f, 1, median)
+  )
+
+### everything looks good 
+```
+
+```{r import BETAs data}
+
+results <- read_rds("midterm_res.rds")
+beta_0r = results$beta_0r
+```
+
+```{r BETA r1 history plots}
+beta_0r_plot <- data.frame(beta = beta_0r[1,], i = 1:length(beta_0r[1,]))
+
+grid.arrange(
+  ggplot(data = beta_0r_plot, 
+         aes(x = i, y = beta)) + 
+    theme_minimal() + 
+    geom_line() + 
+    geom_hline(yintercept = mean(beta_0r_plot$beta), color = "red") + 
+    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+ 
+   
+  ggplot(data = beta_0r_plot %>% filter(i >= 1000), 
+         aes(x = i, y = beta)) + 
+    theme_minimal() + 
+    geom_line() + 
+    geom_hline(yintercept = mean(beta_0r_plot$beta), color = "red") + 
+    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+  nrow = 1
+)
+```
+
+```{r BETA r2 history plots}
+beta_0r_plot <- data.frame(beta = beta_0r[2,], i = 1:length(beta_0r[2,]))
+
+grid.arrange(
+  ggplot(data = beta_0r_plot, 
+         aes(x = i, y = beta)) + 
+    theme_minimal() + 
+    geom_line() + 
+    geom_hline(yintercept = mean(beta_0r_plot$beta), color = "red") + 
+    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+ 
+   
+  ggplot(data = beta_0r_plot %>% filter(i >= 1000), 
+         aes(x = i, y = beta)) + 
+    theme_minimal() + 
+    geom_line() + 
+    geom_hline(yintercept = mean(beta_0r_plot$beta), color = "red") + 
+    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+  nrow = 1
+)
+```
+
+### Sigmas 
+
+```{r evaluate results for SIGMAs, eval = F}
+
+sigma_0r_f <- sigma_0r[, -burnin]
+###########
+# SIGMA 1
+
+sigma_01 <- sigma_0r_f[1,]
+summary(sigma_01)
+
+ggplot(data = data.frame(sigma = sigma_01, i = 1:length(sigma_01)), 
+       aes(x = i, y = sigma)) + 
+  theme_minimal() + 
+  geom_line() + 
+  geom_hline(yintercept = mean(sigma_01), color = "red") + 
+  geom_smooth(color = "blue", alpha = 0.25, se = T)
+
+###########
+# SIGMA 2
+
+sigma_02 <- sigma_0r_f[2,]
+summary(sigma_02)
+
+ggplot(data = data.frame(sigma = sigma_02, i = 1:length(sigma_02)), 
+       aes(x = i, y = sigma)) + 
+  theme_minimal() + 
+  geom_line() + 
+  geom_hline(yintercept = mean(sigma_02), color = "red") + 
+  geom_smooth(color = "blue", alpha = 0.25, se = T)
+
+```
+
+```{r SIGMA import results}
+sigma_0r = results$sigma_0r
+```
+
+```{r SIGMA r1 history plots }
+
+sigma_01 <- data.frame(sig = sigma_0r[1,], i = 1:length( sigma_0r[1,]))
+
+grid.arrange(
+  ggplot(data = sigma_01, 
+         aes(x = i, y = sig)) + 
+    theme_minimal() + 
+    geom_line() + 
+    geom_hline(yintercept = mean(sigma_01$sig), color = "red") + 
+    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+  
+ ggplot(data = sigma_01 %>% filter(i >= 1000), 
+         aes(x = i, y = sig)) + 
+    theme_minimal() + 
+    geom_line() + 
+    geom_hline(yintercept = mean(sigma_01$sig), color = "red") + 
+    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+ 
+ nrow = 1
+)
+
+```
+
+```{r SIGMA r2 history plots }
+
+sigma_01 <- data.frame(sig = sigma_0r[2,], i = 1:length( sigma_0r[2,]))
+
+grid.arrange(
+  ggplot(data = sigma_01, 
+         aes(x = i, y = sig)) + 
+    theme_minimal() + 
+    geom_line() + 
+    geom_hline(yintercept = mean(sigma_01$sig), color = "red") + 
+    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+  
+ ggplot(data = sigma_01 %>% filter(i >= 1000), 
+         aes(x = i, y = sig)) + 
+    theme_minimal() + 
+    geom_line() + 
+    geom_hline(yintercept = mean(sigma_01$sig), color = "red") + 
+    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+ 
+ nrow = 1
+)
+
+```
+
+```{r evaluate results for THETAs, eval = F}
+
+theta_ir_f <- theta_ir[, -burnin]
+
+apply(theta_ir_f, MARGIN = 1, FUN = acceptance_ratio) %>% summary()
+apply(theta_ir_f, MARGIN = 1, FUN = acceptance_ratio) %>% length()
+
+apply(theta_ir_f, MARGIN = 1, FUN = median) -> median_thetas
+median_pis <- expit(median_thetas)
+
+d_check = data.frame(data = with(birth_data, y/n), 
+                         est = median_pis,
+                     ns = birth_data$n)
+
+to_num = max(
+  max(d_check$data, na.rm = T), 
+  max(d_check$est, na.rm = T)
+) 
+
+ggplot(data = d_check, aes(x = data, y = est, color=log10(ns+0.01))) + 
+  theme_minimal() + 
+  geom_point() + 
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed")+
+  scale_colour_gradientn(colours = rainbow(5)) + 
+  xlim(0, to_num) + 
+  ylim(0, to_num)
+  
+
+```
+
+# Problem 4 
+
+```{r log odds ratio }
+
+burnin <- 1:1000
+beta_0r <- results$beta_0r[,-burnin ]
+
+diff_log_odds <- beta_0r[2,] - beta_0r[1,]
+
+from_ = min(diff_log_odds)
+to_   = max(diff_log_odds)
+
+from_ <- ifelse(from_ > 0, 0, from_)
+
+above_zero <- length(which(diff_log_odds < 0))
+
+ggplot(data = data.frame(log_odds_ratio = diff_log_odds), 
+       aes(x = log_odds_ratio)) + 
+  theme_classic() + 
+  geom_histogram(color = "black", fill = "lightgrey", bins = 30)  + 
+  xlim(from_, to_) + 
+  labs(title = paste0("Log Odds Ratio", 
+                      "\nMedian: ", round(diff_log_odds, 2), "; 95% Credible Interval: ", 
+                      round(quantile(diff_log_odds, 0.025), 2), " to ", 
+                      round(quantile(diff_log_odds, 0.975), 2)
+                      )
+       )
+
+```
+
+# Problem 5 
+
+```{r load and prep data for the mapping }
+
+r1_rates <- results$pi_ir[1:(nrow(results$pi_ir)/2), -burnin] 
+f_r1_rates <- apply(r1_rates, 1, median)
+
+r2_rates <- results$pi_ir[(nrow(results$pi_ir)/2 + 1):(nrow(results$pi_ir)), -burnin] 
+f_r2_rates <- apply(r2_rates, 1, median)
+
+rates_ratio <- f_r2_rates/f_r1_rates
+```
+
+```{R for map development purposes, eval = F}
+
+library(sp)
+library(maps)
+library(RColorBrewer)
+rd <- load('penn-1.rdata')
+#         penn
+
+ROUNDING = 0
+PER_ = 1000
+
+H = 700
+W = H * 1.615
+
+###############
+# MAP FOR R = 1
+
+Ns=67 
+ncols=7
+cols=brewer.pal(ncols,'RdYlBu')[ncols:1]
+tcuts=quantile(f_r1_rates * PER_,1:(ncols-1)/ncols)
+tcolb=array(rep(f_r1_rates * PER_,each=ncols-1) > tcuts,
+            dim=c(ncols-1,Ns))
+tcol =apply(tcolb,2,sum)+1
+
+png('r1_rates_map.png',height=H,width=W)
+par(mar=c(0,0,0,10),cex=1)
+    plot(penn,col=cols[tcol],border='lightgray',lwd=.5)
+    legend('right',inset=c(-.15,0),xpd=TRUE,
+           legend=c(paste(
+           c('Below',round(tcuts[-(ncols-1)],ROUNDING),'Over'),
+           c(' ',rep( ' - ',ncols-2),' '),
+           c(round(tcuts,ROUNDING),round(tcuts[ncols-1],ROUNDING)),sep='')),
+           fill=cols,title= paste0('Low Births per ', 
+                                   prettyNum(PER_, big.mark = ",")),bty='n',cex=1.5,
+           border='lightgray')
+dev.off()
+
+
+###############
+# MAP FOR R = 2
+
+Ns=67 
+ncols=7
+cols=brewer.pal(ncols,'RdYlBu')[ncols:1]
+tcuts=quantile(f_r2_rates * PER_,1:(ncols-1)/ncols)
+tcolb=array(rep(f_r2_rates * PER_,each=ncols-1) > tcuts,
+            dim=c(ncols-1,Ns))
+tcol =apply(tcolb,2,sum)+1
+
+png('r2_rates_map.png',height=H,width=W)
+par(mar=c(0,0,0,10),cex=1)
+    plot(penn,col=cols[tcol],border='lightgray',lwd=.5)
+    legend('right',inset=c(-.15,0),xpd=TRUE,
+           legend=c(paste(
+           c('Below',round(tcuts[-(ncols-1)],ROUNDING),'Over'),
+           c(' ',rep( ' - ',ncols-2),' '),
+           c(round(tcuts,ROUNDING),round(tcuts[ncols-1],ROUNDING)),sep='')),
+           fill=cols,title=paste0('Low Births per ', 
+                                   prettyNum(PER_, big.mark = ",")),bty='n',cex=1.5,
+           border='lightgray')
+dev.off()
+
+#################################
+# MAP FOR RATIO OF R = 2 TO R = 1
+
+ROUNDING = 2
+
+Ns=67 
+ncols=7
+cols=brewer.pal(ncols,'RdYlBu')[ncols:1]
+tcuts=quantile(rates_ratio,1:(ncols-1)/ncols)
+tcolb=array(rep(rates_ratio,each=ncols-1) > tcuts,
+            dim=c(ncols-1,Ns))
+tcol =apply(tcolb,2,sum)+1
+
+png('rates_ratio_map.png',height=H,width=W)
+par(mar=c(0,0,0,10),cex=1)
+    plot(penn,col=cols[tcol],border='lightgray',lwd=.5)
+    legend('right',inset=c(-.15,0),xpd=TRUE,
+           legend=c(paste(
+           c('Below',round(tcuts[-(ncols-1)],ROUNDING),'Over'),
+           c(' ',rep( ' - ',ncols-2),' '),
+           c(round(tcuts,ROUNDING),round(tcuts[ncols-1],ROUNDING)),sep='')),
+           fill=cols,title='Ratio of R=2 to R=1',bty='n',cex=1.5,
+           border='lightgray')
+dev.off()
+
+```
+
+```{r side by side maps }
+
+p1 <- knitr::include_graphics('./r1_rates_map.png')
+p2 <- knitr::include_graphics('./r2_rates_map.png')
+rates_p <- knitr::include_graphics('./rates_ratio_map.png')
+
+```
+
+```{r}
+p1 
+```
+
+```{r}
+p2
+```
+
+```{r}
+rates_p 
+```
+
+# Problem 6 
+
+### Philadelphia County 
+
+```{r}
+nrow_ = nrow(results$pi_ir)
+
+r1_phily <- results$pi_ir[1:nrow_/2, -burnin][51 ,]
+r2_phily <- results$pi_ir[(nrow_/2 + 1):nrow_, -burnin][51 ,]
+
+phily_ratio = r2_phily/r1_phily
+
+data_estimate <- 
+  with(birth_data[birth_data$county_id == 51 & birth_data$group_r == 2, ], 
+       y/n)/
+  with(birth_data[birth_data$county_id == 51 & birth_data$group_r == 1, ], 
+       y/n)
+
+state_wide_estimate = 
+  birth_data %>% 
+  group_by(group_r) %>% 
+  summarise(rate = sum(y)/sum(n)) %>% select(rate) %>% unlist()
+
+birth_data %>% 
+  filter(county_id == 51) %>% 
+  select(-county_id) %>% 
+  mutate(crude_rate = y/n, 
+         estimated = c(median(r1_phily), median(r2_phily)), 
+         state_wide = state_wide_estimate
+         ) %>% 
+  kable(col.names = c("Racial Group", "Y", "N", "Crude Rate", "Estiamted Rate", "State-Wide Rate"), 
+                      digits = 2, 
+                      align = 'c', 
+        booktabs = T)
+```
+
+```{r}
+
+state_wide_estimate = state_wide_estimate[2] / state_wide_estimate[1]
+
+ggplot(data = data.frame(ratio = phily_ratio), 
+       aes(x = ratio)) + 
+  theme_classic() + 
+  geom_histogram(color = "black", fill = "lightgrey", bins = 30)   + 
+  geom_vline(aes(color = "State-wide Crude Ratio", xintercept = state_wide_estimate), linewidth = 1, linetype = "dashed")   + 
+  geom_vline(aes(color = "County-Level Crude Ratio", xintercept = data_estimate), linewidth = 1, linetype = "dashed") + 
+  ggtitle(
+    paste0("Estiamted Median Ratio: ", round(median(phily_ratio), 2), 
+           "\n95% Credible Interval: ", round(quantile(phily_ratio, 0.025), 2), " to ", round(quantile(phily_ratio, 0.975), 2)
+    )
+  )
+
+
+```
+
+
+### Sullivan County
+
+
+```{r}
+
+nrow_ = nrow(results$pi_ir)
+
+r1_phily <- results$pi_ir[1:nrow_/2, -burnin][57 ,]
+r2_phily <- results$pi_ir[(nrow_/2 + 1):nrow_, -burnin][57 ,]
+
+phily_ratio = r2_phily/r1_phily
+
+data_estimate <- 
+  with(birth_data[birth_data$county_id == 57 & birth_data$group_r == 2, ], 
+       y/n)/
+  with(birth_data[birth_data$county_id == 57 & birth_data$group_r == 1, ], 
+       y/n)
+
+state_wide_estimate = 
+  birth_data %>% 
+  group_by(group_r) %>% 
+  summarise(rate = sum(y)/sum(n)) %>% select(rate) %>% unlist()
+
+birth_data %>% 
+  filter(county_id == 57) %>% 
+  select(-county_id) %>% 
+  mutate(crude_rate = y/n, 
+         estimated = c(median(r1_phily), median(r2_phily)), 
+         state_wide = state_wide_estimate
+         ) %>% 
+  kable(col.names = c("Racial Group", "Y", "N", "Crude Rate", "Estiamted Rate", "State-Wide Rate"), 
+                      digits = 2, 
+                      align = 'c', 
+        booktabs = T)
+```
+
+```{r}
+
+state_wide_estimate = state_wide_estimate[2] / state_wide_estimate[1]
+
+ggplot(data = data.frame(ratio = phily_ratio), 
+       aes(x = ratio)) + 
+  theme_classic() + 
+  geom_histogram(color = "black", fill = "lightgrey", bins = 30)   + 
+  geom_vline(aes(color = "State-wide Crude Ratio", xintercept = state_wide_estimate), linewidth = 1, linetype = "dashed")   + 
+  geom_vline(aes(color = "State-Level Crude Ratio", xintercept = data_estimate), linewidth = 1, linetype = "dashed") + 
+  ggtitle(
+    paste0("Estiamted Median Ratio: ", round(median(phily_ratio), 2), 
+           "\n95% Credible Interval: ", round(quantile(phily_ratio, 0.025), 2), " to ", round(quantile(phily_ratio, 0.975), 2), 
+           "\nWhite Births Total: ", prettyNum(birth_data[birth_data$county_id == 57 & birth_data$group_r == 1, ]$n, big.mark = ","),
+           "; Black Births Total: ", prettyNum(birth_data[birth_data$county_id == 57 & birth_data$group_r == 2, ]$n, big.mark = ","))
+  )
+
+
+```
+
+\newpage 
+
+# Appendix 
+
+\includepdf[pages={2-15}]{midterm working version.pdf}
+
