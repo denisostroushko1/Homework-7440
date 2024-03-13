@@ -46,7 +46,74 @@ birth_data <-
 
 # Problem 1 
 
+Full hierarchical model: 
+
+\begin{align*}
+p(\theta_{ir}, \beta_{0r}, \sigma^2_r | y_{ir}, n_{ir}) &\propto \prod_{i = 1}^{N = 67} \prod_{r = 1}^{R = 2} Bin(n_{ir}, \pi_{ir}) \times Norm(\beta_{0r}, \sigma^2_r) \times Norm(0, \tau^2) \times IG(0.001, 0.001) \\ 
+& = \prod_{i = 1}^{N = 67} \prod_{r = 1}^{R = 2} Bin(n_{ir}, \frac{exp(\theta_{ir})}{1 + exp(\theta_{ir})}_{ir}) \times Norm(\beta_{0r}, \sigma^2_r) \times Norm(0, \tau^2) \times IG(0.001, 0.001)
+\end{align*}
+
+where $\tau^2 = 10,000$. 
+
+Since $\pi_{ir}$ and $\theta_{ir}$ have a deterministic relationship, and $\theta_{ir}$ is the random variable, 
+we placed $\theta_{ir}$ into the full conditional model. 
+
 # Problem 2 
+
+**Full conditional for $\beta_{0r}$**
+
+We will have a total of 2 full conditional models for each $\beta_{0r}, r=1, 2$. For each $\beta_{0r}$ there are 67 parameters 
+$\theta_{ir}$, and observed values of data $y_{ir}$ and $n_{ir}$. 
+
+Full conditional distribution for $\beta_{0r}$: 
+
+\begin{align*}
+p(\beta_{0r} | .) &\propto [\prod_{i = 1}^{67} Norm(\theta_{ir} | \beta_{0r}, \sigma^2_r)] \times Norm(\beta_{0r} | 0, \tau^2) \\ 
+&\propto \frac{\beta_{0r}}{\sigma^2_r} \sum_{i = 1}^{67} \theta_{ir} - \frac{1}{2} \beta_{0r}^2 (\frac{67}{\sigma^2} + \frac{1}{\tau^2})
+\end{align*}
+
+After more careful consideration, I worked out that this is actually a kernel of a normal distribution. 
+Parameters for this normal distribution are: 
+
+$\Large Mean = \frac{\sum_{i=1}^{67}\theta_{ir}}{67 + \frac{\sigma^2_r}{\tau^2}}$ and 
+
+$\Large Variance = \frac{1}{\frac{67}{\sigma^2} + \frac{1}{\tau^2}}$
+
+We can use Gibbs sampling from a normal distribution to obtain posterior samples for $\beta_{0r}$
+
+**Full conditional for $\theta_{ir}:$**
+
+$\pi_{ir}$ is a function of $\theta_{ir}$, which is  a random variable. Therefore, we will obtain a full conditional for 
+$\theta_{ir}$ using distributions given in the 
+
+For each of $2 \times 67 =$`r 2 * 67` parameters $\theta_{ir}$ we have a full conditional function. First, let's rewrite distribution of $Y_{ir}$ by 
+using $\large \frac{exp(\theta_{ir})}{1 + exp(\theta_{ir})}$. Then we have: 
+
+\begin{align*}
+Y_{ir} &\propto [\frac{exp(\theta_{ir})}{1 + exp(\theta_{ir})}]^{y_{ir}} \times [\frac{1}{1 + exp(\theta_{ir})}]^{n_{ir} - y_{ir}} 
+\end{align*}
+
+Full conditional is given by: 
+
+\begin{align*}
+p(\theta_{ir} | . ) &\propto [\frac{exp(\theta_{ir})}{1 + exp(\theta_{ir})}]^{y_{ir}} \times [\frac{1}{1 + exp(\theta_{ir})}]^{n_{ir} - y_{ir}} \times exp(-\frac{1}{2} (\theta_{ir} - \beta_{0r})^2) \\ 
+&= exp(\theta_{ir})^{y_{ir}} \times [1 + exp(\theta_{ir})]^{-n_{ir}} \times exp(-\frac{1}{2} (\theta_{ir} - \beta_{0r})^2)
+\end{align*}
+
+This is not a recognizable kernel, use Metropolis updates with a symmetric normal candidate density to obtain posterior samples. 
+
+**Full conditional for $\sigma^2_r:$**
+
+As always, when prior for variance of a normal distribution has inverse gamma, we expect to have an inverse gamma distribution as a posterior. 
+
+\begin{align*}
+p(\sigma^2_r | .) &\propto [\prod_{i = 1}^{67} Norm(\theta_{ir} | \beta_{0r}, \sigma^2_r)] \times IG(0.001, 0.001) \\
+&\propto [\sigma^2_r]^{-n/2 - 0.001 - 1} \times exp(1/\sigma^2 \sum_i (\theta_{ir} - \beta_{0r})^2 - 0.001/\sigma^2_r)
+\end{align*}
+
+Therefore, full conditional for $\sigma^2_r$ is given by $IG( 0.001 + n/2, 0.001 + \frac{1}{2} \sum_{i} (\theta_{ir} - \beta_{0r})^2$
+
+**Details with derivations of all full conditionals are attached in the Appendix as hand written notes**
 
 # Problem 3 
 
@@ -153,6 +220,212 @@ write_rds(results, "midterm_res.rds")
 
 ```
 
+```{r M-H and Gibbs updates loop version 2 with a fix to beta updates , eval=F}
+
+#### Interesting, I changed sigmas to sqrt(sigmas) for Beta metropolis update and it did not affect the results 
+
+expit <- function(x){exp(x)/(1 + exp(x))}
+
+reps = 50000
+
+beta_0r <-
+  cbind(
+    matrix(c(0,0), nrow = 2, ncol = 1), 
+    matrix(NA, nrow = 2, ncol = reps - 1)
+  )
+  
+sigma_0r <-
+  cbind(
+    matrix(c(1,1), nrow = 2, ncol = 1), 
+    matrix(NA, nrow = 2, ncol = reps - 1)
+  )
+
+theta_ir <- 
+  cbind(
+    matrix(c(0,0), nrow = nrow(birth_data), ncol = 1), 
+    matrix(NA, nrow = nrow(birth_data), ncol = reps - 1)
+  )
+
+pi_ir <- expit(theta_ir)
+  
+
+######## candidate density variances 
+beta_q = c(0.05, 0.15)
+theta_q = 0.05
+
+######## parameters of priors 
+tau2 = 10000
+a = 0.001
+b = 0.001
+
+
+set.seed(123)
+for(i in 2:reps){
+  
+  if(i %% 1000 == 0){print(i)}
+  ##########
+  # update beta_0r 
+  
+  current_beta_0r <- beta_0r[,(i-1)]
+  proposed_beta_0r <- rnorm(n = 2, mean = current_beta_0r, sd = beta_q)
+  
+  sigma_0r_calc <- sigma_0r[,(i-1)]
+  
+  theta_ir_calc <- theta_ir[,(i-1)]
+  n = length(theta_ir_calc)/2
+  theta_i1 <- sum(theta_ir_calc[1:n])
+  theta_i2 <- sum(theta_ir_calc[(n+1):length(theta_ir_calc)])
+  theta_ir_beta_calc <- c(theta_i1, theta_i2)
+  
+  log_ratio <- 
+    theta_ir_beta_calc/sqrt(sigma_0r_calc) * (proposed_beta_0r - current_beta_0r) - 
+    1/2 * (n/sqrt(sigma_0r_calc) + 1/tau2) * (proposed_beta_0r^2 - current_beta_0r^2)
+  
+  beta_0r[,i] <- ifelse(exp(log_ratio) > runif(n = 2, min = 0, max = 1), proposed_beta_0r, current_beta_0r)
+  
+  #########
+  # update sigma 
+  
+  betas_long <- c(rep(beta_0r[1,i], n), rep(beta_0r[2,i], n))
+  
+  (theta_ir_calc - betas_long)^2 -> theta_beta_sq_diff
+  
+  theta_ir_sigma_calc <- c(
+    
+    sum(theta_beta_sq_diff[1:n]),
+    sum(theta_beta_sq_diff[(n+1): length(theta_beta_sq_diff)])
+    
+  )
+  
+  sigma_0r[,i] <- 1/rgamma(n = 2, n/2 + a, 1/2 * theta_ir_sigma_calc + b)
+  
+  ########
+  # update theta ir 
+  
+  current_theta_ir <- theta_ir[,(i-1)]
+  proposed_theta_ir <- rnorm(n = length(current_theta_ir), mean = current_theta_ir, sd = theta_q)
+    
+  log_ratio <- 
+    birth_data$y * (proposed_theta_ir - current_theta_ir) - 
+    birth_data$n * (log(1 + exp(proposed_theta_ir)) - log(1 + exp(current_theta_ir))) - 
+    1/2 * ( (proposed_theta_ir - betas_long)^2 - (current_theta_ir - betas_long)^2 )
+  
+  theta_ir[,i] <- ifelse(exp(log_ratio) > runif(n = length(current_theta_ir)), 
+                         proposed_theta_ir, 
+                         current_theta_ir)
+  
+  ##########
+  # get pi from theta ir 
+  pi_ir[,i] <- expit(theta_ir[,i])
+}
+
+results <- list(pi_ir, theta_ir, beta_0r, sigma_0r)
+names(results) <- c('pi_ir', 'theta_ir', 'beta_0r', 'sigma_0r')
+write_rds(results, "midterm_res.rds")
+
+```
+
+```{r M-H and Gibbs updates loop version 3 with a betas from conjugate posteriors  , eval=F}
+
+#### Interesting, I changed sigmas to sqrt(sigmas) for Beta metropolis update and it did not affect the results 
+
+expit <- function(x){exp(x)/(1 + exp(x))}
+
+reps = 50000
+
+beta_0r <-
+  cbind(
+    matrix(c(0,0), nrow = 2, ncol = 1), 
+    matrix(NA, nrow = 2, ncol = reps - 1)
+  )
+  
+sigma_0r <-
+  cbind(
+    matrix(c(1,1), nrow = 2, ncol = 1), 
+    matrix(NA, nrow = 2, ncol = reps - 1)
+  )
+
+theta_ir <- 
+  cbind(
+    matrix(c(0,0), nrow = nrow(birth_data), ncol = 1), 
+    matrix(NA, nrow = nrow(birth_data), ncol = reps - 1)
+  )
+
+pi_ir <- expit(theta_ir)
+  
+
+######## candidate density variances 
+beta_q = c(0.05, 0.15)
+theta_q = 0.05
+
+######## parameters of priors 
+tau2 = 10000
+a = 0.001
+b = 0.001
+
+
+set.seed(123)
+for(i in 2:reps){
+  
+  if(i %% 1000 == 0){print(i)}
+  ##########
+  # update beta_0r 
+  
+  current_beta_0r <- beta_0r[,(i-1)]
+  proposed_beta_0r <- rnorm(n = 2, mean = current_beta_0r, sd = beta_q)
+  
+  sigma_0r_calc <- sigma_0r[,(i-1)]
+  
+  theta_ir_calc <- theta_ir[,(i-1)]
+  n = length(theta_ir_calc)/2
+  theta_i1 <- sum(theta_ir_calc[1:n])
+  theta_i2 <- sum(theta_ir_calc[(n+1):length(theta_ir_calc)])
+  theta_ir_beta_calc <- c(theta_i1, theta_i2)
+  
+  beta_0r[,i] <- rnorm(n = 2, mean = theta_ir_beta_calc/(67 + sigma_0r_calc/tau2), sd = sqrt(1/(67/sigma_0r_calc + 1/tau2)))
+  
+  #########
+  # update sigma 
+  
+  betas_long <- c(rep(beta_0r[1,i], n), rep(beta_0r[2,i], n))
+  
+  (theta_ir_calc - betas_long)^2 -> theta_beta_sq_diff
+  
+  theta_ir_sigma_calc <- c(
+    
+    sum(theta_beta_sq_diff[1:n]),
+    sum(theta_beta_sq_diff[(n+1): length(theta_beta_sq_diff)])
+    
+  )
+  
+  sigma_0r[,i] <- 1/rgamma(n = 2, n/2 + a, 1/2 * theta_ir_sigma_calc + b)
+  
+  ########
+  # update theta ir 
+  
+  current_theta_ir <- theta_ir[,(i-1)]
+  proposed_theta_ir <- rnorm(n = length(current_theta_ir), mean = current_theta_ir, sd = theta_q)
+    
+  log_ratio <- 
+    birth_data$y * (proposed_theta_ir - current_theta_ir) - 
+    birth_data$n * (log(1 + exp(proposed_theta_ir)) - log(1 + exp(current_theta_ir))) - 
+    1/2 * ( (proposed_theta_ir - betas_long)^2 - (current_theta_ir - betas_long)^2 )
+  
+  theta_ir[,i] <- ifelse(exp(log_ratio) > runif(n = length(current_theta_ir)), 
+                         proposed_theta_ir, 
+                         current_theta_ir)
+  
+  ##########
+  # get pi from theta ir 
+  pi_ir[,i] <- expit(theta_ir[,i])
+}
+
+results <- list(pi_ir, theta_ir, beta_0r, sigma_0r)
+names(results) <- c('pi_ir', 'theta_ir', 'beta_0r', 'sigma_0r')
+write_rds(results, "midterm_res.rds")
+
+```
+
 ```{r functions for results validation, eval = F}
 
 acceptance_ratio <- function(x){
@@ -161,7 +434,13 @@ acceptance_ratio <- function(x){
 
 ```
 
-### Betas 
+
+I used provided starting values, and 50,000 iterations of Metropolis and Gibbs sampling. 
+
+**History plots for $\beta_{0r}$**
+
+@fig-betas-hist and @fig-betas-hist-2 show history values for $\beta_{0r}, r = 1,2$. While there are no issues with $\beta_{01}$, history plot after 1,000 burnin period for $\beta_{02}$ can be a cause for concern. While the values fluctuate somewhat randomly around the final average value for this parameter, 
+I can see how some Bayesian statisticians might argue that there is a periodic trend in the sampled values. To me, this looks okay, and I would attribute this behavior to the small values of $y_{i2}$ and $n_{i2}$ in the data, with some values being  0 and 0 respectively for a given county. 
 
 ```{r evaluate results for BETAs, eval = F}
 
@@ -179,7 +458,7 @@ ggplot(data = data.frame(beta = beta_01, i = 1:length(beta_01)),
   theme_minimal() + 
   geom_line() + 
   geom_hline(yintercept = mean(beta_01), color = "red") + 
-  geom_smooth(color = "blue", alpha = 0.25, se = T)
+  geom_smooth(color = "blue", alpha = 0.25, se = T) 
 
 
 ###########
@@ -220,6 +499,12 @@ beta_0r = results$beta_0r
 ```
 
 ```{r BETA r1 history plots}
+#| label: fig-betas-hist
+#| fig-width: 12
+#| fig-height: 5
+#| fig-cap: "History plots for Beta_01 show reasonable model convergence after 1,000 burnin iterations"
+
+
 beta_0r_plot <- data.frame(beta = beta_0r[1,], i = 1:length(beta_0r[1,]))
 
 grid.arrange(
@@ -228,20 +513,29 @@ grid.arrange(
     theme_minimal() + 
     geom_line() + 
     geom_hline(yintercept = mean(beta_0r_plot$beta), color = "red") + 
-    geom_smooth(color = "blue", alpha = 0.25, se = T), 
- 
+    geom_smooth(color = "blue", alpha = 0.25, se = T)+ 
+    labs(x = "", y = "Beta_01", title = "All history values"), 
+   
    
   ggplot(data = beta_0r_plot %>% filter(i >= 1000), 
          aes(x = i, y = beta)) + 
     theme_minimal() + 
     geom_line() + 
     geom_hline(yintercept = mean(beta_0r_plot$beta), color = "red") + 
-    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+    geom_smooth(color = "blue", alpha = 0.25, se = T)+ 
+    labs(x = "", y = "Beta_01", title = "History values after 1,000 Burnin period"), 
   nrow = 1
 )
 ```
 
 ```{r BETA r2 history plots}
+#| label: fig-betas-hist-2
+#| fig-width: 12
+#| fig-height: 5
+#| fig-cap: "History plots for Beta_02 show mildly acceptable model convergence after 1,000 burnin iterations"
+
+
+
 beta_0r_plot <- data.frame(beta = beta_0r[2,], i = 1:length(beta_0r[2,]))
 
 grid.arrange(
@@ -250,7 +544,8 @@ grid.arrange(
     theme_minimal() + 
     geom_line() + 
     geom_hline(yintercept = mean(beta_0r_plot$beta), color = "red") + 
-    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+    geom_smooth(color = "blue", alpha = 0.25, se = T)+ 
+    labs(x = "", y = "Beta_02", title = "All history values"), 
  
    
   ggplot(data = beta_0r_plot %>% filter(i >= 1000), 
@@ -258,12 +553,15 @@ grid.arrange(
     theme_minimal() + 
     geom_line() + 
     geom_hline(yintercept = mean(beta_0r_plot$beta), color = "red") + 
-    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+    geom_smooth(color = "blue", alpha = 0.25, se = T)+ 
+    labs(x = "", y = "Beta_01", title = "History values after 1,000 Burnin interations"), 
   nrow = 1
 )
 ```
 
-### Sigmas 
+**History plots for $\sigma^2_r$**
+
+@fig-sigma-hist and @fig-sigma2-hist shows reasonable convergence. No issues to report here. 
 
 ```{r evaluate results for SIGMAs, eval = F}
 
@@ -301,6 +599,11 @@ sigma_0r = results$sigma_0r
 ```
 
 ```{r SIGMA r1 history plots }
+#| label: fig-sigma-hist
+#| fig-width: 12
+#| fig-height: 5
+#| fig-cap: "History plots for Sigma^2_1 show reasonable model convergence after 1,000 burnin iterations"
+
 
 sigma_01 <- data.frame(sig = sigma_0r[1,], i = 1:length( sigma_0r[1,]))
 
@@ -310,14 +613,16 @@ grid.arrange(
     theme_minimal() + 
     geom_line() + 
     geom_hline(yintercept = mean(sigma_01$sig), color = "red") + 
-    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+    geom_smooth(color = "blue", alpha = 0.25, se = T)+ 
+    labs(x = "", y = "Sigma^2_1", title = "All History values"), 
   
  ggplot(data = sigma_01 %>% filter(i >= 1000), 
          aes(x = i, y = sig)) + 
     theme_minimal() + 
     geom_line() + 
     geom_hline(yintercept = mean(sigma_01$sig), color = "red") + 
-    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+    geom_smooth(color = "blue", alpha = 0.25, se = T)+ 
+    labs(x = "", y = "Sigma^2_1", title = "History values after 1,000 Burnin period"), 
  
  nrow = 1
 )
@@ -325,6 +630,11 @@ grid.arrange(
 ```
 
 ```{r SIGMA r2 history plots }
+#| label: fig-sigma2-hist
+#| fig-width: 12
+#| fig-height: 5
+#| fig-cap: "History plots for Sigma^2_2 show reasonable model convergence after 1,000 burnin iterations"
+#| 
 
 sigma_01 <- data.frame(sig = sigma_0r[2,], i = 1:length( sigma_0r[2,]))
 
@@ -334,14 +644,16 @@ grid.arrange(
     theme_minimal() + 
     geom_line() + 
     geom_hline(yintercept = mean(sigma_01$sig), color = "red") + 
-    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+    geom_smooth(color = "blue", alpha = 0.25, se = T)+ 
+    labs(x = "", y = "Sigma^2_2", title = "All History values"), 
   
  ggplot(data = sigma_01 %>% filter(i >= 1000), 
          aes(x = i, y = sig)) + 
     theme_minimal() + 
     geom_line() + 
     geom_hline(yintercept = mean(sigma_01$sig), color = "red") + 
-    geom_smooth(color = "blue", alpha = 0.25, se = T), 
+    geom_smooth(color = "blue", alpha = 0.25, se = T)+ 
+    labs(x = "", y = "Sigma^2_2", title = "History values after 1,000 Burnin period"), 
  
  nrow = 1
 )
@@ -380,7 +692,21 @@ ggplot(data = d_check, aes(x = data, y = est, color=log10(ns+0.01))) +
 
 # Problem 4 
 
+Consider the hint, that $\Large E[\theta_{ir} | \gamma, \sigma^2_r] = \gamma_0 + \gamma_1 \times (r - 1)$. 
+
+based on previous information we also know that $\large E[\theta_{ir} | \beta_{0r}, \sigma^2_r] = \beta_{0r}$ since $\theta_{ir}$ is a normally distributed random variable. 
+
+Setting the two sides of these equations we get $\Large \beta_{0r} = \gamma_0 + \gamma_1 \times (r - 1)$. 
+
+When $r = 1$, $\Large \beta_{01} =  \gamma_0$, and when $r = 2$,  $\Large \beta_{02} =  \gamma_0 + \gamma_1$. 
+
+Since $\theta_{ir}$ is the log odds using parameter $\pi_{ir}$, the log-odds ratio is given by $\large \beta_{02} - \beta_{01}$. 
+
+@fig-log-or shows the distribution of the log-odds ratio. 95% credible internal does not include zero, suggesting that the in the state of Pennsylvania black mothers are more likely to give birth to children who are lower in weight. 
+
 ```{r log odds ratio }
+#| label: fig-log-or
+#| fig-cap: "Log-odds ratio distribution suggesting there are racial disparities in terms of proportions of low-wight births"
 
 burnin <- 1:1000
 beta_0r <- results$beta_0r[,-burnin ]
@@ -399,14 +725,16 @@ ggplot(data = data.frame(log_odds_ratio = diff_log_odds),
   theme_classic() + 
   geom_histogram(color = "black", fill = "lightgrey", bins = 30)  + 
   xlim(from_, to_) + 
-  labs(title = paste0("Log Odds Ratio", 
-                      "\nMedian: ", round(diff_log_odds, 2), "; 95% Credible Interval: ", 
+  labs(title = paste0("nMedian Log Odds Ratio: ", round(diff_log_odds, 2), "\n95% Credible Interval: ", 
                       round(quantile(diff_log_odds, 0.025), 2), " to ", 
                       round(quantile(diff_log_odds, 0.975), 2)
-                      )
-       )
+                      ), 
+       x = "Sampled Log-odds Ratio"
+       ) 
 
 ```
+
+About `r round(length(which(diff_log_odds < 0))/length(diff_log_odds), 4)*100`% of sampled log-odds ratios are below 0, suggesting overwhelming evidence that black mothers are at much higher risk of low-birth-weight events. 
 
 # Problem 5 
 
@@ -519,15 +847,30 @@ rates_p <- knitr::include_graphics('./rates_ratio_map.png')
 
 ```
 
+@fig-map-1, @fig-map-2, @fig-map-3 show desired maps for rates and ratio of rates at the county level in Pennsylvania. It appears that some counties have 
+a very extreme disparity between Black and White moms. Lowest bucket cutoff was 1.33, implying that at the lower end the rate of low-birthweight events for Black moms is about 33% higher than White moms at the county level. 
+
 ```{r}
+#| label: fig-map-1
+#| fig-cap: "Reginoal rates of low-birthweight events for White moms in PA"
+
+
 p1 
 ```
 
 ```{r}
+#| label: fig-map-2
+#| fig-cap: "Reginoal rates of low-birthweight events for Black moms in PA"
+
+
 p2
 ```
 
 ```{r}
+#| label: fig-map-3
+#| fig-cap: "Reginoal ratio of Black to White mom rates in low-birthweight events in PA"
+
+
 rates_p 
 ```
 
@@ -535,7 +878,14 @@ rates_p
 
 ### Philadelphia County 
 
+@tbl-phil presents summary statistics from raw data (crude rates) and estimated rates. @fig-phil for the ratio of the estimated rates. It appears that 
+the estimated ratios are slightly higher than those estimated directly from the data. I would be comfortable presenting these results. White estimated and crude ratios are different, it stems from the minor differences between race-wise rates, which appear small on paper. 
+
 ```{r}
+#| label: tbl-phil
+#| tbl-cap: "Summary statistics for Philadelphia county"
+
+
 nrow_ = nrow(results$pi_ir)
 
 r1_phily <- results$pi_ir[1:nrow_/2, -burnin][51 ,]
@@ -554,20 +904,29 @@ state_wide_estimate =
   group_by(group_r) %>% 
   summarise(rate = sum(y)/sum(n)) %>% select(rate) %>% unlist()
 
+State_wide_est_bayes <- 
+  c(results$pi_ir[1:nrow_/2, -burnin] %>% rowMeans() %>% mean(), 
+    results$pi_ir[(nrow_/2 + 1):nrow_, -burnin] %>% rowMeans() %>% mean()
+  )
+
 birth_data %>% 
   filter(county_id == 51) %>% 
   select(-county_id) %>% 
   mutate(crude_rate = y/n, 
          estimated = c(median(r1_phily), median(r2_phily)), 
-         state_wide = state_wide_estimate
+         state_wide = state_wide_estimate, 
+         State_wide_est_bayes = State_wide_est_bayes
          ) %>% 
-  kable(col.names = c("Racial Group", "Y", "N", "Crude Rate", "Estiamted Rate", "State-Wide Rate"), 
+  kable(col.names = c("Racial Group", "Y", "N", "Crude Rate", "Estiamted Rate", "State-Wide Crude Rate", "State-Wide Est. Rate"), 
                       digits = 2, 
                       align = 'c', 
         booktabs = T)
 ```
 
 ```{r}
+#| label: fig-phil
+#| fig-cap: "Theoretical distribution of low-birthweight events between Black and White moms"
+
 
 state_wide_estimate = state_wide_estimate[2] / state_wide_estimate[1]
 
@@ -589,8 +948,14 @@ ggplot(data = data.frame(ratio = phily_ratio),
 
 ### Sullivan County
 
+@tbl-sull presents summary statistics from raw data (crude rates) and estimated rates. @fig-sull for the ratio of the estimated rates. We can see that there are 
+no events of any birth recorded for this county for Black moms. So, we have an estimated rate, which is essentially imputed data. We can see that the 
+crude rate is almost half of the estimated rate, and estimated rates are being pulled towards what the state-wide rates are. I would be comfortable presenting these results, but I would also advise that the estimates are based on the small amount of data and therefore future observations can vary greatly from what we have here. This is also supported by the wide 95% credible interval. Additionally, I would advise that future observations and repeated reporting would be subject to highly variable estimates because the distribution in @tbl-sull shows a heavy tail, implying a chance of high value extreme values, but not outliers by any means. 
 
 ```{r}
+#| label: tbl-sull
+#| tbl-cap: "Summary statistics for Philadelphia county"
+
 
 nrow_ = nrow(results$pi_ir)
 
@@ -610,20 +975,29 @@ state_wide_estimate =
   group_by(group_r) %>% 
   summarise(rate = sum(y)/sum(n)) %>% select(rate) %>% unlist()
 
+State_wide_est_bayes <- 
+  c(results$pi_ir[1:nrow_/2, -burnin] %>% rowMeans() %>% mean(), 
+    results$pi_ir[(nrow_/2 + 1):nrow_, -burnin] %>% rowMeans() %>% mean()
+  )
+
 birth_data %>% 
   filter(county_id == 57) %>% 
   select(-county_id) %>% 
   mutate(crude_rate = y/n, 
          estimated = c(median(r1_phily), median(r2_phily)), 
-         state_wide = state_wide_estimate
+         state_wide = state_wide_estimate, 
+         State_wide_est_bayes = State_wide_est_bayes
          ) %>% 
-  kable(col.names = c("Racial Group", "Y", "N", "Crude Rate", "Estiamted Rate", "State-Wide Rate"), 
+  kable(col.names = c("Racial Group", "Y", "N", "Crude Rate", "Estiamted Rate", "State-Wide Crude Rate", "State-Wide Est. Rate"), 
                       digits = 2, 
                       align = 'c', 
         booktabs = T)
 ```
 
 ```{r}
+#| label: fig-sull
+#| fig-cap: "Theoretical distribution of low-birthweight events between Black and White moms"
+
 
 state_wide_estimate = state_wide_estimate[2] / state_wide_estimate[1]
 
@@ -646,6 +1020,4 @@ ggplot(data = data.frame(ratio = phily_ratio),
 \newpage 
 
 # Appendix 
-
-\includepdf[pages={2-15}]{midterm working version.pdf}
 
