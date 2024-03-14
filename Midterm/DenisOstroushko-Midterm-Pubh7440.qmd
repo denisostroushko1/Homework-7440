@@ -12,7 +12,6 @@ header-includes: \usepackage{pdfpages}
 ```{r local helper, eval= F}
 rm(list = ls())
 i = 2
-burnin = 1:10000
 ```
 
 ```{r}
@@ -22,6 +21,9 @@ library(gridExtra)
 
 options(scipen = 99999, 
         knitr.kable.NA = '')
+
+burnin = 1:10000
+BURNIN = 10000
 ```
 
 ```{r read and prepare the data }
@@ -97,7 +99,7 @@ Full conditional is given by:
 
 \begin{align*}
 p(\theta_{ir} | . ) &\propto [\frac{exp(\theta_{ir})}{1 + exp(\theta_{ir})}]^{y_{ir}} \times [\frac{1}{1 + exp(\theta_{ir})}]^{n_{ir} - y_{ir}} \times exp(-\frac{1}{2} (\theta_{ir} - \beta_{0r})^2) \\ 
-&= exp(\theta_{ir})^{y_{ir}} \times [1 + exp(\theta_{ir})]^{-n_{ir}} \times exp(-\frac{1}{2} (\theta_{ir} - \beta_{0r})^2)
+&= exp(\theta_{ir})^{y_{ir}} \times [1 + exp(\theta_{ir})]^{-n_{ir}} \times exp(-\frac{1}{2 \sigma^2_r} (\theta_{ir} - \beta_{0r})^2)
 \end{align*}
 
 This is not a recognizable kernel, use Metropolis updates with a symmetric normal candidate density to obtain posterior samples. 
@@ -116,214 +118,6 @@ Therefore, full conditional for $\sigma^2_r$ is given by $IG( 0.001 + n/2, 0.001
 **Details with derivations of all full conditionals are attached in the Appendix as hand written notes**
 
 # Problem 3 
-
-```{r M-H and Gibbs updates loop, eval=F}
-
-expit <- function(x){exp(x)/(1 + exp(x))}
-
-reps = 50000
-
-beta_0r <-
-  cbind(
-    matrix(c(0,0), nrow = 2, ncol = 1), 
-    matrix(NA, nrow = 2, ncol = reps - 1)
-  )
-  
-sigma_0r <-
-  cbind(
-    matrix(c(1,1), nrow = 2, ncol = 1), 
-    matrix(NA, nrow = 2, ncol = reps - 1)
-  )
-
-theta_ir <- 
-  cbind(
-    matrix(c(0,0), nrow = nrow(birth_data), ncol = 1), 
-    matrix(NA, nrow = nrow(birth_data), ncol = reps - 1)
-  )
-
-pi_ir <- expit(theta_ir)
-  
-
-######## candidate density variances 
-beta_q = c(0.05, 0.15)
-theta_q = 0.05
-
-######## parameters of priors 
-tau2 = 10000
-a = 0.001
-b = 0.001
-
-
-set.seed(123)
-for(i in 2:reps){
-  
-  if(i %% 1000 == 0){print(i)}
-  ##########
-  # update beta_0r 
-  
-  current_beta_0r <- beta_0r[,(i-1)]
-  proposed_beta_0r <- rnorm(n = 2, mean = current_beta_0r, sd = beta_q)
-  
-  sigma_0r_calc <- sigma_0r[,(i-1)]
-  
-  theta_ir_calc <- theta_ir[,(i-1)]
-  n = length(theta_ir_calc)/2
-  theta_i1 <- sum(theta_ir_calc[1:n])
-  theta_i2 <- sum(theta_ir_calc[(n+1):length(theta_ir_calc)])
-  theta_ir_beta_calc <- c(theta_i1, theta_i2)
-  
-  log_ratio <- 
-    theta_ir_beta_calc/sigma_0r_calc * (proposed_beta_0r - current_beta_0r) - 
-    1/2 * (n/sigma_0r_calc + 1/tau2) * (proposed_beta_0r^2 - current_beta_0r^2)
-  
-  beta_0r[,i] <- ifelse(exp(log_ratio) > runif(n = 2, min = 0, max = 1), proposed_beta_0r, current_beta_0r)
-  
-  #########
-  # update sigma 
-  
-  betas_long <- c(rep(beta_0r[1,i], n), rep(beta_0r[2,i], n))
-  
-  (theta_ir_calc - betas_long)^2 -> theta_beta_sq_diff
-  
-  theta_ir_sigma_calc <- c(
-    
-    sum(theta_beta_sq_diff[1:n]),
-    sum(theta_beta_sq_diff[(n+1): length(theta_beta_sq_diff)])
-    
-  )
-  
-  sigma_0r[,i] <- 1/rgamma(n = 2, n/2 + a, 1/2 * theta_ir_sigma_calc + b)
-  
-  ########
-  # update theta ir 
-  
-  current_theta_ir <- theta_ir[,(i-1)]
-  proposed_theta_ir <- rnorm(n = length(current_theta_ir), mean = current_theta_ir, sd = theta_q)
-    
-  log_ratio <- 
-    birth_data$y * (proposed_theta_ir - current_theta_ir) - 
-    birth_data$n * (log(1 + exp(proposed_theta_ir)) - log(1 + exp(current_theta_ir))) - 
-    1/2 * ( (proposed_theta_ir - betas_long)^2 - (current_theta_ir - betas_long)^2 )
-  
-  theta_ir[,i] <- ifelse(exp(log_ratio) > runif(n = length(current_theta_ir)), 
-                         proposed_theta_ir, 
-                         current_theta_ir)
-  
-  ##########
-  # get pi from theta ir 
-  pi_ir[,i] <- expit(theta_ir[,i])
-}
-
-results <- list(pi_ir, theta_ir, beta_0r, sigma_0r)
-names(results) <- c('pi_ir', 'theta_ir', 'beta_0r', 'sigma_0r')
-write_rds(results, "midterm_res.rds")
-
-```
-
-```{r M-H and Gibbs updates loop version 2 with a fix to beta updates , eval=F}
-
-#### Interesting, I changed sigmas to sqrt(sigmas) for Beta metropolis update and it did not affect the results 
-
-expit <- function(x){exp(x)/(1 + exp(x))}
-
-reps = 50000
-
-beta_0r <-
-  cbind(
-    matrix(c(0,0), nrow = 2, ncol = 1), 
-    matrix(NA, nrow = 2, ncol = reps - 1)
-  )
-  
-sigma_0r <-
-  cbind(
-    matrix(c(1,1), nrow = 2, ncol = 1), 
-    matrix(NA, nrow = 2, ncol = reps - 1)
-  )
-
-theta_ir <- 
-  cbind(
-    matrix(c(0,0), nrow = nrow(birth_data), ncol = 1), 
-    matrix(NA, nrow = nrow(birth_data), ncol = reps - 1)
-  )
-
-pi_ir <- expit(theta_ir)
-  
-
-######## candidate density variances 
-beta_q = c(0.05, 0.15)
-theta_q = 0.05
-
-######## parameters of priors 
-tau2 = 10000
-a = 0.001
-b = 0.001
-
-
-set.seed(123)
-for(i in 2:reps){
-  
-  if(i %% 1000 == 0){print(i)}
-  ##########
-  # update beta_0r 
-  
-  current_beta_0r <- beta_0r[,(i-1)]
-  proposed_beta_0r <- rnorm(n = 2, mean = current_beta_0r, sd = beta_q)
-  
-  sigma_0r_calc <- sigma_0r[,(i-1)]
-  
-  theta_ir_calc <- theta_ir[,(i-1)]
-  n = length(theta_ir_calc)/2
-  theta_i1 <- sum(theta_ir_calc[1:n])
-  theta_i2 <- sum(theta_ir_calc[(n+1):length(theta_ir_calc)])
-  theta_ir_beta_calc <- c(theta_i1, theta_i2)
-  
-  log_ratio <- 
-    theta_ir_beta_calc/sqrt(sigma_0r_calc) * (proposed_beta_0r - current_beta_0r) - 
-    1/2 * (n/sqrt(sigma_0r_calc) + 1/tau2) * (proposed_beta_0r^2 - current_beta_0r^2)
-  
-  beta_0r[,i] <- ifelse(exp(log_ratio) > runif(n = 2, min = 0, max = 1), proposed_beta_0r, current_beta_0r)
-  
-  #########
-  # update sigma 
-  
-  betas_long <- c(rep(beta_0r[1,i], n), rep(beta_0r[2,i], n))
-  
-  (theta_ir_calc - betas_long)^2 -> theta_beta_sq_diff
-  
-  theta_ir_sigma_calc <- c(
-    
-    sum(theta_beta_sq_diff[1:n]),
-    sum(theta_beta_sq_diff[(n+1): length(theta_beta_sq_diff)])
-    
-  )
-  
-  sigma_0r[,i] <- 1/rgamma(n = 2, n/2 + a, 1/2 * theta_ir_sigma_calc + b)
-  
-  ########
-  # update theta ir 
-  
-  current_theta_ir <- theta_ir[,(i-1)]
-  proposed_theta_ir <- rnorm(n = length(current_theta_ir), mean = current_theta_ir, sd = theta_q)
-    
-  log_ratio <- 
-    birth_data$y * (proposed_theta_ir - current_theta_ir) - 
-    birth_data$n * (log(1 + exp(proposed_theta_ir)) - log(1 + exp(current_theta_ir))) - 
-    1/2 * ( (proposed_theta_ir - betas_long)^2 - (current_theta_ir - betas_long)^2 )
-  
-  theta_ir[,i] <- ifelse(exp(log_ratio) > runif(n = length(current_theta_ir)), 
-                         proposed_theta_ir, 
-                         current_theta_ir)
-  
-  ##########
-  # get pi from theta ir 
-  pi_ir[,i] <- expit(theta_ir[,i])
-}
-
-results <- list(pi_ir, theta_ir, beta_0r, sigma_0r)
-names(results) <- c('pi_ir', 'theta_ir', 'beta_0r', 'sigma_0r')
-write_rds(results, "midterm_res.rds")
-
-```
 
 ```{r M-H and Gibbs updates loop version 3 with a betas from conjugate posteriors  , eval=F}
 
@@ -406,10 +200,12 @@ for(i in 2:reps){
   current_theta_ir <- theta_ir[,(i-1)]
   proposed_theta_ir <- rnorm(n = length(current_theta_ir), mean = current_theta_ir, sd = theta_q)
     
+  sigmas_long <- c(rep(sigma_0r[1,i], n), rep(sigma_0r[2,i], n))
+  
   log_ratio <- 
     birth_data$y * (proposed_theta_ir - current_theta_ir) - 
     birth_data$n * (log(1 + exp(proposed_theta_ir)) - log(1 + exp(current_theta_ir))) - 
-    1/2 * ( (proposed_theta_ir - betas_long)^2 - (current_theta_ir - betas_long)^2 )
+    1/(2*sigmas_long) * ( (proposed_theta_ir - betas_long)^2 - (current_theta_ir - betas_long)^2 )
   
   theta_ir[,i] <- ifelse(exp(log_ratio) > runif(n = length(current_theta_ir)), 
                          proposed_theta_ir, 
@@ -517,7 +313,7 @@ grid.arrange(
     labs(x = "", y = "Beta_01", title = "All history values"), 
    
    
-  ggplot(data = beta_0r_plot %>% filter(i >= 1000), 
+  ggplot(data = beta_0r_plot %>% filter(i >= BURNIN), 
          aes(x = i, y = beta)) + 
     theme_minimal() + 
     geom_line() + 
@@ -526,6 +322,8 @@ grid.arrange(
     labs(x = "", y = "Beta_01", title = "History values after 1,000 Burnin period"), 
   nrow = 1
 )
+
+
 ```
 
 ```{r BETA r2 history plots}
@@ -548,7 +346,7 @@ grid.arrange(
     labs(x = "", y = "Beta_02", title = "All history values"), 
  
    
-  ggplot(data = beta_0r_plot %>% filter(i >= 1000), 
+  ggplot(data = beta_0r_plot %>% filter(i >= BURNIN), 
          aes(x = i, y = beta)) + 
     theme_minimal() + 
     geom_line() + 
@@ -616,7 +414,7 @@ grid.arrange(
     geom_smooth(color = "blue", alpha = 0.25, se = T)+ 
     labs(x = "", y = "Sigma^2_1", title = "All History values"), 
   
- ggplot(data = sigma_01 %>% filter(i >= 1000), 
+ ggplot(data = sigma_01 %>% filter(i >= BURNIN), 
          aes(x = i, y = sig)) + 
     theme_minimal() + 
     geom_line() + 
@@ -647,7 +445,7 @@ grid.arrange(
     geom_smooth(color = "blue", alpha = 0.25, se = T)+ 
     labs(x = "", y = "Sigma^2_2", title = "All History values"), 
   
- ggplot(data = sigma_01 %>% filter(i >= 1000), 
+ ggplot(data = sigma_01 %>% filter(i >= BURNIN), 
          aes(x = i, y = sig)) + 
     theme_minimal() + 
     geom_line() + 
@@ -708,7 +506,8 @@ Since $\theta_{ir}$ is the log odds using parameter $\pi_{ir}$, the log-odds rat
 #| label: fig-log-or
 #| fig-cap: "Log-odds ratio distribution suggesting there are racial disparities in terms of proportions of low-wight births"
 
-burnin <- 1:1000
+
+
 beta_0r <- results$beta_0r[,-burnin ]
 
 diff_log_odds <- beta_0r[2,] - beta_0r[1,]
