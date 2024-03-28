@@ -1,0 +1,961 @@
+---
+title: "Intro Guide to Nimble for Bayesian Analysis"
+author: "Denis Ostroushko" 
+date: '`r Sys.Date()`'
+format: html
+toc: true
+execute: 
+  warning: false
+  message: false 
+  echo: false 
+---
+
+```{r local helper, eval= F}
+rm(list = ls())
+i = 2
+```
+
+```{r}
+library(tidyverse)
+library(kableExtra)
+library(gridExtra)
+library(igraph)
+library(nimble)
+library(broom)
+library(plotly)
+
+options(scipen = 99999, 
+        knitr.kable.NA = '')
+```
+
+# Example 1: Regression Model 
+
+### The model 
+
+\begin{align*}
+Y_i = \beta_0 + \beta_1 \times x_i + \epsilon_i
+\end{align*}
+
+Parameters fo the model: 
+
+* $Y_i$ inherits variance of $\epsilon_i$. $Y_i$ is a random variable that is a combination of other random variables in this model 
+* Assume non-proper prior for $\beta_0$, $\beta_1$ which is a flat normal distribution. Therefore posterior will also be a normal distribution 
+* Assume Inverse Gamma (IG) prior for parameter $\sigma^2$, which is the variance of residuals. 
+
+For this example, we assume: 
+* $\beta_0 = 1$
+* $\beta_1 = 2$
+* $\sigma = 2$
+* $N = 100$, which is our sample size 
+
+```{r}
+
+set.seed(162)
+
+X = rnorm(n = 100, mean = 5, sd = 5)
+resid = rnorm(n = 100, mean = 0, sd = 2)
+
+data = list(
+            y = 1 + 2*X + resid, 
+            x = X
+            )
+```
+
+### Nimble Code 
+
+**Step 1: ** define the model using such `Nimble code`
+
+```{r, echo = T, eval = F}
+
+N = length(data[[1]])
+
+# model: y = 1 + 2*x + error 
+
+mc <-  # define the structure of the model 
+  nimbleCode({
+    
+    intercept ~ dflat();   # prior for intercept 
+    slope ~ dflat();  # prior for slope, variance is big => prior is uninformative 
+    tau ~ dgamma(0.001, 0.001) # constant variance in the model 
+    sigma <- 1/sqrt(tau)
+        ## fun fact, inside BUGS code only "<-" is allowed, you can't use "="
+        ## everything is either an equation, i.e. assigned with <- 
+        ##  or it has to be a random variable distributed with RHS, on rhs ~ 
+    
+    # we have a regression for 4 normal variables, so we need to "loop" over them all 
+    for(i in 1:N) {
+          ### FYI, PSA, the order of these things does not matter
+      
+      # calculate each predicted value with this regression model 
+      mu[i] <- intercept + slope * x[i]
+      # y is then a realized observation from a normal distribution, and each y 
+        # has its own mean 
+      y[i] ~ dnorm(mu[i] , tau)
+      }
+  })
+
+```
+
+*Main observations:* 
+
+1. inside Nimble code we need to 'loop over' all observations in the data set 
+2. all priors are defined outside of the loop. Once prior is defined, we do not need to reference this model parameter anymore, the package automatically tracks samples and creates a set of posterior samples to estimate posterior distribution. 
+3. Within the loop we need to specify the 'data generating algorithm', which is witting out how observations $y_i$ from a random variables $Y_i$ realize. 
+  - By Linear Regression assumptions, each $Y_i$ is an independent random variable with its own mean, and variance similar to all other $Y_j's$
+  - So, we need to calculate the mean for each $Y_i$, and sample a realized value $y_i$. 
+
+**Step 2:** initialize model parameters and the data 
+
+```{r , echo = T, eval = F}
+
+Inits <- list(intercept = 0, 
+              slope = 1, 
+              tau = 1
+              )
+
+model <- nimbleModel(mc, data = data)
+
+```
+
+*Main observations:* 
+
+1. Data must be a list. The software does not take in tibbles, data frames, and other common types of data for regression modeling
+2. Initial values must be supplied for all model parameters that have a prior distribution 
+
+**Step 3:** Run your MCMC
+
+```{r , echo = T, eval = F}
+
+
+mcmc.out <- nimbleMCMC(code = mc, 
+                       model = model, 
+                       data = data, 
+                       inits = Inits, 
+                       monitors = c("intercept", "slope", "sigma", "y", "mu"), 
+                       thin = 1,
+                       niter = 10000, 
+                       nburnin = 10000/10, 
+                       nchains = 1, 
+                       summary = T,
+                       setSeed = TRUE
+                       )
+
+```
+
+*Main observations:* 
+
+1. `code` must be a nimble model from **Step 1** 
+2. `model` must be a model compiled in **Step 2** 
+3. `motitors` is a list of parameters that we wish to get posterior samples for. 
+  - Their names must be identical to those stated in the `mc` nimble model 
+
+
+```{r run nimble model, eval = F}
+
+N = length(data[[1]])
+
+# model: y = 1 + 2*x + error 
+
+mc <-  # define the structure of the model 
+  nimbleCode({
+    
+    intercept ~ dflat();   # prior for intercept 
+    slope ~ dflat();  # prior for slope, variance is big => prior is uninformative 
+    tau ~ dgamma(0.001, 0.001) # constant variance in the model 
+    sigma <- 1/sqrt(tau)
+        ## fun fact, inside BUGS code only "<-" is allowed, you can't use "="
+        ## everything is either an equation, i.e. assigned with <- 
+        ##  or it has to be a random variable distribtued with RHS, on rhs ~ 
+    
+    # we have a regression for 4 normal variables, so we need to "loop" over them all 
+    for(i in 1:N) {
+          ### FYI, PSA, the order of these things does not matter
+      
+      # calculate each predicted value with this regression model 
+      mu[i] <- intercept + slope * x[i]
+      # y is then a realized observation from a nomal distribtuion, and each y has its own mean 
+      y[i] ~ dnorm(mu[i] , tau)
+      }
+  })
+
+Inits <- list(intercept = 0, 
+              slope = 1, 
+              tau = 1
+              )
+
+model <- nimbleModel(mc, data = data)
+
+mcmc.out <- nimbleMCMC(code = mc, 
+                       model = model, 
+                       data = data, 
+                       inits = Inits, 
+                       monitors = c("intercept", "slope", "sigma", "y", "mu"), 
+                       thin = 1,
+                       niter = 10000, 
+                       nburnin = 10000/10, 
+                       nchains = 1, 
+                       summary = T,
+                       setSeed = TRUE
+                       )
+
+write_rds(mcmc.out, "example1_nimble.rds")
+```
+
+### Results 
+
+###### Beta1 = Slope 
+
+One advantageous aspect of Bayesian analysis results lies in the utilization of non-informative or improper priors. These priors lack substantial information about model parameters, treating them as random variables. Consequently, Bayesian estimates closely align with those obtained through frequentist frameworks. This alignment facilitates cross-validation of results, instilling confidence in the efficacy of Nimble for accurate posterior estimation.
+
+```{r read in example 1 data }
+mcmc.out <- read_rds("example1_nimble.rds")
+```
+
+@tbl-freq presents results of a frequentist framework estimate. Note that these estimates capture the true coefficients in the 95% confidence interval. 
+@fig-bayes-beta1 visualizes posterior distribution of $\beta_1$ and compares results with the true value, and a frequentist estimate. 
+
+Standard error and estimate using both statistical frameworks are approximately equal, giving us a nice sense of comfort. 
+We expect $\beta$ parameters to behave like means, and have a normal distribution. @fig-bayes-beta1 shows expected behavior. 
+
+```{r summarize beta parameter parametres }
+#| label: tbl-freq 
+#| tbl-cap: "Estimates for Beta0, Beta1 using Frequentist LM"
+freq_lm <- lm(data$y ~ data$x)
+
+freq_lm %>% tidy() %>% 
+  select(-statistic, - p.value) %>% 
+  kable(col.names = c("Model term", "Est.", "SE"),
+        digits = 4, 
+        booktabs = T)
+
+beta_ <- freq_lm %>% tidy() %>% filter(term == "data$x") %>% select(estimate) %>% unlist()
+```
+
+```{r}
+#| label: fig-bayes-beta1
+#| fig-cap: "Showing no difference between two frameworks, both closely approximate true value"
+
+
+ggplot(
+  data = data.frame(x = mcmc.out$samples[,"slope"]), 
+  aes(x = x)
+) + 
+  theme_classic() + 
+  geom_histogram(bins = 25, fill = "lightgrey", color = "black") + 
+  geom_vline(aes(xintercept = 2, colour = "True Value"), linewidth = 1, linetype = "dashed", show.legend = T)+ 
+  geom_vline(aes(xintercept = mean(mcmc.out$samples[,"slope"]), color = "Bayesian Estiamte"), linewidth = 1, linetype = "dashed") +
+  geom_vline(aes(xintercept = beta_, color = "Frequesntist Estiamte"), linewidth = 1, linetype = "dashed") + 
+  
+  labs(
+    x = "Posterior Samples", 
+    y = " ", 
+    colour = "Value Type", 
+    title = paste0("Posterior mean: ", round( mean(mcmc.out$samples[,"slope"]), 4), ". SD of sampels: ",  round( sd(mcmc.out$samples[,"slope"]), 4) ) 
+  )
+
+```
+
+###### Sigma = Standard Error (Variance) of Residuals 
+
+In the frequentist framework we only care about the estimated value of $\sigma^2$, with a Bayesian framework, we can also obtain a posterior distribution and 
+overall uncertainty in the estimate. Without getting too meta, we can now know the variance of a variance estimate. 
+
+Both `lm` and `nimble` return the value(s) of $\sigma$, so we square them to obtain $\sigma^2$ summary statistics. @fig-bayes-sigma shows posterior distribution for the variance of residuals, and therefore estimated variance for each $Y_i$. It is more interesting to look at $\sigma^2$ distribution, due to squaring the tail gets longer and the distribution starts to look more and more like $\chi^2$ distribution, which is exactly the distribution that we expect for variance when we treat it as a random variable. 
+
+
+```{r summarize vairance estimate}
+#| label: fig-bayes-sigma
+#| fig-cap: "Showing some difference between two frameworks, both closely approximate true value"
+
+sigma_ <- freq_lm$residuals %>% sd()
+
+ggplot(
+  data = data.frame(x = mcmc.out$samples[,"sigma"]^2), 
+  aes(x = x)
+) + 
+  theme_classic() + 
+  geom_histogram(bins = 25, fill = "lightgrey", color = "black") + 
+  geom_vline(aes(xintercept = 2^2, colour = "True Value"), linewidth = 1, linetype = "dashed", show.legend = T)+ 
+  geom_vline(aes(xintercept = mean(mcmc.out$samples[,"sigma"]^2), color = "Bayesian Estiamte"), linewidth = 1, linetype = "dashed") +
+  geom_vline(aes(xintercept = sigma_^2, color = "Frequesntist Estiamte"), linewidth = 1, linetype = "dashed") + 
+  
+  labs(
+    x = "Posterior Samples", 
+    y = " ", 
+    colour = "Value Type", 
+    title = paste0("Posterior mean: ", round( mean(mcmc.out$samples[,"sigma"]^2), 4), ". SD of sampels: ",  round( sd(mcmc.out$samples[,"sigma"]^2), 4) ) 
+  )
+
+
+
+```
+
+
+##### Estiamted Values 
+
+By the nature of the Bayesian framework, Nimble also provides posterior samples for the mean of each $Y_i$. The distribution we are seeing in @fig-bayes-mu1 is the posterior distribution for the estimated mean for $Y_1$. Recall that we estimated variance for $Y_1, Y_2, \dots, Y_100$ to be 4, and this plot has nothing to do with this variance. 
+
+```{r}
+#| label: fig-bayes-mu1
+#| fig-cap: "Showing some difference between two frameworks, both produced wrong fit the given observation "
+
+est <- freq_lm$fitted.values[1]
+
+ggplot(
+  data = data.frame(x = mcmc.out$samples[,"mu[1]"]), 
+  aes(x = x)
+) + 
+  theme_classic() + 
+  geom_histogram(bins = 25, fill = "lightgrey", color = "black") + 
+  geom_vline(aes(xintercept = mean(mcmc.out$samples[,"mu[1]"]), color = "Bayesian Estiamte"), linewidth = 1, linetype = "dashed") +
+  geom_vline(aes(xintercept = est, color = "Frequesntist Estiamte"), linewidth = 1, linetype = "dashed") + 
+  
+  labs(
+    x = "Posterior Samples", 
+    y = " ", 
+    colour = "Value Type", 
+    title = paste0("Posterior mean: ", round( mean(mcmc.out$samples[,"mu[1]"]), 4), ". Frequentist estimate: ", round(est, 2), ". True value: ", round(data$x[1], 2) ) 
+  )
+```
+
+
+A nice feature of these posterior samples is that we can obtain standard error for the mean of each $Y_i$. I am sure something like that can be done using 
+frequentist methods and asymptotic properties of estimators. However, in this framework of data analysis, uncertainty around predicted mean of $Y_i$ is readily available. 
+
+Note that each mean has its own posterior distribution, and therefore varying values of standard errors. For example, standard error for the mean of $Y_2$ is 
+`r round(sd(mcmc.out$samples[,"mu[2]"]), 4)`, and for $Y_3$ it is `r round(sd(mcmc.out$samples[,"mu[3]"]), 4)`. @fig-show  shows all 100 studentized residuals and 
+standard errors for fitted values. There is no obvious relationships, however, when the model fits a bad value and produces a high error, uncertainty for the point estimate, expressed as standard error tends to be higher, although for positive errors only. 
+
+```{r}
+#| label: fig-show 
+#| fig-cap: "100 Studentized Residuals and Corresponding Standard Errors of Means"
+
+mcmc.out$samples %>% colnames() -> col_names
+substr(col_names,1,2) == "mu" -> fitted_val_id
+
+mcmc.out$samples[,fitted_val_id] %>% 
+  apply(., 2, mean) -> fitted_values
+
+mcmc.out$samples[,fitted_val_id] %>% 
+  apply(., 2, sd) -> sd_of_fitted
+
+values <- 
+  data.frame(
+    y = data$y, 
+    fitted = fitted_values, 
+    sd = sd_of_fitted
+  ) %>% 
+  mutate(redisuals = y - fitted, 
+         studentize_resids = (redisuals - mean(redisuals))/(sd(redisuals) * sqrt(1 - 1/nrow(.))), 
+         i = 1:nrow(.)
+         ) 
+
+ggplot(data = values, 
+       aes(x = redisuals, y = sd_of_fitted)) + 
+  theme_classic() + 
+  geom_point() + 
+  geom_vline(xintercept = 0, color = "darkgrey", linetype = "dashed", linewidth = 1) + 
+  labs(x = "Studentized Residual", 
+       y = "Posterior Standard Error for fitted Mean")
+```
+
+##### Residuals 
+
+Typical assessment of residuals can be done with Bayesian linear models as well. Here is a summary of residual normality and relationship betweem residuals and fitted values, or lack there of. 
+
+```{r}
+
+hist(values$redisuals)
+
+qqnorm(values$redisuals)
+qqline(values$redisuals)
+
+```
+
+```{r summarize fitted values and residuals }
+#| label: fig-nice-resids 
+#| fig-cap: "Fitted and actual values align quite well. Residuals show no relationship with the fitted values "
+#| fig-width: 14
+
+gridExtra::grid.arrange(
+  
+  ggplot(data = values, aes(x = y, y = fitted)) + 
+    theme_classic() + 
+    geom_point() + 
+    stat_smooth(color = "red", se = T) + 
+    geom_errorbar(aes(ymin = fitted - 1.96 * sd, 
+                      ymax = fitted + 1.96 * sd), width = 0.1) + 
+    labs(x = "Observed values", 
+         y = "Fitted Values"), 
+  
+  ggplot(data = values, aes(x = fitted, y = studentize_resids)) + 
+    theme_classic() + 
+    geom_point() + 
+    stat_smooth(color = "red", se = T)  + 
+    geom_hline(yintercept = 0, color = "blue", linewidth = 1, linetype = "dashed")+ 
+    geom_hline(yintercept = 2, color = "darkgrey", linewidth = 1, linetype = "dashed")+ 
+    geom_hline(yintercept = -2, color = "darkgrey", linewidth = 1, linetype = "dashed") + 
+    labs(x = "Fitted Values", 
+         y = "Studentized Residuals"), 
+  
+  nrow = 1
+  
+)
+
+```
+
+#### Convergence Plots 
+
+A unique feature of Bayesian Analysis is to assess convergence of MCMC samplers. We are interested in $\beta_1$ and $\sigma$, therefore we will look at the convergence plots for those two model parameters. A good convergence plot will show:
+
+1. no patterns or trends over time. Random fluctuations are acceptable. 
+2. Convergence and spread around what the estimated value of a parameters was. 
+3. For symmetrical distributions (Normal) we expect extreme and normal deviations to be equally balances towards each tail 
+3. For skewed distributions (Gamma, $\chi^2$), expect more extreme values towards higher values, at the tail, but extremes should be equal in their magnitude. 
+
+Presented plots show such behavior, model has converged. 
+
+```{r convergence of beta and sigma parameters}
+#| fig-width: 14
+
+gridExtra::grid.arrange(
+  
+  ggplot(
+    data = data.frame(Beta1 = mcmc.out$samples[,"slope"], 
+                      i = 1:length(mcmc.out$samples[,"slope"])), 
+    aes(x = i, y = Beta1)
+  ) + 
+    geom_line() + 
+    geom_smooth(), 
+  
+  
+  ggplot(
+    data = data.frame(Sigma = mcmc.out$samples[,"sigma"], 
+                      i = 1:length(mcmc.out$samples[,"sigma"])), 
+    aes(x = i, y = Sigma)
+  ) + 
+    geom_line() + 
+    geom_smooth(), 
+  
+  nrow = 1
+)
+```
+
+##### Joint Density of Beta1 and Sigma 
+
+As a bonus, here is a join kernel density of $\beta_1$ and $\sigma^2$ based on posterior samples. 
+
+```{r}
+#| fig-width: 12
+#| fig-height: 8
+
+
+plot_df <- 
+  data.frame(beta = mcmc.out$samples[,"slope"], 
+                         sigma = mcmc.out$samples[,"sigma"])
+
+density_est <- MASS::kde2d(plot_df$beta, plot_df$sigma, n = 100)
+
+
+plot_ly(z = ~density_est$z, 
+        colorbar = list(title = "Density")) %>% 
+  add_surface() %>% 
+  layout(
+    scene = list(
+      xaxis = list(title = 'Beta'),
+      yaxis = list(title = 'Sigma'),
+      zaxis = list(title = 'Joint Density')
+    )
+  )
+  
+
+```
+
+
+# Example 2: Logistic Regression 
+
+model: $Y_i = log(\frac{p_i}{1-p_i})$ and $Y_i = 1 - 1 \times x_{1i} + 2 \times x_{2i} + 0.5 \times x_{3i}$
+
+```{r generate the data for the second example}
+
+N = 100 
+set.seed(1)
+
+X1 = rnorm(N)
+X2 = rnorm(N, sd = 2)
+X3 = rbinom(N, size = 1, prob = 0.3)
+X4 = rbinom(N, size = 3, prob = 0.5) + 1
+
+coef_X4 = case_when(X4 == 1 ~ 0, 
+                    X4 == 2 ~ 0.1, 
+                    X4 == 3 ~ 1, 
+                    X4 == 4 ~ 1.3)
+
+Y = 1 - 1 * X1 + 2 * X2 + 0.5 * X3 +  coef_X4
+
+outcome <- rbinom(N, size = 1, prob =expit(Y))
+
+data_logistic = list(outcome = outcome, 
+                     x1 = X1, 
+                     x2 = X2, 
+                     x3 = X3)
+```
+
+```{r run example2 ninmble code , eval = F}
+
+N = length(data_logistic[[1]])
+
+snimble_example2 <- 
+  nimbleCode({
+    
+    ## priors 
+    beta0 ~ dflat()
+    beta1 ~ dflat()
+    beta2 ~ dflat()
+    beta3 ~ dflat()
+    
+    for(i in 1:N){
+      pi[i] <- expit(beta0 + beta1 * x1[i] + beta2 * x2[i] + beta3 * x3[i] )
+      outcome[i] ~  dbinom(pi[i], size = 1)
+    }
+  })
+
+
+Inits <- list(beta0 = 0, 
+              beta1 = 0,
+              beta2 = 0,
+              beta3 = 0
+              )
+
+model <- nimbleModel(snimble_example2, data = data_logistic)
+
+mcmc.out <- nimbleMCMC(code = snimble_example2, 
+                       model = model, 
+                       data = data_logistic, 
+                       inits = Inits, 
+                       monitors = c("beta0", "beta1", "beta2", "beta3", "outcome", "pi"), 
+                       thin = 1,
+                       niter = 10000, 
+                       nburnin = 10000/10, 
+                       nchains = 1, 
+                       summary = T,
+                       setSeed = TRUE
+                       )
+
+write_rds(mcmc.out, "example2_nimble.rds")
+
+mcmc.out$summary
+
+```
+
+### Results 
+
+###### Beta1, Continious Predictor
+
+```{r read in data for example 2}
+mcmc.out <- read_rds("example2_nimble.rds")
+```
+
+```{r summarize beta parameter for logistic  }
+#| label: tbl-freq-glm
+#| tbl-cap: "Estimates for Beta0, Beta1 using Frequentist LM"
+
+
+
+freq_glm <- glm(data_logistic$outcome ~ data_logistic$x1 + data_logistic$x2 + data_logistic$x3, family = "binomial")
+
+freq_glm %>% tidy() %>% 
+  select(-statistic, - p.value, -term) %>%
+  mutate(term = c("(Intercept)", "x1", "x2", "x3")) %>% 
+  select(term, everything()) %>% 
+  kable(col.names = c("Model term", "Est.", "SE") ,
+        digits = 4, 
+        booktabs = T)
+
+
+beta_1 <- freq_glm %>% tidy() %>% filter(term == "data_logistic$x1") %>% select(estimate) %>% unlist()
+
+```
+
+```{r}
+#| label: fig-bayes-ex2-beta1
+#| fig-cap: "Showing no difference between two frameworks, both closely approximate true value"
+
+
+ggplot(
+  data = data.frame(x = mcmc.out$samples[,"beta1"]), 
+  aes(x = x)
+) + 
+  theme_classic() + 
+  geom_histogram(bins = 25, fill = "lightgrey", color = "black") + 
+  geom_vline(aes(xintercept = -1, colour = "True Value"), linewidth = 1, linetype = "dashed", show.legend = T) + 
+  geom_vline(aes(xintercept = mean(mcmc.out$samples[,"beta1"]), color = "Bayesian Estiamte"), linewidth = 1, linetype = "dashed") +
+  geom_vline(aes(xintercept = beta_1, color = "Frequesntist Estiamte"), linewidth = 1, linetype = "dashed") + 
+  
+  labs(
+    x = "Posterior Samples", 
+    y = " ", 
+    colour = "Value Type", 
+    title = paste0("Posterior mean: ", round( mean(mcmc.out$samples[,"beta1"]), 4), ". SD of sampels: ",  round( sd(mcmc.out$samples[,"beta1"]), 4) ) 
+  )
+
+```
+
+##### Estiamted Values 
+
+```{r distribution of pi1 bayesian models }
+#| label: fig-bayes-pi1
+#| fig-cap: "Showing some difference between two frameworks, both produced wrong fit the given observation "
+
+est <- freq_glm$fitted.values[1]
+
+ggplot(
+  data = data.frame(x = mcmc.out$samples[,"pi[1]"]), 
+  aes(x = x)
+) + 
+  theme_classic() + 
+  geom_histogram(bins = 25, fill = "lightgrey", color = "black") + 
+  geom_vline(aes(xintercept = mean(mcmc.out$samples[,"pi[1]"]), color = "Bayesian Estiamte"), linewidth = 1, linetype = "dashed") +
+  geom_vline(aes(xintercept = est, color = "Frequesntist Estiamte"), linewidth = 1, linetype = "dashed") + 
+  
+  labs(
+    x = "Posterior Samples", 
+    y = " ", 
+    colour = "Value Type", 
+    title = paste0("Posterior mean: ", round( mean(mcmc.out$samples[,"pi[1]"]), 4), ". Frequentist estimate: ", round(est, 2), ". True value: ", round(data_logistic$outcome[1], 2) ) 
+  )
+
+```
+
+```{r fitted values vs actual values }
+
+mcmc.out$samples %>% colnames() %>% 
+  {which(substr(., 1, 2) == "pi") } -> to_select_cols 
+
+mcmc.out$samples[,to_select_cols] %>% 
+  apply(., 2, mean) -> fitted_prob 
+
+plot_df <- 
+  data.frame(outcome = data_logistic$outcome, 
+             fitted = fitted_prob, 
+             fitted_freq = freq_glm$fitted.values)
+
+ggplot(data = plot_df, 
+       aes(x = fitted_prob, y = outcome)) + 
+  theme_classic() + 
+  geom_point() + 
+  geom_smooth()
+
+
+```
+
+#### Convergence Plots 
+
+A unique feature of Bayesian Analysis is to assess convergence of MCMC samplers. We are interested in $\beta_1$ and $\sigma$, therefore we will look at the convergence plots for those two model parameters. A good convergence plot will show:
+
+1. no patterns or trends over time. Random fluctuations are acceptable. 
+2. Convergence and spread around what the estimated value of a parameters was. 
+3. For symmetrical distributions (Normal) we expect extreme and normal deviations to be equally balances towards each tail 
+3. For skewed distributions (Gamma, $\chi^2$), expect more extreme values towards higher values, at the tail, but extremes should be equal in their magnitude. 
+
+Presented plots show such behavior, model has converged. 
+
+```{r convergence of beta and sigma parameters logistic regression }
+#| fig-width: 14
+
+gridExtra::grid.arrange(
+  
+  ggplot(
+    data = data.frame(Beta1 = mcmc.out$samples[,"beta1"], 
+                      i = 1:length(mcmc.out$samples[,"beta1"])), 
+    aes(x = i, y = Beta1)
+  ) + 
+    geom_line() + 
+    geom_smooth(), 
+  
+  
+  ggplot(
+    data = data.frame(Sigma = mcmc.out$samples[,"beta2"], 
+                      i = 1:length(mcmc.out$samples[,"beta2"])), 
+    aes(x = i, y = Sigma)
+  ) + 
+    geom_line() + 
+    geom_smooth(), 
+  
+  nrow = 1
+)
+```
+
+# Example 3: Non-linear regression - Models from Biology 
+
+$Y_i = \alpha - \beta * \gamma ^ {x_{i}}$. 
+
+```{r data for example 3 my approach, eval = F }
+#Data:
+
+set.seed(2)
+x = c( 1.0, 1.5, 1.5, 1.5, 2.5, 4.0, 5.0, 5.0, 7.0,
+        8.0, 8.5, 9.0, 9.5, 9.5, 10.0, 12.0,
+        12.0, 13.0,
+        13.0, 14.5, 15.5, 15.5, 16.5, 17.0, 22.5,
+        29.0, 31.5)
+
+x = seq(from = min(x), to = max(x), by = 0.1)
+x = sample(x)
+
+error = rnorm(n=length(x))
+y = 4 - 1*(.8^x) + error
+
+list(x = x,
+      Y = y) -> data_ex3
+
+```
+
+```{r}
+
+data_ex3 <- 
+  list(
+    x = c( 1.0, 1.5, 1.5, 1.5, 2.5, 4.0, 5.0, 5.0, 7.0,
+          8.0, 8.5, 9.0, 9.5, 9.5, 10.0, 12.0,
+          12.0, 13.0,
+          13.0, 14.5, 15.5, 15.5, 16.5, 17.0, 22.5,
+          29.0, 31.5),
+    Y = c(1.80, 1.85, 1.87, 1.77, 2.02, 2.27, 2.15, 2.26,
+    2.47,
+    2.19, 2.26, 2.40, 2.39, 2.41, 2.50, 2.32,
+    2.32, 2.43,
+    2.47, 2.56, 2.65, 2.47, 2.64, 2.56, 2.70,
+    2.72, 2.57)
+    )
+
+```
+
+```{r nimble example 3, eval = F}
+
+summary(data_ex3$x)
+summary(data_ex3$Y)
+
+N = length(data_ex3[[1]])
+
+nimble_example3 <- 
+  nimbleCode({
+    
+    ## priors 
+    alpha ~ dflat()
+    beta ~ dflat()
+    gamma ~ dunif(0.5, 1.0)
+    
+    U3 <- logit(gamma)
+    tau <- 1/(sigma*sigma)
+    sigma ~ dunif(0.01, 100)
+
+    for(i in 1:N){
+      Y[i] ~ dnorm(mu[i], tau)
+      mu[i] <- alpha - beta * gamma ^ x[i]
+    }
+  })
+
+
+Inits <- list(alpha = 1, beta = 1, sigma = 1, gamma = 0.9)
+
+model <- nimbleModel(nimble_example3, data = data_ex3)
+
+mcmc.out <- nimbleMCMC(code = nimble_example3, 
+                       model = model, 
+                       data = data_ex3, 
+                       inits = Inits, 
+                       monitors = c("U3", "alpha", "beta", "gamma", "sigma", "tau", "mu", "Y"), 
+                       thin = 1,
+                       niter = 10000, 
+                       nburnin = 10000/10, 
+                       nchains = 1, 
+                       summary = T,
+                       setSeed = TRUE
+                       )
+
+write_rds(mcmc.out, "example3_nimble.rds")
+
+mcmc.out$summary
+
+
+```
+
+### Results 
+
+#### Fitted Parameters 
+
+```{R read in results of third example}
+
+mcmc.out <-read_rds( "example3_nimble.rds")
+
+```
+
+```{r distribution of alpha }
+
+ggplot(
+  data = data.frame(x = mcmc.out$samples[,"alpha"]), 
+  aes(x = x)
+) + 
+  theme_classic() + 
+  geom_histogram(bins = 25, fill = "lightgrey", color = "black") + 
+  geom_vline(aes(xintercept = mean(mcmc.out$samples[,"alpha"]), color = "Bayesian Estiamte"), linewidth = 1, linetype = "dashed") +
+  
+  labs(
+    x = "Posterior Samples", 
+    y = " ", 
+    colour = "Value Type", 
+    title = paste0("Posterior mean: ", round( mean(mcmc.out$samples[,"alpha"]), 4), ". SD of sampels: ",  round( sd(mcmc.out$samples[,"alpha"]), 4) ) 
+  )
+
+```
+
+```{r distribution of gamma }
+
+ggplot(
+  data = data.frame(x = mcmc.out$samples[,"gamma"]), 
+  aes(x = x)
+) + 
+  theme_classic() + 
+  geom_histogram(bins = 25, fill = "lightgrey", color = "black") + 
+  geom_vline(aes(xintercept = mean(mcmc.out$samples[,"gamma"]), color = "Bayesian Estiamte"), linewidth = 1, linetype = "dashed") +
+  
+  labs(
+    x = "Posterior Samples", 
+    y = " ", 
+    colour = "Value Type", 
+    title = paste0("Posterior mean: ", round( mean(mcmc.out$samples[,"gamma"]), 4), ". SD of sampels: ",  round( sd(mcmc.out$samples[,"gamma"]), 4) ) 
+  )
+
+```
+
+
+```{r distribution of sigma }
+
+ggplot(
+  data = data.frame(x = mcmc.out$samples[,"sigma"]), 
+  aes(x = x)
+) + 
+  theme_classic() + 
+  geom_histogram(bins = 25, fill = "lightgrey", color = "black") + 
+  geom_vline(aes(xintercept = mean(mcmc.out$samples[,"sigma"]), color = "Bayesian Estiamte"), linewidth = 1, linetype = "dashed") +
+  
+  labs(
+    x = "Posterior Samples", 
+    y = " ", 
+    colour = "Value Type", 
+    title = paste0("Posterior mean: ", round( mean(mcmc.out$samples[,"sigma"]), 4), ". SD of sampels: ",  round( sd(mcmc.out$samples[,"sigma"]), 4) ) 
+  )
+
+```
+
+##### Fitted Values 
+
+```{r one fitted value example 3 }
+
+mcmc.out$samples %>% colnames() %>% 
+  {which(substr(., 1, 2) == "mu")} -> cols_to_pull 
+
+i = 5
+
+ggplot(data = data.frame(x = mcmc.out$samples[,cols_to_pull][,i]), 
+       aes(x = x)) + 
+  geom_density()
+
+```
+
+```{r example 3 fitted values }
+
+mcmc.out$samples %>% colnames() %>% 
+  {which(substr(., 1, 2) == "mu")} -> cols_to_pull 
+
+mcmc.out$samples %>% colnames() %>% 
+  {which(substr(., 1, 1) == "Y")} -> cols_to_pull2 
+
+mcmc.out$samples[,cols_to_pull] -> fitted_values
+
+plot_df <- 
+  data.frame(observed = apply(mcmc.out$samples[,cols_to_pull2], 2, mean), 
+             fitted = apply(fitted_values, 2, mean),
+             fitted_se = apply(fitted_values, 2, sd))
+
+head(plot_df)
+
+ggplot(data = plot_df,  
+      aes(x = fitted, y = observed)) + 
+  theme_classic() + 
+  geom_point() + 
+  stat_smooth()
+
+```
+
+```{r compare output of nimble with calculated values }
+
+head(plot_df)
+
+mcmc.out$samples[,"alpha"] %>% mean() -> alpha_mean
+mcmc.out$samples[,"gamma"] %>% mean() -> gamma_mean
+mcmc.out$samples[,"beta"] %>% mean() -> beta_mean
+
+plot_df$x <- data_ex3$x
+plot_df$calculated_y <- alpha_mean - beta_mean * gamma_mean ^ plot_df$x
+
+ggplot(data = plot_df, 
+       aes(x = observed, y = calculated_y)) + 
+  theme_classic() + 
+  geom_point() + 
+  stat_smooth()
+  
+```
+
+##### Convergence 
+
+```{r}
+
+which. <- "alpha"
+
+plot_conv <- 
+  data.frame(x = mcmc.out$samples[,which.]) %>% 
+  mutate(i = 1:nrow(.))
+
+ggplot(data = plot_conv, 
+       aes(x = i, y = x)) + 
+  theme_classic() + 
+  geom_line() + 
+  stat_smooth()
+
+```
+
+
+```{r}
+
+which. <- "beta"
+
+plot_conv <- 
+  data.frame(x = mcmc.out$samples[,which.]) %>% 
+  mutate(i = 1:nrow(.))
+
+ggplot(data = plot_conv, 
+       aes(x = i, y = x)) + 
+  theme_classic() + 
+  geom_line() + 
+  stat_smooth()
+
+```
+
+```{r}
+
+which. <- "gamma"
+
+plot_conv <- 
+  data.frame(x = mcmc.out$samples[,which.]) %>% 
+  mutate(i = 1:nrow(.))
+
+ggplot(data = plot_conv, 
+       aes(x = i, y = x)) + 
+  theme_classic() + 
+  geom_line() + 
+  stat_smooth()
+
+```
+
+
