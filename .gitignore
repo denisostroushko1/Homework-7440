@@ -1,8 +1,12 @@
 .Rproj.user
 .Rhistory
 .RData
+.RDataTmp
+.RDataTmp1
 .Ruserdata
+
 /HW3/gibbs results.rds
+
 /HW4 - Part 1/MHresults/MH results1.rds
 /HW4 - Part 1/MHresults/MH results2.rds
 /HW4 - Part 1/MHresults/MH results4.rds
@@ -10,14 +14,22 @@
 /HW4 - Part 1/MHresults/MH results6.rds
 /HW4 - Part 1/MHresults/MH results7.rds
 /HW4 - Part 2/MHresults/MH results.rds
+
 /Midterm/midterm_res.rds
+
 /HW5/rds/hw5 predict nimble.rds
 /HW5/rds/hw5 res.rds
 /HW5/rds/hw5 quadratic nimble 2.rds
 /HW5/rds/hw5 quaratic nimble.rds
+
+/HW6/
+
 /Nimble examples/example1_nimble.rds
 /Nimble examples/example2_nimble.rds
 /Nimble examples/example3_nimble.rds
+
+
+
 
 
 

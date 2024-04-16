@@ -483,22 +483,15 @@ set.seed(1)
 
 X1 = rnorm(N)
 X2 = rnorm(N, sd = 2)
-X3 = rbinom(N, size = 1, prob = 0.3)
-X4 = rbinom(N, size = 3, prob = 0.5) + 1
 
-coef_X4 = case_when(X4 == 1 ~ 0, 
-                    X4 == 2 ~ 0.1, 
-                    X4 == 3 ~ 1, 
-                    X4 == 4 ~ 1.3)
 
-Y = 1 - 1 * X1 + 2 * X2 + 0.5 * X3 +  coef_X4
+Y = 1 - 1 * X1 + 2 * X2 
 
 outcome <- rbinom(N, size = 1, prob =expit(Y))
 
 data_logistic = list(outcome = outcome, 
                      x1 = X1, 
-                     x2 = X2, 
-                     x3 = X3)
+                     x2 = X2)
 ```
 
 ```{r run example2 ninmble code , eval = F}
@@ -512,10 +505,9 @@ snimble_example2 <-
     beta0 ~ dflat()
     beta1 ~ dflat()
     beta2 ~ dflat()
-    beta3 ~ dflat()
     
     for(i in 1:N){
-      pi[i] <- expit(beta0 + beta1 * x1[i] + beta2 * x2[i] + beta3 * x3[i] )
+      pi[i] <- expit(beta0 + beta1 * x1[i] + beta2 * x2[i])
       outcome[i] ~  dbinom(pi[i], size = 1)
     }
   })
@@ -523,8 +515,7 @@ snimble_example2 <-
 
 Inits <- list(beta0 = 0, 
               beta1 = 0,
-              beta2 = 0,
-              beta3 = 0
+              beta2 = 0
               )
 
 model <- nimbleModel(snimble_example2, data = data_logistic)
@@ -533,7 +524,7 @@ mcmc.out <- nimbleMCMC(code = snimble_example2,
                        model = model, 
                        data = data_logistic, 
                        inits = Inits, 
-                       monitors = c("beta0", "beta1", "beta2", "beta3", "outcome", "pi"), 
+                       monitors = c("beta0", "beta1", "beta2", "outcome", "pi"), 
                        thin = 1,
                        niter = 10000, 
                        nburnin = 10000/10, 
@@ -562,11 +553,11 @@ mcmc.out <- read_rds("example2_nimble.rds")
 
 
 
-freq_glm <- glm(data_logistic$outcome ~ data_logistic$x1 + data_logistic$x2 + data_logistic$x3, family = "binomial")
+freq_glm <- glm(data_logistic$outcome ~ data_logistic$x1 + data_logistic$x2, family = "binomial")
 
 freq_glm %>% tidy() %>% 
   select(-statistic, - p.value, -term) %>%
-  mutate(term = c("(Intercept)", "x1", "x2", "x3")) %>% 
+  mutate(term = c("(Intercept)", "x1", "x2")) %>% 
   select(term, everything()) %>% 
   kable(col.names = c("Model term", "Est.", "SE") ,
         digits = 4, 
