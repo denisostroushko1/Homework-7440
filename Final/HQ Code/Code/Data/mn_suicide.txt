@@ -1,0 +1,710 @@
+"Notes"	"Race"	"Race Code"	"Gender"	"Gender Code"	"County"	"County Code"	Deaths	Population	Crude Rate
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Aitkin County, MN"	"27001"	0	173	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Anoka County, MN"	"27003"	0	1443	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Becker County, MN"	"27005"	Suppressed	1108	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Beltrami County, MN"	"27007"	Suppressed	3700	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Benton County, MN"	"27009"	0	98	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Big Stone County, MN"	"27011"	0	16	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Blue Earth County, MN"	"27013"	0	113	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Brown County, MN"	"27015"	0	31	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Carlton County, MN"	"27017"	Suppressed	815	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Carver County, MN"	"27019"	0	113	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Cass County, MN"	"27021"	Suppressed	1276	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Chippewa County, MN"	"27023"	0	58	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Chisago County, MN"	"27025"	0	120	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Clay County, MN"	"27027"	Suppressed	450	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Clearwater County, MN"	"27029"	0	316	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Cook County, MN"	"27031"	0	200	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Cottonwood County, MN"	"27033"	0	24	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Crow Wing County, MN"	"27035"	0	302	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Dakota County, MN"	"27037"	0	1174	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Dodge County, MN"	"27039"	0	38	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Douglas County, MN"	"27041"	0	62	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Faribault County, MN"	"27043"	0	32	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Fillmore County, MN"	"27045"	0	17	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Freeborn County, MN"	"27047"	0	54	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Goodhue County, MN"	"27049"	0	262	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Grant County, MN"	"27051"	0	17	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Hennepin County, MN"	"27053"	Suppressed	5986	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Houston County, MN"	"27055"	0	28	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Hubbard County, MN"	"27057"	0	251	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Isanti County, MN"	"27059"	0	129	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Itasca County, MN"	"27061"	0	706	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Jackson County, MN"	"27063"	0	16	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Kanabec County, MN"	"27065"	0	69	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Kandiyohi County, MN"	"27067"	0	89	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Kittson County, MN"	"27069"	0	7	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Koochiching County, MN"	"27071"	0	148	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Lac qui Parle County, MN"	"27073"	0	9	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Lake County, MN"	"27075"	0	28	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Lake of the Woods County, MN"	"27077"	0	17	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Le Sueur County, MN"	"27079"	0	60	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Lincoln County, MN"	"27081"	0	13	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Lyon County, MN"	"27083"	0	62	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"McLeod County, MN"	"27085"	0	66	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Mahnomen County, MN"	"27087"	0	873	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Marshall County, MN"	"27089"	0	30	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Martin County, MN"	"27091"	0	44	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Meeker County, MN"	"27093"	0	21	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Mille Lacs County, MN"	"27095"	0	640	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Morrison County, MN"	"27097"	0	54	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Mower County, MN"	"27099"	0	79	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Murray County, MN"	"27101"	0	9	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Nicollet County, MN"	"27103"	0	57	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Nobles County, MN"	"27105"	0	75	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Norman County, MN"	"27107"	0	55	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Olmsted County, MN"	"27109"	0	245	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Otter Tail County, MN"	"27111"	0	209	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Pennington County, MN"	"27113"	0	111	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Pine County, MN"	"27115"	0	335	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Pipestone County, MN"	"27117"	0	63	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Polk County, MN"	"27119"	Suppressed	217	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Pope County, MN"	"27121"	0	16	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Ramsey County, MN"	"27123"	Suppressed	2566	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Red Lake County, MN"	"27125"	0	30	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Redwood County, MN"	"27127"	0	297	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Renville County, MN"	"27129"	0	77	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Rice County, MN"	"27131"	0	133	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Rock County, MN"	"27133"	0	27	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Roseau County, MN"	"27135"	0	110	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"St. Louis County, MN"	"27137"	Suppressed	2003	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Scott County, MN"	"27139"	0	685	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Sherburne County, MN"	"27141"	0	205	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Sibley County, MN"	"27143"	0	30	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Stearns County, MN"	"27145"	0	255	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Steele County, MN"	"27147"	0	54	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Stevens County, MN"	"27149"	0	94	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Swift County, MN"	"27151"	0	31	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Todd County, MN"	"27153"	0	59	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Traverse County, MN"	"27155"	0	62	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Wabasha County, MN"	"27157"	0	30	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Wadena County, MN"	"27159"	0	49	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Waseca County, MN"	"27161"	0	97	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Washington County, MN"	"27163"	0	594	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Watonwan County, MN"	"27165"	0	39	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Wilkin County, MN"	"27167"	0	24	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Winona County, MN"	"27169"	0	89	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Wright County, MN"	"27171"	0	278	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"	"Yellow Medicine County, MN"	"27173"	0	149	Unreliable
+"Total"	"American Indian or Alaska Native"	"1002-5"	"Female"	"F"			12	30896	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Aitkin County, MN"	"27001"	0	149	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Anoka County, MN"	"27003"	0	1433	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Becker County, MN"	"27005"	Suppressed	1003	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Beltrami County, MN"	"27007"	Suppressed	3445	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Benton County, MN"	"27009"	0	96	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Big Stone County, MN"	"27011"	0	12	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Blue Earth County, MN"	"27013"	0	139	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Brown County, MN"	"27015"	0	26	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Carlton County, MN"	"27017"	0	947	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Carver County, MN"	"27019"	0	149	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Cass County, MN"	"27021"	Suppressed	1218	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Chippewa County, MN"	"27023"	0	62	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Chisago County, MN"	"27025"	0	279	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Clay County, MN"	"27027"	0	366	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Clearwater County, MN"	"27029"	Suppressed	343	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Cook County, MN"	"27031"	0	195	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Cottonwood County, MN"	"27033"	0	29	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Crow Wing County, MN"	"27035"	0	266	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Dakota County, MN"	"27037"	0	1055	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Dodge County, MN"	"27039"	0	27	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Douglas County, MN"	"27041"	0	79	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Faribault County, MN"	"27043"	0	30	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Fillmore County, MN"	"27045"	0	22	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Freeborn County, MN"	"27047"	0	64	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Goodhue County, MN"	"27049"	0	294	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Grant County, MN"	"27051"	0	9	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Hennepin County, MN"	"27053"	Suppressed	5587	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Houston County, MN"	"27055"	0	14	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Hubbard County, MN"	"27057"	0	236	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Isanti County, MN"	"27059"	0	87	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Itasca County, MN"	"27061"	Suppressed	738	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Jackson County, MN"	"27063"	0	23	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Kanabec County, MN"	"27065"	0	69	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Kandiyohi County, MN"	"27067"	0	112	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Kittson County, MN"	"27069"	0	5	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Koochiching County, MN"	"27071"	0	144	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Lac qui Parle County, MN"	"27073"	0	6	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Lake County, MN"	"27075"	0	34	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Lake of the Woods County, MN"	"27077"	0	18	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Le Sueur County, MN"	"27079"	0	56	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Lincoln County, MN"	"27081"	0	8	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Lyon County, MN"	"27083"	0	85	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"McLeod County, MN"	"27085"	Suppressed	71	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Mahnomen County, MN"	"27087"	Suppressed	808	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Marshall County, MN"	"27089"	0	27	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Martin County, MN"	"27091"	0	40	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Meeker County, MN"	"27093"	0	42	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Mille Lacs County, MN"	"27095"	Suppressed	522	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Morrison County, MN"	"27097"	0	56	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Mower County, MN"	"27099"	0	76	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Murray County, MN"	"27101"	0	22	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Nicollet County, MN"	"27103"	0	97	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Nobles County, MN"	"27105"	0	94	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Norman County, MN"	"27107"	0	55	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Olmsted County, MN"	"27109"	0	297	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Otter Tail County, MN"	"27111"	0	173	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Pennington County, MN"	"27113"	0	122	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Pine County, MN"	"27115"	0	487	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Pipestone County, MN"	"27117"	0	70	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Polk County, MN"	"27119"	0	228	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Pope County, MN"	"27121"	0	26	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Ramsey County, MN"	"27123"	Suppressed	2185	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Red Lake County, MN"	"27125"	0	27	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Redwood County, MN"	"27127"	0	274	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Renville County, MN"	"27129"	0	81	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Rice County, MN"	"27131"	0	266	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Rock County, MN"	"27133"	0	34	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Roseau County, MN"	"27135"	0	111	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"St. Louis County, MN"	"27137"	Suppressed	1976	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Scott County, MN"	"27139"	Suppressed	671	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Sherburne County, MN"	"27141"	Suppressed	309	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Sibley County, MN"	"27143"	0	19	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Stearns County, MN"	"27145"	0	292	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Steele County, MN"	"27147"	0	75	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Stevens County, MN"	"27149"	0	52	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Swift County, MN"	"27151"	0	31	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Todd County, MN"	"27153"	0	71	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Traverse County, MN"	"27155"	0	68	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Wabasha County, MN"	"27157"	0	27	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Wadena County, MN"	"27159"	0	45	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Waseca County, MN"	"27161"	0	36	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Washington County, MN"	"27163"	0	760	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Watonwan County, MN"	"27165"	0	45	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Wilkin County, MN"	"27167"	Suppressed	47	Suppressed
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Winona County, MN"	"27169"	0	98	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Wright County, MN"	"27171"	0	254	Unreliable
+	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"	"Yellow Medicine County, MN"	"27173"	0	145	Unreliable
+"Total"	"American Indian or Alaska Native"	"1002-5"	"Male"	"M"			19	30271	Unreliable
+"Total"	"American Indian or Alaska Native"	"1002-5"					31	61167	50.7
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Aitkin County, MN"	"27001"	0	27	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Anoka County, MN"	"27003"	Suppressed	7593	Suppressed
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Becker County, MN"	"27005"	0	101	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Beltrami County, MN"	"27007"	0	218	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Benton County, MN"	"27009"	0	228	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Big Stone County, MN"	"27011"	0	9	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Blue Earth County, MN"	"27013"	0	752	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Brown County, MN"	"27015"	0	84	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Carlton County, MN"	"27017"	0	85	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Carver County, MN"	"27019"	0	1620	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Cass County, MN"	"27021"	0	74	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Chippewa County, MN"	"27023"	0	99	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Chisago County, MN"	"27025"	0	362	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Clay County, MN"	"27027"	0	445	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Clearwater County, MN"	"27029"	0	22	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Cook County, MN"	"27031"	0	32	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Cottonwood County, MN"	"27033"	0	183	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Crow Wing County, MN"	"27035"	0	195	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Dakota County, MN"	"27037"	Suppressed	10127	Suppressed
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Dodge County, MN"	"27039"	0	114	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Douglas County, MN"	"27041"	0	91	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Faribault County, MN"	"27043"	0	31	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Fillmore County, MN"	"27045"	0	69	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Freeborn County, MN"	"27047"	0	350	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Goodhue County, MN"	"27049"	0	194	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Grant County, MN"	"27051"	0	18	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Hennepin County, MN"	"27053"	Suppressed	40205	Suppressed
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Houston County, MN"	"27055"	0	60	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Hubbard County, MN"	"27057"	0	76	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Isanti County, MN"	"27059"	0	236	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Itasca County, MN"	"27061"	0	136	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Jackson County, MN"	"27063"	0	74	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Kanabec County, MN"	"27065"	0	51	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Kandiyohi County, MN"	"27067"	0	235	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Kittson County, MN"	"27069"	0	14	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Koochiching County, MN"	"27071"	0	59	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Lac qui Parle County, MN"	"27073"	0	29	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Lake County, MN"	"27075"	0	36	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Lake of the Woods County, MN"	"27077"	0	35	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Le Sueur County, MN"	"27079"	0	97	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Lincoln County, MN"	"27081"	0	11	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Lyon County, MN"	"27083"	0	412	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"McLeod County, MN"	"27085"	0	127	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Mahnomen County, MN"	"27087"	0	5	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Marshall County, MN"	"27089"	0	21	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Martin County, MN"	"27091"	0	64	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Meeker County, MN"	"27093"	0	59	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Mille Lacs County, MN"	"27095"	0	93	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Morrison County, MN"	"27097"	0	65	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Mower County, MN"	"27099"	0	793	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Murray County, MN"	"27101"	0	48	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Nicollet County, MN"	"27103"	0	252	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Nobles County, MN"	"27105"	0	524	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Norman County, MN"	"27107"	0	26	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Olmsted County, MN"	"27109"	0	4510	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Otter Tail County, MN"	"27111"	0	217	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Pennington County, MN"	"27113"	0	43	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Pine County, MN"	"27115"	0	106	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Pipestone County, MN"	"27117"	0	41	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Polk County, MN"	"27119"	0	144	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Pope County, MN"	"27121"	0	38	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Ramsey County, MN"	"27123"	Suppressed	32100	Suppressed
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Red Lake County, MN"	"27125"	0	14	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Redwood County, MN"	"27127"	0	125	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Renville County, MN"	"27129"	0	50	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Rice County, MN"	"27131"	0	785	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Rock County, MN"	"27133"	0	35	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Roseau County, MN"	"27135"	0	174	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"St. Louis County, MN"	"27137"	0	1243	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Scott County, MN"	"27139"	Suppressed	4161	Suppressed
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Sherburne County, MN"	"27141"	0	635	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Sibley County, MN"	"27143"	0	52	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Stearns County, MN"	"27145"	0	1821	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Steele County, MN"	"27147"	0	208	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Stevens County, MN"	"27149"	0	105	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Swift County, MN"	"27151"	0	46	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Todd County, MN"	"27153"	0	85	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Traverse County, MN"	"27155"	0	3	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Wabasha County, MN"	"27157"	0	68	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Wadena County, MN"	"27159"	0	45	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Waseca County, MN"	"27161"	0	80	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Washington County, MN"	"27163"	Suppressed	7084	Suppressed
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Watonwan County, MN"	"27165"	0	59	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Wilkin County, MN"	"27167"	0	16	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Winona County, MN"	"27169"	0	619	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Wright County, MN"	"27171"	Suppressed	940	Suppressed
+	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"	"Yellow Medicine County, MN"	"27173"	0	26	Unreliable
+"Total"	"Asian or Pacific Islander"	"A-PI"	"Female"	"F"			10	122644	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Aitkin County, MN"	"27001"	0	15	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Anoka County, MN"	"27003"	Suppressed	7042	Suppressed
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Becker County, MN"	"27005"	0	72	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Beltrami County, MN"	"27007"	0	149	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Benton County, MN"	"27009"	0	187	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Big Stone County, MN"	"27011"	0	4	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Blue Earth County, MN"	"27013"	0	857	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Brown County, MN"	"27015"	0	118	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Carlton County, MN"	"27017"	0	120	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Carver County, MN"	"27019"	0	1386	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Cass County, MN"	"27021"	0	54	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Chippewa County, MN"	"27023"	0	91	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Chisago County, MN"	"27025"	0	311	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Clay County, MN"	"27027"	0	462	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Clearwater County, MN"	"27029"	0	11	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Cook County, MN"	"27031"	0	17	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Cottonwood County, MN"	"27033"	Suppressed	179	Suppressed
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Crow Wing County, MN"	"27035"	0	123	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Dakota County, MN"	"27037"	0	8886	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Dodge County, MN"	"27039"	0	44	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Douglas County, MN"	"27041"	0	80	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Faribault County, MN"	"27043"	0	19	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Fillmore County, MN"	"27045"	0	31	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Freeborn County, MN"	"27047"	0	348	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Goodhue County, MN"	"27049"	0	156	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Grant County, MN"	"27051"	0	11	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Hennepin County, MN"	"27053"	10	39113	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Houston County, MN"	"27055"	0	48	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Hubbard County, MN"	"27057"	0	42	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Isanti County, MN"	"27059"	0	203	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Itasca County, MN"	"27061"	0	66	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Jackson County, MN"	"27063"	0	77	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Kanabec County, MN"	"27065"	0	44	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Kandiyohi County, MN"	"27067"	0	205	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Kittson County, MN"	"27069"	0	10	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Koochiching County, MN"	"27071"	0	17	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Lac qui Parle County, MN"	"27073"	0	31	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Lake County, MN"	"27075"	0	23	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Lake of the Woods County, MN"	"27077"	0	11	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Le Sueur County, MN"	"27079"	0	66	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Lincoln County, MN"	"27081"	0	13	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Lyon County, MN"	"27083"	0	412	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"McLeod County, MN"	"27085"	0	114	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Mahnomen County, MN"	"27087"	0	7	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Marshall County, MN"	"27089"	0	11	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Martin County, MN"	"27091"	0	58	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Meeker County, MN"	"27093"	0	38	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Mille Lacs County, MN"	"27095"	0	67	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Morrison County, MN"	"27097"	0	50	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Mower County, MN"	"27099"	Suppressed	808	Suppressed
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Murray County, MN"	"27101"	0	70	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Nicollet County, MN"	"27103"	0	242	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Nobles County, MN"	"27105"	0	655	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Norman County, MN"	"27107"	0	18	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Olmsted County, MN"	"27109"	0	4132	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Otter Tail County, MN"	"27111"	0	140	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Pennington County, MN"	"27113"	0	48	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Pine County, MN"	"27115"	0	116	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Pipestone County, MN"	"27117"	0	29	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Polk County, MN"	"27119"	0	137	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Pope County, MN"	"27121"	0	23	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Ramsey County, MN"	"27123"	Suppressed	30979	Suppressed
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Red Lake County, MN"	"27125"	0	5	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Redwood County, MN"	"27127"	0	143	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Renville County, MN"	"27129"	0	31	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Rice County, MN"	"27131"	0	652	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Rock County, MN"	"27133"	0	26	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Roseau County, MN"	"27135"	0	160	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"St. Louis County, MN"	"27137"	0	1038	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Scott County, MN"	"27139"	0	3748	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Sherburne County, MN"	"27141"	Suppressed	505	Suppressed
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Sibley County, MN"	"27143"	0	43	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Stearns County, MN"	"27145"	0	1719	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Steele County, MN"	"27147"	0	140	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Stevens County, MN"	"27149"	0	93	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Swift County, MN"	"27151"	0	45	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Todd County, MN"	"27153"	Suppressed	72	Suppressed
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Traverse County, MN"	"27155"	0	14	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Wabasha County, MN"	"27157"	0	44	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Wadena County, MN"	"27159"	0	17	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Waseca County, MN"	"27161"	0	65	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Washington County, MN"	"27163"	Suppressed	6317	Suppressed
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Watonwan County, MN"	"27165"	0	48	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Wilkin County, MN"	"27167"	0	12	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Winona County, MN"	"27169"	0	603	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Wright County, MN"	"27171"	0	799	Unreliable
+	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"	"Yellow Medicine County, MN"	"27173"	0	24	Unreliable
+"Total"	"Asian or Pacific Islander"	"A-PI"	"Male"	"M"			25	115259	21.7
+"Total"	"Asian or Pacific Islander"	"A-PI"					35	237903	14.7
+	"Black or African American"	"2054-5"	"Female"	"F"	"Aitkin County, MN"	"27001"	0	54	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Anoka County, MN"	"27003"	Suppressed	9624	Suppressed
+	"Black or African American"	"2054-5"	"Female"	"F"	"Becker County, MN"	"27005"	0	91	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Beltrami County, MN"	"27007"	0	164	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Benton County, MN"	"27009"	0	726	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Big Stone County, MN"	"27011"	0	13	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Blue Earth County, MN"	"27013"	0	1141	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Brown County, MN"	"27015"	0	59	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Carlton County, MN"	"27017"	0	77	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Carver County, MN"	"27019"	0	892	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Cass County, MN"	"27021"	0	69	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Chippewa County, MN"	"27023"	0	49	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Chisago County, MN"	"27025"	0	145	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Clay County, MN"	"27027"	0	963	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Clearwater County, MN"	"27029"	0	33	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Cook County, MN"	"27031"	0	51	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Cottonwood County, MN"	"27033"	0	51	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Crow Wing County, MN"	"27035"	0	234	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Dakota County, MN"	"27037"	Suppressed	12001	Suppressed
+	"Black or African American"	"2054-5"	"Female"	"F"	"Dodge County, MN"	"27039"	0	76	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Douglas County, MN"	"27041"	0	112	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Faribault County, MN"	"27043"	0	60	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Fillmore County, MN"	"27045"	0	51	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Freeborn County, MN"	"27047"	0	170	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Goodhue County, MN"	"27049"	0	266	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Grant County, MN"	"27051"	0	29	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Hennepin County, MN"	"27053"	Suppressed	67367	Suppressed
+	"Black or African American"	"2054-5"	"Female"	"F"	"Houston County, MN"	"27055"	0	61	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Hubbard County, MN"	"27057"	0	57	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Isanti County, MN"	"27059"	0	173	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Itasca County, MN"	"27061"	0	102	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Jackson County, MN"	"27063"	0	34	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Kanabec County, MN"	"27065"	0	55	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Kandiyohi County, MN"	"27067"	0	807	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Kittson County, MN"	"27069"	0	26	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Koochiching County, MN"	"27071"	0	48	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Lac qui Parle County, MN"	"27073"	0	21	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Lake County, MN"	"27075"	0	28	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Lake of the Woods County, MN"	"27077"	0	21	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Le Sueur County, MN"	"27079"	0	95	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Lincoln County, MN"	"27081"	0	9	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Lyon County, MN"	"27083"	0	263	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"McLeod County, MN"	"27085"	0	121	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Mahnomen County, MN"	"27087"	0	29	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Marshall County, MN"	"27089"	0	29	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Martin County, MN"	"27091"	0	62	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Meeker County, MN"	"27093"	0	73	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Mille Lacs County, MN"	"27095"	0	79	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Morrison County, MN"	"27097"	0	110	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Mower County, MN"	"27099"	0	459	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Murray County, MN"	"27101"	0	26	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Nicollet County, MN"	"27103"	0	462	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Nobles County, MN"	"27105"	0	306	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Norman County, MN"	"27107"	0	26	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Olmsted County, MN"	"27109"	0	3902	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Otter Tail County, MN"	"27111"	0	306	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Pennington County, MN"	"27113"	0	56	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Pine County, MN"	"27115"	0	86	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Pipestone County, MN"	"27117"	0	64	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Polk County, MN"	"27119"	0	330	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Pope County, MN"	"27121"	0	30	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Ramsey County, MN"	"27123"	Suppressed	27498	Suppressed
+	"Black or African American"	"2054-5"	"Female"	"F"	"Red Lake County, MN"	"27125"	0	18	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Redwood County, MN"	"27127"	0	64	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Renville County, MN"	"27129"	0	30	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Rice County, MN"	"27131"	0	1077	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Rock County, MN"	"27133"	0	22	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Roseau County, MN"	"27135"	0	41	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"St. Louis County, MN"	"27137"	Suppressed	1283	Suppressed
+	"Black or African American"	"2054-5"	"Female"	"F"	"Scott County, MN"	"27139"	0	2822	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Sherburne County, MN"	"27141"	0	973	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Sibley County, MN"	"27143"	0	53	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Stearns County, MN"	"27145"	0	3954	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Steele County, MN"	"27147"	0	396	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Stevens County, MN"	"27149"	0	66	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Swift County, MN"	"27151"	0	49	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Todd County, MN"	"27153"	0	67	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Traverse County, MN"	"27155"	0	14	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Wabasha County, MN"	"27157"	0	61	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Wadena County, MN"	"27159"	0	62	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Waseca County, MN"	"27161"	0	263	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Washington County, MN"	"27163"	0	4843	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Watonwan County, MN"	"27165"	0	53	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Wilkin County, MN"	"27167"	0	17	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Winona County, MN"	"27169"	0	375	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Wright County, MN"	"27171"	0	928	Unreliable
+	"Black or African American"	"2054-5"	"Female"	"F"	"Yellow Medicine County, MN"	"27173"	0	36	Unreliable
+"Total"	"Black or African American"	"2054-5"	"Female"	"F"			10	147989	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Aitkin County, MN"	"27001"	0	66	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Anoka County, MN"	"27003"	0	10116	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Becker County, MN"	"27005"	0	112	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Beltrami County, MN"	"27007"	0	261	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Benton County, MN"	"27009"	Suppressed	886	Suppressed
+	"Black or African American"	"2054-5"	"Male"	"M"	"Big Stone County, MN"	"27011"	0	25	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Blue Earth County, MN"	"27013"	0	1315	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Brown County, MN"	"27015"	0	95	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Carlton County, MN"	"27017"	0	569	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Carver County, MN"	"27019"	Suppressed	891	Suppressed
+	"Black or African American"	"2054-5"	"Male"	"M"	"Cass County, MN"	"27021"	0	71	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Chippewa County, MN"	"27023"	0	57	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Chisago County, MN"	"27025"	0	659	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Clay County, MN"	"27027"	Suppressed	1133	Suppressed
+	"Black or African American"	"2054-5"	"Male"	"M"	"Clearwater County, MN"	"27029"	0	42	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Cook County, MN"	"27031"	0	43	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Cottonwood County, MN"	"27033"	0	80	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Crow Wing County, MN"	"27035"	0	333	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Dakota County, MN"	"27037"	Suppressed	12500	Suppressed
+	"Black or African American"	"2054-5"	"Male"	"M"	"Dodge County, MN"	"27039"	0	88	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Douglas County, MN"	"27041"	0	146	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Faribault County, MN"	"27043"	0	69	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Fillmore County, MN"	"27045"	0	76	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Freeborn County, MN"	"27047"	0	221	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Goodhue County, MN"	"27049"	0	371	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Grant County, MN"	"27051"	0	24	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Hennepin County, MN"	"27053"	13	65372	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Houston County, MN"	"27055"	0	83	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Hubbard County, MN"	"27057"	0	83	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Isanti County, MN"	"27059"	0	215	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Itasca County, MN"	"27061"	0	177	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Jackson County, MN"	"27063"	0	54	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Kanabec County, MN"	"27065"	0	80	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Kandiyohi County, MN"	"27067"	0	998	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Kittson County, MN"	"27069"	0	10	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Koochiching County, MN"	"27071"	0	66	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Lac qui Parle County, MN"	"27073"	0	31	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Lake County, MN"	"27075"	0	42	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Lake of the Woods County, MN"	"27077"	0	20	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Le Sueur County, MN"	"27079"	0	134	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Lincoln County, MN"	"27081"	0	17	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Lyon County, MN"	"27083"	0	355	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"McLeod County, MN"	"27085"	0	176	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Mahnomen County, MN"	"27087"	0	36	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Marshall County, MN"	"27089"	0	28	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Martin County, MN"	"27091"	0	95	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Meeker County, MN"	"27093"	0	124	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Mille Lacs County, MN"	"27095"	0	109	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Morrison County, MN"	"27097"	0	139	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Mower County, MN"	"27099"	0	707	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Murray County, MN"	"27101"	0	27	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Nicollet County, MN"	"27103"	0	535	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Nobles County, MN"	"27105"	0	480	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Norman County, MN"	"27107"	0	30	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Olmsted County, MN"	"27109"	0	4067	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Otter Tail County, MN"	"27111"	0	415	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Pennington County, MN"	"27113"	0	110	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Pine County, MN"	"27115"	0	607	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Pipestone County, MN"	"27117"	0	78	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Polk County, MN"	"27119"	0	411	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Pope County, MN"	"27121"	0	31	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Ramsey County, MN"	"27123"	Suppressed	26396	Suppressed
+	"Black or African American"	"2054-5"	"Male"	"M"	"Red Lake County, MN"	"27125"	0	16	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Redwood County, MN"	"27127"	0	85	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Renville County, MN"	"27129"	0	69	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Rice County, MN"	"27131"	0	2120	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Rock County, MN"	"27133"	0	52	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Roseau County, MN"	"27135"	0	44	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"St. Louis County, MN"	"27137"	Suppressed	1885	Suppressed
+	"Black or African American"	"2054-5"	"Male"	"M"	"Scott County, MN"	"27139"	0	2873	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Sherburne County, MN"	"27141"	0	1554	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Sibley County, MN"	"27143"	0	82	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Stearns County, MN"	"27145"	Suppressed	4725	Suppressed
+	"Black or African American"	"2054-5"	"Male"	"M"	"Steele County, MN"	"27147"	0	526	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Stevens County, MN"	"27149"	0	67	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Swift County, MN"	"27151"	0	63	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Todd County, MN"	"27153"	0	95	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Traverse County, MN"	"27155"	0	14	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Wabasha County, MN"	"27157"	0	67	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Wadena County, MN"	"27159"	0	96	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Waseca County, MN"	"27161"	0	117	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Washington County, MN"	"27163"	0	5660	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Watonwan County, MN"	"27165"	0	56	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Wilkin County, MN"	"27167"	0	27	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Winona County, MN"	"27169"	0	417	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Wright County, MN"	"27171"	0	1136	Unreliable
+	"Black or African American"	"2054-5"	"Male"	"M"	"Yellow Medicine County, MN"	"27173"	0	47	Unreliable
+"Total"	"Black or African American"	"2054-5"	"Male"	"M"			29	154480	18.8
+"Total"	"Black or African American"	"2054-5"					39	302469	12.9
+	"White"	"2106-3"	"Female"	"F"	"Aitkin County, MN"	"27001"	Suppressed	6599	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Anoka County, MN"	"27003"	Suppressed	125391	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Becker County, MN"	"27005"	0	12525	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Beltrami County, MN"	"27007"	Suppressed	14706	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Benton County, MN"	"27009"	Suppressed	15127	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Big Stone County, MN"	"27011"	0	2035	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Blue Earth County, MN"	"27013"	Suppressed	26210	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Brown County, MN"	"27015"	Suppressed	10238	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Carlton County, MN"	"27017"	Suppressed	12992	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Carver County, MN"	"27019"	Suppressed	39163	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Cass County, MN"	"27021"	Suppressed	10709	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Chippewa County, MN"	"27023"	Suppressed	4485	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Chisago County, MN"	"27025"	Suppressed	21620	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Clay County, MN"	"27027"	0	24033	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Clearwater County, MN"	"27029"	Suppressed	3088	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Cook County, MN"	"27031"	0	2125	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Cottonwood County, MN"	"27033"	Suppressed	4233	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Crow Wing County, MN"	"27035"	Suppressed	26330	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Dakota County, MN"	"27037"	Suppressed	152140	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Dodge County, MN"	"27039"	Suppressed	8114	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Douglas County, MN"	"27041"	Suppressed	15434	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Faribault County, MN"	"27043"	0	5489	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Fillmore County, MN"	"27045"	Suppressed	8269	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Freeborn County, MN"	"27047"	0	12004	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Goodhue County, MN"	"27049"	Suppressed	18423	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Grant County, MN"	"27051"	Suppressed	2340	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Hennepin County, MN"	"27053"	31	411449	7.5
+	"White"	"2106-3"	"Female"	"F"	"Houston County, MN"	"27055"	0	7520	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Hubbard County, MN"	"27057"	Suppressed	8335	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Isanti County, MN"	"27059"	Suppressed	15741	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Itasca County, MN"	"27061"	Suppressed	17768	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Jackson County, MN"	"27063"	0	3817	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Kanabec County, MN"	"27065"	0	6484	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Kandiyohi County, MN"	"27067"	Suppressed	15998	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Kittson County, MN"	"27069"	Suppressed	1722	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Koochiching County, MN"	"27071"	Suppressed	4997	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Lac qui Parle County, MN"	"27073"	0	2718	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Lake County, MN"	"27075"	Suppressed	4306	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Lake of the Woods County, MN"	"27077"	0	1434	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Le Sueur County, MN"	"27079"	0	11297	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Lincoln County, MN"	"27081"	0	2232	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Lyon County, MN"	"27083"	0	9404	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"McLeod County, MN"	"27085"	Suppressed	14407	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Mahnomen County, MN"	"27087"	0	1110	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Marshall County, MN"	"27089"	0	3655	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Martin County, MN"	"27091"	0	8024	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Meeker County, MN"	"27093"	Suppressed	9060	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Mille Lacs County, MN"	"27095"	Suppressed	9709	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Morrison County, MN"	"27097"	Suppressed	13165	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Mower County, MN"	"27099"	0	14468	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Murray County, MN"	"27101"	0	3288	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Nicollet County, MN"	"27103"	Suppressed	13139	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Nobles County, MN"	"27105"	Suppressed	7041	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Norman County, MN"	"27107"	0	2451	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Olmsted County, MN"	"27109"	Suppressed	56506	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Otter Tail County, MN"	"27111"	0	23281	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Pennington County, MN"	"27113"	0	5533	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Pine County, MN"	"27115"	0	11001	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Pipestone County, MN"	"27117"	0	3507	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Polk County, MN"	"27119"	Suppressed	11802	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Pope County, MN"	"27121"	0	4504	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Ramsey County, MN"	"27123"	10	166468	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Red Lake County, MN"	"27125"	0	1536	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Redwood County, MN"	"27127"	0	5568	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Renville County, MN"	"27129"	0	5588	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Rice County, MN"	"27131"	0	24761	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Rock County, MN"	"27133"	0	3643	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Roseau County, MN"	"27135"	Suppressed	5553	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"St. Louis County, MN"	"27137"	10	79618	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Scott County, MN"	"27139"	Suppressed	50692	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Sherburne County, MN"	"27141"	Suppressed	35364	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Sibley County, MN"	"27143"	0	5840	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Stearns County, MN"	"27145"	Suppressed	58561	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Steele County, MN"	"27147"	0	14001	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Stevens County, MN"	"27149"	0	3767	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Swift County, MN"	"27151"	0	3622	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Todd County, MN"	"27153"	Suppressed	9353	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Traverse County, MN"	"27155"	0	1260	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Wabasha County, MN"	"27157"	Suppressed	8740	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Wadena County, MN"	"27159"	Suppressed	5290	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Waseca County, MN"	"27161"	0	7472	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Washington County, MN"	"27163"	11	94606	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Watonwan County, MN"	"27165"	Suppressed	4231	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Wilkin County, MN"	"27167"	0	2370	Unreliable
+	"White"	"2106-3"	"Female"	"F"	"Winona County, MN"	"27169"	Suppressed	20740	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Wright County, MN"	"27171"	Suppressed	50875	Suppressed
+	"White"	"2106-3"	"Female"	"F"	"Yellow Medicine County, MN"	"27173"	0	3681	Unreliable
+"Total"	"White"	"2106-3"	"Female"	"F"			157	1997895	7.9
+	"White"	"2106-3"	"Male"	"M"	"Aitkin County, MN"	"27001"	Suppressed	6684	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Anoka County, MN"	"27003"	25	124469	20.1
+	"White"	"2106-3"	"Male"	"M"	"Becker County, MN"	"27005"	Suppressed	12529	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Beltrami County, MN"	"27007"	Suppressed	14499	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Benton County, MN"	"27009"	Suppressed	14798	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Big Stone County, MN"	"27011"	0	1984	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Blue Earth County, MN"	"27013"	Suppressed	25833	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Brown County, MN"	"27015"	Suppressed	9842	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Carlton County, MN"	"27017"	Suppressed	13724	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Carver County, MN"	"27019"	Suppressed	38216	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Cass County, MN"	"27021"	Suppressed	11169	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Chippewa County, MN"	"27023"	Suppressed	4481	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Chisago County, MN"	"27025"	Suppressed	22526	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Clay County, MN"	"27027"	Suppressed	22891	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Clearwater County, MN"	"27029"	Suppressed	3145	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Cook County, MN"	"27031"	0	2104	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Cottonwood County, MN"	"27033"	Suppressed	4119	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Crow Wing County, MN"	"27035"	11	25849	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Dakota County, MN"	"27037"	38	144938	26.2
+	"White"	"2106-3"	"Male"	"M"	"Dodge County, MN"	"27039"	Suppressed	8078	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Douglas County, MN"	"27041"	Suppressed	15324	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Faribault County, MN"	"27043"	Suppressed	5475	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Fillmore County, MN"	"27045"	Suppressed	8160	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Freeborn County, MN"	"27047"	Suppressed	11628	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Goodhue County, MN"	"27049"	Suppressed	17949	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Grant County, MN"	"27051"	0	2392	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Hennepin County, MN"	"27053"	103	398357	25.9
+	"White"	"2106-3"	"Male"	"M"	"Houston County, MN"	"27055"	Suppressed	7420	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Hubbard County, MN"	"27057"	Suppressed	8575	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Isanti County, MN"	"27059"	Suppressed	15912	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Itasca County, MN"	"27061"	Suppressed	17805	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Jackson County, MN"	"27063"	Suppressed	4025	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Kanabec County, MN"	"27065"	Suppressed	6632	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Kandiyohi County, MN"	"27067"	Suppressed	15900	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Kittson County, MN"	"27069"	0	1714	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Koochiching County, MN"	"27071"	Suppressed	5014	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Lac qui Parle County, MN"	"27073"	0	2661	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Lake County, MN"	"27075"	Suppressed	4464	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Lake of the Woods County, MN"	"27077"	0	1620	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Le Sueur County, MN"	"27079"	Suppressed	11458	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Lincoln County, MN"	"27081"	Suppressed	2236	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Lyon County, MN"	"27083"	Suppressed	8948	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"McLeod County, MN"	"27085"	Suppressed	14181	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Mahnomen County, MN"	"27087"	Suppressed	1153	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Marshall County, MN"	"27089"	Suppressed	3753	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Martin County, MN"	"27091"	Suppressed	7718	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Meeker County, MN"	"27093"	0	9225	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Mille Lacs County, MN"	"27095"	Suppressed	9862	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Morrison County, MN"	"27097"	Suppressed	13288	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Mower County, MN"	"27099"	Suppressed	14351	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Murray County, MN"	"27101"	Suppressed	3251	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Nicollet County, MN"	"27103"	Suppressed	13234	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Nobles County, MN"	"27105"	Suppressed	7380	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Norman County, MN"	"27107"	Suppressed	2458	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Olmsted County, MN"	"27109"	16	52274	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Otter Tail County, MN"	"27111"	11	23316	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Pennington County, MN"	"27113"	Suppressed	5413	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Pine County, MN"	"27115"	Suppressed	12211	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Pipestone County, MN"	"27117"	0	3281	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Polk County, MN"	"27119"	Suppressed	11686	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Pope County, MN"	"27121"	Suppressed	4605	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Ramsey County, MN"	"27123"	43	153823	28.0
+	"White"	"2106-3"	"Male"	"M"	"Red Lake County, MN"	"27125"	Suppressed	1603	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Redwood County, MN"	"27127"	Suppressed	5504	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Renville County, MN"	"27129"	Suppressed	5795	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Rice County, MN"	"27131"	Suppressed	25178	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Rock County, MN"	"27133"	0	3578	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Roseau County, MN"	"27135"	Suppressed	5981	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"St. Louis County, MN"	"27137"	25	78926	31.7
+	"White"	"2106-3"	"Male"	"M"	"Scott County, MN"	"27139"	Suppressed	50187	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Sherburne County, MN"	"27141"	Suppressed	36773	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Sibley County, MN"	"27143"	Suppressed	5956	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Stearns County, MN"	"27145"	14	58572	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Steele County, MN"	"27147"	Suppressed	13836	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Stevens County, MN"	"27149"	Suppressed	3786	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Swift County, MN"	"27151"	Suppressed	3596	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Todd County, MN"	"27153"	Suppressed	9896	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Traverse County, MN"	"27155"	0	1251	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Wabasha County, MN"	"27157"	Suppressed	8700	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Wadena County, MN"	"27159"	Suppressed	5138	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Waseca County, MN"	"27161"	Suppressed	6950	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Washington County, MN"	"27163"	26	90626	28.7
+	"White"	"2106-3"	"Male"	"M"	"Watonwan County, MN"	"27165"	0	4156	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Wilkin County, MN"	"27167"	Suppressed	2529	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Winona County, MN"	"27169"	Suppressed	20167	Suppressed
+	"White"	"2106-3"	"Male"	"M"	"Wright County, MN"	"27171"	12	51547	Unreliable
+	"White"	"2106-3"	"Male"	"M"	"Yellow Medicine County, MN"	"27173"	0	3742	Unreliable
+"Total"	"White"	"2106-3"	"Male"	"M"			559	1955983	28.6
+"Total"	"White"	"2106-3"					716	3953878	18.1
+"Total"							821	4555417	18.0

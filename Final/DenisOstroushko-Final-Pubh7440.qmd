@@ -1,0 +1,37 @@
+---
+title: "Denis Ostroushko - PUBH 7440 - Final"
+format: pdf
+execute: 
+  warning: false
+  message: false 
+  echo: false 
+header-includes: \usepackage{pdfpages}
+---
+
+
+```{r local helper, eval= F}
+rm(list = ls())
+i = 2
+```
+
+```{r}
+
+library(tidyverse)
+library(kableExtra)
+library(gridExtra)
+library(mvtnorm)
+library(MCMCpack)
+
+options(scipen = 99999, 
+        knitr.kable.NA = '')
+
+burnin = 1:10000
+BURNIN = 10000
+
+```
+
+```{r}
+
+
+```
+
