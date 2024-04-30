@@ -16,11 +16,12 @@ i = 2
 
 ```{r}
 
-library(tidyverse)
+library(RColorBrewer)
 library(kableExtra)
 library(gridExtra)
 library(mvtnorm)
 library(MCMCpack)
+library(tidyverse)
 
 options(scipen = 99999, 
         knitr.kable.NA = '')
@@ -32,6 +33,958 @@ BURNIN = 10000
 
 ```{r}
 
+results <- read_rds("res.rds")
+data <- read.table(file = "./HQ Code/Code/Data/mn_suicide.txt", sep='\t',header=TRUE, stringsAsFactors=FALSE)
+  
+data <- data %>% arrange(County, Race, Gender)
+
+```
+
+# Section 1: Preliminaries 
+
+### 1.1 
+
+```{r}
+
+data %>% 
+  filter(Notes == "Total" & Gender != "" ) %>% 
+  select(Race, Gender, Deaths, Population) %>% 
+  mutate(
+    Deaths = as.numeric(Deaths), 
+    Population = as.numeric(Population), 
+    Crude_Rate = Deaths/Population * 100000
+  )  -> crude_rates_from_data 
+
+```
+
+```{r}
+cbind(
+  crude_rates_from_data %>% filter(Gender == "Female") %>% select(-Gender) %>% 
+    rename(Deaths_f = Deaths, 
+           Pop_f = Population, 
+           Crute_rate_f = Crude_Rate), 
+  crude_rates_from_data %>% filter(Gender == "Male") %>% select(-Gender, -Race) %>% 
+    rename(Deaths_m = Deaths, 
+           Pop_m = Population, 
+           Crute_rate_m = Crude_Rate)
+) -> processed_crude_rates_from_data
+
+processed_crude_rates_from_data
+```
+
+### 1.2 
+
+### 1.3 
+
+```{r}
+
+
+data %>% 
+  filter(Notes != "Total") %>% nrow() -> total_data_size
+
+```
+
+### 1.4 
+
+```{r}
+
+data %>% 
+  mutate(Deaths = as.numeric(Deaths)) %>% 
+  filter(Notes != "Total" & !is.na(Deaths) ) %>% nrow() -> non_suppressed
+
+```
+
+total data: `r total_data_size`
+
+non-missing data: `r non_suppressed`, missingness: `r round((total_data_size - non_suppressed)/total_data_size, 2)*100`%
+
+```{r}
+
+data %>% 
+  mutate(Deaths = ifelse(Deaths != "Suppressed" & Deaths != "0", "10+", Deaths)) %>% 
+  filter(Notes != "Total") %>% 
+  group_by(Deaths) %>% 
+  summarize(n = n())
+
+```
+
+# Section 2: Fitting and Evaluating the Model 
+
+### 2.1 
+
+Iterations: 50,000 
+
+Initial values for Beta: log of mean of death rates for the combination of sex and race categories 
+
+Sigma: 10 
+
+Tau: 10 
+
+Random effects: set to 0, learn from data 
+
+### 2.2 
+
+##### Betas
+
+```{r}
+
+betas <- results$beta0
+
+betas_2d <- array(data = c(aperm(betas, perm = c(2, 1, 3))), dim = c(8, 50000))
+
+hist_plot_beta <- function(which_beta){
+  
+  ggplot(data = data.frame(beta = betas_2d[which_beta, ], 
+                           i = 1:length(betas_2d[which_beta, ])), 
+         aes(x = i, y = beta)) + 
+    theme_classic() + 
+    geom_line() + 
+    geom_smooth(color = "red", linewidth = 1, se = F)
+  
+}
+
+beta_plots <- vector(mode = "list", length = 8)
+
+for(i in 1:8){
+  beta_plots[[i]] <- hist_plot_beta(i) 
+}
+
+```
+
+```{r}
+#| fig-width: 10
+#| fig-height: 14
+
+grid.arrange(
+  beta_plots[[1]], beta_plots[[5]],
+  beta_plots[[2]], beta_plots[[6]],
+  beta_plots[[3]], beta_plots[[7]],
+  beta_plots[[4]], beta_plots[[8]], 
+  
+  nrow = 4, ncol = 2
+)
+```
+
+##### Sigmas
+
+```{r}
+
+sigs <- results$sig2
+
+sigs_2d <- array(data = c(aperm(sigs, perm = c(2, 1, 3))), dim = c(8, 50000))
+
+hist_plot_sig2 <- function(which_beta){
+  
+  ggplot(data = data.frame(sig2 = sigs_2d[which_beta, ], 
+                           i = 1:length(sigs_2d[which_beta, ])), 
+         aes(x = i, y = sig2)) + 
+    theme_classic() + 
+    geom_line() + 
+    geom_smooth(color = "red", linewidth = 1, se = F)
+  
+}
+sig2_plots <- vector(mode = "list", length = 8)
+
+for(i in 1:8){
+  sig2_plots[[i]] <- hist_plot_sig2(i) 
+}
+
+```
+
+```{r}
+#| fig-width: 10
+#| fig-height: 14
+
+grid.arrange(
+  sig2_plots[[1]], sig2_plots[[5]],
+  sig2_plots[[2]], sig2_plots[[6]],
+  sig2_plots[[3]], sig2_plots[[7]],
+  sig2_plots[[4]], sig2_plots[[8]], 
+  
+  nrow = 4, ncol = 2
+)
+```
+
+##### Taus
+
+```{r}
+
+tau2 <- results$tau2
+
+tau2_2d <- array(data = c(aperm(tau2, perm = c(2, 1, 3))), dim = c(8, 50000))
+
+hist_plot_tau2 <- function(which_beta){
+  
+  ggplot(data = data.frame(tau2 = tau2_2d[which_beta, ], 
+                           i = 1:length(tau2_2d[which_beta, ])), 
+         aes(x = i, y = tau2)) + 
+    theme_classic() + 
+    geom_line() + 
+    geom_smooth(color = "red", linewidth = 1, se = F)
+  
+}
+
+tau_plots <- vector(mode = "list", length = 8)
+
+for(i in 1:8){
+  tau_plots[[i]] <- hist_plot_tau2(i) 
+}
+
+```
+
+```{r}
+#| fig-width: 10
+#| fig-height: 14
+
+grid.arrange(
+  tau_plots[[1]], tau_plots[[5]],
+  tau_plots[[2]], tau_plots[[6]],
+  tau_plots[[3]], tau_plots[[7]],
+  tau_plots[[4]], tau_plots[[8]], 
+  
+  nrow = 4, ncol = 2
+)
+```
+### 2.3 
+
+```{r}
+#| fig-width: 10
+#| fig-height: 14
+
+MAX_LAG = 200
+
+par(mfrow = c(4, 2))
+
+acf(betas_2d[1,], lag.max = MAX_LAG)
+acf(betas_2d[2,], lag.max = MAX_LAG)
+acf(betas_2d[3,], lag.max = MAX_LAG)
+acf(betas_2d[4,], lag.max = MAX_LAG)
+
+acf(betas_2d[5,], lag.max = MAX_LAG)
+acf(betas_2d[6,], lag.max = MAX_LAG)
+acf(betas_2d[7,], lag.max = MAX_LAG)
+acf(betas_2d[8,], lag.max = MAX_LAG)
+
+# Reset the plot layout to default (1x1) after plotting
+par(mfrow = c(1, 1))
+
+
+
+```
+
+### 2.4 
+
+#### American Indian / Alaska Native
+
+```{r}
+
+lami <- results$lami
+
+ind_lami <- lami[69, 2, 1, ][-burnin]
+
+```
+
+```{r}
+
+  
+ggplot(data = data.frame(l = ind_lami, 
+                         i = 1:length(ind_lami)), 
+       aes(x = i, y = l)) + 
+  theme_classic() + 
+  geom_line() + 
+  geom_smooth(color = "red", linewidth = 1, se = F)
+
+```
+
+```{r}
+
+ggplot(data = data.frame(l = ind_lami, 
+                         i = 1:length(ind_lami)), 
+       aes(x = l)) + 
+  theme_classic() + 
+  geom_histogram(bins = 50, color = "black", fill = "lightgrey") 
+
+```
+
+```{r}
+
+acf(ind_lami, lag.max = 100)
+
+```
+
+#### White 
+
+```{r}
+
+white_lami <- lami[69, 2, 4, ][-burnin]
+
+```
+
+```{r}
+
+  
+ggplot(data = data.frame(l = white_lami, 
+                         i = 1:length(white_lami)), 
+       aes(x = i, y = l)) + 
+  theme_classic() + 
+  geom_line() + 
+  geom_smooth(color = "red", linewidth = 1, se = F)
+
+```
+
+```{r}
+
+ggplot(data = data.frame(l = white_lami, 
+                         i = 1:length(white_lami)), 
+       aes(x = l)) + 
+  theme_classic() + 
+  geom_histogram(bins = 50, color = "black", fill = "lightgrey") 
+
+```
+
+
+```{r}
+
+acf(white_lami, lag.max = 100)
+
+```
+
+# Section 3: Bayesian Inference 
+
+### 3.1 
+
+```{r pull weights and sample of death at county level for each group }
+
+### Assumed race indexing from project description: American Indian / Alaska Native, Asian, Black, and White correspond to 1, 2, 3, 4
+### Assumed sex/gender indexing from project description: female/male correspond to 1, 2
+
+#############
+s1r1_lami <- lami[,1,1,][,-burnin] ## county level death rates for s=1 r=1
+data %>% filter(Notes != "Total" & Race == "American Indian or Alaska Native" & Gender == "Female") %>% 
+  mutate(weight = Population / sum(Population)) %>% 
+  select(weight) %>% unlist() -> s1r1_weights
+
+s1r2_lami <- lami[,1,2,][,-burnin]
+data %>% filter(Notes != "Total" & Race == "Asian or Pacific Islander" & Gender == "Female") %>% 
+  mutate(weight = Population / sum(Population)) %>% 
+  select(weight) %>% unlist() -> s1r2_weights
+
+s1r3_lami <- lami[,1,3,][,-burnin]
+data %>% filter(Notes != "Total" & Race == "Black or African American" & Gender == "Female") %>% 
+  mutate(weight = Population / sum(Population)) %>% 
+  select(weight) %>% unlist() -> s1r3_weights
+
+s1r4_lami <- lami[,1,4,][,-burnin]
+data %>% filter(Notes != "Total" & Race == "White" & Gender == "Female") %>% 
+  mutate(weight = Population / sum(Population)) %>% 
+  select(weight) %>% unlist() -> s1r4_weights
+
+############
+s2r1_lami <- lami[,2,1,][,-burnin]
+data %>% filter(Notes != "Total" & Race == "American Indian or Alaska Native" & Gender == "Male") %>% 
+  mutate(weight = Population / sum(Population)) %>% 
+  select(weight) %>% unlist() -> s2r1_weights
+
+s2r2_lami <- lami[,2,2,][,-burnin]
+data %>% filter(Notes != "Total" & Race == "Asian or Pacific Islander" & Gender == "Male") %>% 
+  mutate(weight = Population / sum(Population)) %>% 
+  select(weight) %>% unlist() -> s2r2_weights
+
+s2r3_lami <- lami[,2,3,][,-burnin]
+data %>% filter(Notes != "Total" & Race == "Black or African American" & Gender == "Male") %>% 
+  mutate(weight = Population / sum(Population)) %>% 
+  select(weight) %>% unlist() -> s2r3_weights
+
+s2r4_lami <- lami[,2,4,][,-burnin]
+data %>% filter(Notes != "Total" & Race == "White" & Gender == "Male") %>% 
+  mutate(weight = Population / sum(Population)) %>% 
+  select(weight) %>% unlist() -> s2r4_weights
+
+```
+
+```{r create weighted median distributions }
+
+(s1r1_lami %>% t() %>% as.matrix()) %*% 
+  (s1r1_weights %>% as.matrix() ) * 100000-> weighted_medians_s1r1
+
+(s1r2_lami %>% t() %>% as.matrix()) %*% 
+  (s1r2_weights %>% as.matrix() )  * 100000-> weighted_medians_s1r2
+
+(s1r3_lami %>% t() %>% as.matrix()) %*% 
+  (s1r3_weights %>% as.matrix() )  * 100000-> weighted_medians_s1r3
+
+(s1r4_lami %>% t() %>% as.matrix()) %*% 
+  (s1r4_weights %>% as.matrix() )  * 100000-> weighted_medians_s1r4
+
+#####################
+
+(s2r1_lami %>% t() %>% as.matrix()) %*% 
+  (s2r1_weights %>% as.matrix() )  * 100000-> weighted_medians_s2r1
+
+(s2r2_lami %>% t() %>% as.matrix()) %*% 
+  (s2r2_weights %>% as.matrix() )  * 100000-> weighted_medians_s2r2
+
+(s2r3_lami %>% t() %>% as.matrix()) %*% 
+  (s2r3_weights %>% as.matrix() )  * 100000-> weighted_medians_s2r3
+
+(s2r4_lami %>% t() %>% as.matrix()) %*% 
+  (s2r4_weights %>% as.matrix() )  * 100000-> weighted_medians_s2r4
+
+```
+
+```{r display results }
+
+data.frame(
+  race = c("American Indian or Alaska Native" , "Asian or Pacific Islander" , "Black or African American" , "White" ), 
+  median_s1 = c(
+    median(weighted_medians_s1r1),
+    median(weighted_medians_s1r2), 
+    median(weighted_medians_s1r3),
+    median(weighted_medians_s1r4)
+  ), 
+  
+  median_s1_ci = c(
+    
+    paste0(round(quantile(weighted_medians_s1r1, 0.025), 1), ", ", 
+           round(quantile(weighted_medians_s1r1, 0.975), 1) ),
+    paste0(round(quantile(weighted_medians_s1r2, 0.025), 1), ", ", 
+           round(quantile(weighted_medians_s1r2, 0.975), 1) ),
+    paste0(round(quantile(weighted_medians_s1r3, 0.025), 1), ", ", 
+           round(quantile(weighted_medians_s1r3, 0.975), 1) ),
+    paste0(round(quantile(weighted_medians_s1r4, 0.025), 1), ", ", 
+           round(quantile(weighted_medians_s1r4, 0.975), 1) )
+    
+  ), 
+  median_s2 = c(
+    median(weighted_medians_s2r1),
+    median(weighted_medians_s2r2), 
+    median(weighted_medians_s2r3),
+    median(weighted_medians_s2r4)
+  ),
+  
+  median_s1_ci = c(
+    
+    paste0(round(quantile(weighted_medians_s2r1, 0.025), 1), ", ", 
+           round(quantile(weighted_medians_s2r1, 0.975), 1) ),
+    paste0(round(quantile(weighted_medians_s2r2, 0.025), 1), ", ", 
+           round(quantile(weighted_medians_s2r2, 0.975), 1) ),
+    paste0(round(quantile(weighted_medians_s2r3, 0.025), 1), ", ", 
+           round(quantile(weighted_medians_s2r3, 0.975), 1) ),
+    paste0(round(quantile(weighted_medians_s2r4, 0.025), 1), ", ", 
+           round(quantile(weighted_medians_s2r4, 0.975), 1) )
+    
+  ), 
+  
+  p_s2_gr_s1 = c(
+    mean(I(weighted_medians_s2r1 > weighted_medians_s1r1)),
+    mean(I(weighted_medians_s2r2 > weighted_medians_s1r2)),
+    mean(I(weighted_medians_s2r3 > weighted_medians_s1r3)),
+    mean(I(weighted_medians_s2r4 > weighted_medians_s1r4))
+  )
+) %>% 
+  cbind(., 
+        processed_crude_rates_from_data %>% 
+          select(Crute_rate_f, Crute_rate_m)) %>% 
+  kable(booktabs = T, 
+        digits = 2) %>% 
+  column_spec(6, border_right = T)%>% 
+  column_spec(1, width = "3cm")
+
+```
+
+### 3.2 
+
+```{r}
+
+create_rates_map <- function(rates_samples, sex, race){
+  
+  # Get Minnesota county data
+  county <- map_data("county", region = "minnesota")
+  
+  apply(rates_samples, 1, median) * 100000 -> s1r1_median_at_county
+  
+  county %>% select(subregion) %>% unique() %>% 
+    mutate(rate = s1r1_median_at_county) -> county_level_rates
+  
+  county_f <- 
+    left_join(
+      x = county, 
+      y= county_level_rates, 
+      by = c("subregion")
+    ) 
+  
+  num_colors <- 7
+  palette <- brewer.pal(num_colors, "RdYlBu")
+  
+  library(viridis)
+  
+  # Draw the map and color counties by rate_breaks
+  ggplot(county_f, aes(x = long, y = lat, group = group, fill = rate)) +
+    geom_polygon() +
+    coord_map() +
+    scale_fill_viridis(name = "Rate Breaks", option = "H") +
+    labs(title = paste0("Race: ", race, ".\nGender: ", sex)) +
+    theme_void() 
+}
+```
+
+```{r}
+#| fig-height: 14
+#| fig-width: 10
+
+
+lamis <- list(
+s1r1_lami ,
+s1r2_lami ,
+s1r3_lami,
+s1r4_lami,
+
+s2r1_lami,
+s2r2_lami,
+s2r3_lami,
+s2r4_lami
+)
+
+races <- rep(c("American Indian or Alaska Native" , "Asian or Pacific Islander" , "Black or African American" , "White" ), 2)
+
+sex = c(rep("Female" ,4), rep("Male", 4))
+
+final_plots <- vector(mode  = "list", length = 8)
+
+for(i in 1:8){
+  create_rates_map(rates_samples = lamis[[i]], 
+                         sex = sex[i], 
+                         race = races[i]) -> final_plots[[i]]
+}
+        
+grid.arrange(
+  final_plots[[1]], final_plots[[5]], 
+  final_plots[[2]], final_plots[[6]], 
+  final_plots[[3]], final_plots[[7]], 
+  final_plots[[4]], final_plots[[8]], 
+  
+  nrow = 4, ncol = 2
+
+)
+```
+
+### 3.3 
+
+```{r assign urban rural counties }
+
+data %>% filter(Notes != "Total" & !is.na(Gender)) %>% 
+  group_by(County) %>% 
+  summarise(Population = sum(Population)) %>% 
+  ungroup() %>% 
+  mutate(# County = gsub("\\County, MN", "", County) %>% tolower(), 
+         urban = ifelse(Population > 150000, "Yes", "No")
+  ) -> urban_flags 
+
+data <- data %>% 
+  mutate(
+    urban = ifelse(County %in% (
+      urban_flags %>% filter(urban == "Yes") %>% select(County) %>% unlist()
+    ), "Yes", "No"
+    )
+  )
+
+```
+
+```{r}
+
+data %>% 
+  filter(Notes != "Total" & Gender != "" ) %>% 
+  group_by(Race, Gender, urban) %>% 
+  summarise(
+    Deaths = sum(as.numeric(Deaths), na.rm = T), 
+    Population = sum(Population)
+  ) %>% 
+  ungroup() %>% 
+  mutate(Crude_Rate = Deaths/Population * 100000) -> crude_rate_urban_summary
+
+cbind(
+  crude_rate_urban_summary %>% filter(urban == "Yes" & Gender == "Female") %>% 
+    select(-Gender, -urban, -Deaths, -Population) %>% 
+    rename(
+      Crude_Rate_ur_f = Crude_Rate
+    ), 
+  crude_rate_urban_summary %>% filter(urban == "No" & Gender == "Female") %>% 
+    rename(
+      Crude_Rate_rur_f = Crude_Rate
+    ) %>% 
+    select(Crude_Rate_rur_f), 
+  
+  crude_rate_urban_summary %>% filter(urban == "Yes" & Gender == "Male") %>% 
+    rename(
+      Crude_Rate_ur_m = Crude_Rate
+    ) %>% 
+    select(Crude_Rate_ur_m), 
+  
+  crude_rate_urban_summary %>% filter(urban == "No" & Gender == "Male") %>% 
+    rename(
+      Crude_Rate_rur_m = Crude_Rate
+    ) %>% 
+    select(Crude_Rate_rur_m)
+  
+) %>% 
+  kable(booktabs = T, 
+        digits = 1, 
+        col.names = c("Race", "Urban", "Rural", "Urban", "Rural")) %>% 
+  add_header_above(c(" " = 1, "Female" = 2, "Male" = 2))%>% 
+  column_spec(1, width = "3cm")
+  
+
+```
+
+```{r medians from the posterior samples }
+
+urban_id <- which(urban_flags$urban == "Yes")
+rural_id <- which(urban_flags$urban != "Yes")
+
+######################################################
+s1r1_ur <- s1r1_lami[urban_id,]
+s1r1_rur <- s1r1_lami[rural_id,]
+
+s1r2_ur <- s1r2_lami[urban_id,]
+s1r2_rur <- s1r2_lami[rural_id,]
+
+s1r3_ur <- s1r3_lami[urban_id,]
+s1r3_rur <- s1r3_lami[rural_id,]
+
+s1r4_ur <- s1r4_lami[urban_id,] 
+s1r4_rur <- s1r4_lami[rural_id,]
+
+######################################################
+s2r1_ur <- s2r1_lami[urban_id,]
+s2r1_rur <- s2r1_lami[rural_id,]
+
+s2r2_ur <- s2r2_lami[urban_id,]
+s2r2_rur <- s2r2_lami[rural_id,]
+
+s2r3_ur <- s2r3_lami[urban_id,]
+s2r3_rur <- s2r3_lami[rural_id,]
+
+s2r4_ur <- s2r4_lami[urban_id,]
+s2r4_rur <- s2r4_lami[rural_id,]
+
+```
+
+```{r get weights by rural urban }
+
+##################################################
+# 1 1 
+data %>% 
+  filter(Race == "American Indian or Alaska Native" & Gender == "Female" & 
+           urban == "Yes" & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s1r1_ur_weight
+
+data %>% 
+  filter(Race == "American Indian or Alaska Native" & Gender == "Female" & 
+           urban == "No"  & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s1r1_rur_weight
+# 1 2 
+data %>% 
+  filter(Race == "Asian or Pacific Islander" & Gender == "Female" & 
+           urban == "Yes"  & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s1r2_ur_weight
+
+data %>% 
+  filter(Race == "Asian or Pacific Islander" & Gender == "Female" & 
+           urban == "No"  & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s1r2_rur_weight
+
+# 1 3
+data %>% 
+  filter(Race == "Black or African American" & Gender == "Female" & 
+           urban == "Yes"  & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s1r3_ur_weight
+
+data %>% 
+  filter(Race == "Black or African American" & Gender == "Female" & 
+           urban == "No"  & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s1r3_rur_weight
+# 1 4
+data %>% 
+  filter(Race == "White" & Gender == "Female" & 
+           urban == "Yes"  & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s1r4_ur_weight
+
+data %>% 
+  filter(Race == "White" & Gender == "Female" & 
+           urban == "No"  & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s1r4_rur_weight
+
+##################################################
+# 2 1 
+data %>% 
+  filter(Race == "American Indian or Alaska Native" & Gender == "Male" & 
+           urban == "Yes"  & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s2r1_ur_weight
+
+data %>% 
+  filter(Race == "American Indian or Alaska Native" & Gender == "Male" & 
+           urban == "No"  & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s2r1_rur_weight
+# 2 2 
+data %>% 
+  filter(Race == "Asian or Pacific Islander" & Gender == "Male" & 
+           urban == "Yes"  & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s2r2_ur_weight
+
+data %>% 
+  filter(Race == "Asian or Pacific Islander" & Gender == "Male" & 
+           urban == "No"  & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s2r2_rur_weight
+# 2 3
+data %>% 
+  filter(Race == "Black or African American" & Gender == "Male" & 
+           urban == "Yes"  & Notes != "Total")  %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s2r3_ur_weight
+
+data %>% 
+  filter(Race == "Black or African American" & Gender == "Male" & 
+           urban == "No"  & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s2r3_rur_weight
+# 2 4
+data %>% 
+  filter(Race == "White" & Gender == "Male" & 
+           urban == "Yes"  & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s2r4_ur_weight
+
+data %>% 
+  filter(Race == "White" & Gender == "Male" & 
+           urban == "No"  & Notes != "Total") %>% 
+  mutate(weight = Population/sum(Population)) %>% 
+  select(weight) %>% unlist() -> s2r4_rur_weight
+
+```
+
+```{r get weighted samples of posterior medians }
+
+################################################################
+((s1r1_ur %>% t() %>% as.matrix()) %*% as.matrix(s1r1_ur_weight)) %>% 
+  as.vector() * 100000 -> s1r1_ur_f
+((s1r1_rur %>% t() %>% as.matrix()) %*% as.matrix(s1r1_rur_weight)) %>% 
+  as.vector() * 100000 -> s1r1_rur_f
+
+((s1r2_ur %>% t() %>% as.matrix()) %*% as.matrix(s1r2_ur_weight)) %>% 
+  as.vector() * 100000 -> s1r2_ur_f
+((s1r2_rur %>% t() %>% as.matrix()) %*% as.matrix(s1r2_rur_weight)) %>% 
+  as.vector() * 100000 -> s1r2_rur_f
+
+((s1r3_ur %>% t() %>% as.matrix()) %*% as.matrix(s1r3_ur_weight)) %>% 
+  as.vector() * 100000 -> s1r3_ur_f
+((s1r3_rur %>% t() %>% as.matrix()) %*% as.matrix(s1r3_rur_weight)) %>% 
+  as.vector() * 100000 -> s1r3_rur_f
+
+((s1r4_ur %>% t() %>% as.matrix()) %*% as.matrix(s1r4_ur_weight)) %>% 
+  as.vector() * 100000 -> s1r4_ur_f
+((s1r4_rur %>% t() %>% as.matrix()) %*% as.matrix(s1r4_rur_weight)) %>% 
+  as.vector() * 100000 -> s1r4_rur_f
+
+################################################################
+((s2r1_ur %>% t() %>% as.matrix()) %*% as.matrix(s2r1_ur_weight)) %>% 
+  as.vector() * 100000 -> s2r1_ur_f
+((s2r1_rur %>% t() %>% as.matrix()) %*% as.matrix(s2r1_rur_weight)) %>% 
+  as.vector() * 100000 -> s2r1_rur_f
+
+((s2r2_ur %>% t() %>% as.matrix()) %*% as.matrix(s2r2_ur_weight)) %>% 
+  as.vector() * 100000 -> s2r2_ur_f
+((s2r2_rur %>% t() %>% as.matrix()) %*% as.matrix(s2r2_rur_weight)) %>% 
+  as.vector() * 100000 -> s2r2_rur_f
+
+((s2r3_ur %>% t() %>% as.matrix()) %*% as.matrix(s2r3_ur_weight)) %>% 
+  as.vector() * 100000 -> s2r3_ur_f
+((s2r3_rur %>% t() %>% as.matrix()) %*% as.matrix(s2r3_rur_weight)) %>% 
+  as.vector() * 100000 -> s2r3_rur_f
+
+((s2r4_ur %>% t() %>% as.matrix()) %*% as.matrix(s2r4_ur_weight)) %>% 
+  as.vector() * 100000 -> s2r4_ur_f
+((s2r4_rur %>% t() %>% as.matrix()) %*% as.matrix(s2r4_rur_weight)) %>% 
+  as.vector() * 100000 -> s2r4_rur_f
+
+```
+
+```{r present results }
+
+data.frame(
+  race = c("American Indian or Alaska Native", "Asian or Pacific Islander", "Black or African American", "White"), 
+  ur_f = c(median(s1r1_ur_f), median(s1r2_ur_f), median(s1r3_ur_f), median(s1r4_ur_f) ), 
+  ur_f_l = c(quantile(s1r1_ur_f, 0.025), quantile(s1r2_ur_f, 0.025), quantile(s1r3_ur_f, 0.025), quantile(s1r4_ur_f, 0.025) ), 
+  ur_f_u = c(quantile(s1r1_ur_f, 0.975), quantile(s1r2_ur_f, 0.975), quantile(s1r3_ur_f, 0.975), quantile(s1r4_ur_f, 0.975) ), 
+  
+  
+  rur_f = c(median(s1r1_rur_f), median(s1r2_rur_f), median(s1r3_rur_f), median(s1r4_rur_f) ), 
+  rur_f_l = c(quantile(s1r1_rur_f, 0.025), quantile(s1r2_rur_f, 0.025), quantile(s1r3_rur_f, 0.025), quantile(s1r4_rur_f, 0.025) ), 
+  rur_f_u = c(quantile(s1r1_rur_f, 0.975), quantile(s1r2_rur_f, 0.975), quantile(s1r3_rur_f, 0.975), quantile(s1r4_rur_f, 0.975) ),
+  
+  ur_m = c(median(s2r1_ur_f), median(s2r2_ur_f), median(s2r3_ur_f), median(s2r4_ur_f) ), 
+  ur_m_l = c(quantile(s2r1_ur_f, 0.025), quantile(s2r2_ur_f, 0.025), quantile(s2r3_ur_f, 0.025), quantile(s2r4_ur_f, 0.025) ), 
+  ur_m_u = c(quantile(s2r1_ur_f, 0.975), quantile(s2r2_ur_f, 0.975), quantile(s2r3_ur_f, 0.975), quantile(s2r4_ur_f, 0.975) ), 
+  
+  rur_m = c(median(s2r1_rur_f), median(s2r2_rur_f), median(s2r3_rur_f), median(s2r4_rur_f) ), 
+  rur_m_l = c(quantile(s2r1_rur_f, 0.025), quantile(s2r2_rur_f, 0.025), quantile(s2r3_rur_f, 0.025), quantile(s2r4_rur_f, 0.025) ), 
+  rur_m_u = c(quantile(s2r1_rur_f, 0.975), quantile(s2r2_rur_f, 0.975), quantile(s2r3_rur_f, 0.975), quantile(s2r4_rur_f, 0.975) )
+  
+) %>% 
+  mutate_at(vars(setdiff(colnames(.), "race")), ~ round(., 1)
+  ) %>% 
+  
+  mutate(ur_f_ci = paste0(ur_f_l, ", ", ur_f_u), 
+         rur_f_ci = paste0(rur_f_l, ", ", rur_f_u), 
+         ur_m_ci = paste0(ur_m_l, ", ", ur_m_u), 
+         rur_m_ci = paste0(rur_m_l, ", ", rur_m_u)
+         ) %>% 
+  select(race, 
+         ur_f, ur_f_ci, 
+         rur_f, rur_f_ci, 
+         
+         ur_m, ur_m_ci, 
+         rur_m, rur_m_ci) %>% 
+  kable(booktabs = T, 
+        col.names = c("Race", 
+                      "Urban", "Urban C.I.", 
+                      "Rural", "Rural C.I.", 
+                      "Urban", "Urban C.I.", 
+                      "Rural", "Rural C.I.")) %>% 
+  add_header_above(c(" " = 1, "Female" = 4, "Male" = 4)) %>% 
+  column_spec(1, width = "3cm")
+         
+
+```
+
+### 3.4 
+
+```{r}
+create_probability_map <- function(probabilities, sex, race){
+  
+  # Get Minnesota county data
+  county <- map_data("county", region = "minnesota")
+  
+  county %>% select(subregion) %>% unique() %>% 
+    mutate(prob = probabilities) -> county_level_rates
+  
+  county_f <- 
+    left_join(
+      x = county, 
+      y= county_level_rates, 
+      by = c("subregion")
+    ) 
+  
+  num_colors <- 7
+  palette <- brewer.pal(num_colors, "RdYlBu")
+  
+  library(viridis)
+  
+  # Draw the map and color counties by rate_breaks
+  ggplot(county_f, aes(x = long, y = lat, group = group, fill = prob)) +
+    geom_polygon() +
+    coord_map() +
+    scale_fill_viridis(name = "Rate Breaks", 
+                       option = "H", 
+                       limits = c(0,1), 
+                       breaks = seq(0, 1, by = 0.1),
+                       guide = guide_colorbar(barheight = 15,
+                                            barwidth = 0.5)
+                       ) +
+    labs(title = paste0("Race: ", race, ".\nGender: ", sex)) +
+    theme_void() 
+}
+```
+
+```{r}
+#| fig-height: 14
+#| fig-width: 10
+
+
+##################################################################
+s1r1_r4_comp <- s1r1_lami > s1r4_lami
+s1r1_r4_post_prob <- apply(s1r1_r4_comp, 1, mean)
+
+s2r1_r4_comp <- s2r1_lami > s2r4_lami
+s2r1_r4_post_prob <- apply(s2r1_r4_comp, 1, mean)
+
+##################################################################
+s1r2_r4_comp <- s1r2_lami > s1r4_lami
+s1r2_r4_post_prob <- apply(s1r2_r4_comp, 1, mean)
+
+s2r2_r4_comp <- s2r2_lami > s2r4_lami
+s2r2_r4_post_prob <- apply(s2r2_r4_comp, 1, mean)
+
+##################################################################
+s1r3_r4_comp <- s1r3_lami > s1r4_lami
+s1r3_r4_post_prob <- apply(s1r3_r4_comp, 1, mean)
+
+s2r3_r4_comp <- s2r3_lami > s2r4_lami
+s2r3_r4_post_prob <- apply(s2r3_r4_comp, 1, mean)
+
+##################################################################
+grid.arrange(
+  create_probability_map(probabilities = s1r1_r4_post_prob, sex = "Female", race = "AI/AN to White"), 
+  create_probability_map(probabilities = s2r1_r4_post_prob, sex = "Male", race = "AI/AN to White"), 
+  
+  create_probability_map(probabilities = s1r2_r4_post_prob, sex = "Female", race = "Asian to White"), 
+  create_probability_map(probabilities = s2r2_r4_post_prob, sex = "Male", race = "Asian to White"), 
+  
+  create_probability_map(probabilities = s1r3_r4_post_prob, sex = "Female", race = "Black to White"), 
+  create_probability_map(probabilities = s2r3_r4_post_prob, sex = "Male", race = "Black to White"), 
+  
+  nrow = 3, ncol = 2
+)
+
+```
+
+### 3.5 
+
+```{r}
+#| fig-height: 10
+#| fig-width: 10
+
+
+##################################################################
+r1_s1s2_comp <- s2r1_lami > s1r1_lami
+r1_s1s2_comp_post_prob <- apply(r1_s1s2_comp, 1, mean)
+
+##################################################################
+r2_s1s2_comp <- s2r2_lami > s1r2_lami
+r2_s1s2_comp_post_prob <- apply(r2_s1s2_comp, 1, mean)
+
+##################################################################
+r3_s1s2_comp <- s2r3_lami > s1r3_lami
+r3_s1s2_comp_post_prob <- apply(r3_s1s2_comp, 1, mean)
+
+##################################################################
+r4_s1s2_comp <- s2r4_lami > s1r4_lami
+r4_s1s2_comp_post_prob <- apply(r4_s1s2_comp, 1, mean)
+
+
+##################################################################
+grid.arrange(
+  create_probability_map(probabilities = r1_s1s2_comp_post_prob, sex = "Male to Female", race = "AI/AN"), 
+  
+  create_probability_map(probabilities = r2_s1s2_comp_post_prob, sex = "Male to Female", race = "Asian"), 
+  
+  create_probability_map(probabilities = r3_s1s2_comp_post_prob, sex = "Male to Female", race = "Black"), 
+  
+  create_probability_map(probabilities = r4_s1s2_comp_post_prob, sex = "Male to Female", race = "White"), 
+  
+  nrow = 2, ncol = 2
+)
 
 ```
 
