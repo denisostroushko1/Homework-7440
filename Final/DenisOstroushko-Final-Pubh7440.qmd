@@ -17,16 +17,17 @@ i = 2
 ```{r}
 
 library(RColorBrewer)
-library(kableExtra)
 library(gridExtra)
 library(mvtnorm)
 library(MCMCpack)
+
+library(kableExtra)
 library(tidyverse)
 
 options(scipen = 99999, 
         knitr.kable.NA = '')
 
-burnin = 1:10000
+burnin = 1:1000
 BURNIN = 10000
 
 ```
@@ -44,6 +45,8 @@ data <- data %>% arrange(County, Race, Gender)
 
 ### 1.1 
 
+@tbl-sum-1-1 shows crude deaths and death rates for each racial group by gender. It appears that within each racial group crude death rates for males are higher. Within each gender group, American Indian or Alaskan Native populations experience the highest death rates. 
+
 ```{r}
 
 data %>% 
@@ -58,6 +61,10 @@ data %>%
 ```
 
 ```{r}
+#| label: tbl-sum-1-1
+#| tbl-cap: "Crude rates and aggregate values from the data. Suppressed data artificially lowers total deaths and crude rates for all groups."
+
+
 cbind(
   crude_rates_from_data %>% filter(Gender == "Female") %>% select(-Gender) %>% 
     rename(Deaths_f = Deaths, 
@@ -69,20 +76,55 @@ cbind(
            Crute_rate_m = Crude_Rate)
 ) -> processed_crude_rates_from_data
 
-processed_crude_rates_from_data
+processed_crude_rates_from_data %>% 
+  mutate(Pop_m = prettyNum(Pop_m, big.mark = ","),
+         Pop_f = prettyNum(Pop_m, big.mark = ",")) %>% 
+  kable(booktabs = T, 
+        align = c('l', rep('c', 6)), 
+        digits = 1, 
+        col.names = c("Race", "Deaths", "Population", "Crude Rate per 100,000",
+                      "Deaths", "Population", "Crude Rate per 100,000")) %>% 
+  add_header_above(c(" " = 1, "Female" = 3, "Male" = 3)) %>% 
+  add_footnote("Deaths and Rate per 100,000 treat supressed values as missing data not contributing to the totals.") %>% 
+  column_spec(1, width = "3cm") %>% 
+  column_spec(c(2:7), width = "2cm") %>% 
+  kable_styling(latex_options = "hold_position")
+
+
+
 ```
 
 ### 1.2 
 
+Typically, we used Inverse Gamma (IG) distributions with values 0.001 for parameters $\alpha$ and $\beta$, which would make them non-informative but proper priors. The choice of prior for $\tau^2_{rs}$ with parameters valued at 1 and 0.01 makes this prior somewhat informative. Prior for $\sigma^2_{rs}$ is more informative than priors for  $\tau^2_{rs}$. 
+Prior distribution for $\beta_{0rs}$ are non-informative due to the large variance of a normal distribution. 
+
 ### 1.3 
 
-```{r}
+The total number of data points is defined by the number of combinations between racial group, gender groups, and the number of counties. We have a 4 racial groups, 2 gender groups, and 87 counties in MN. These amount to the total of `r 2*4*87` data points. Some of them need to be imputed. 
 
-
+```{r }
 data %>% 
   filter(Notes != "Total") %>% nrow() -> total_data_size
 
 ```
+
+Now we take a look at the list of parameters: 
+
+* There are `r 2*4*87` death rates $\lambda_{irs}$ for each race-gender group in each company. 
+
+* Each death rate $\lambda_{irs}$ is governed by 8 race-gender death rate means $\beta_{0rs}$
+
+* There are `r 2*4*87` random effects $z_{irs}$ for each  $\lambda_{irs}$
+
+* There are 8 $\tau^2_{rs}$
+
+* There are 8  $\sigma^2_{rs}$
+
+Therefore, there are a total of 696 + 8 + 696 + 8 + 8 = `r 696 + 8 + 696 + 8 + 8` parameters in this model. 
+
+**This could be of concern** to some people because the number of 'parameters' exceeds the total number of data points in the dataset. From a frequentist statistician point of view, this could lead to the problem of over-parametrizing the model, and achieving a perfect fit to the data. However, this is not quite true. While $\lambda_{irs}$ are a parameter here, 
+we can think of them as a fitted value in a poisson regression regression model. Additionally, random effects $z_{irs}$ are each a parameter with their own distribution, however, this is a by-product of Bayesian estimation process and we are not interested in interpreting them. 
 
 ### 1.4 
 
@@ -94,17 +136,22 @@ data %>%
 
 ```
 
-total data: `r total_data_size`
+We have a total number of data points: `r total_data_size`
 
-non-missing data: `r non_suppressed`, missingness: `r round((total_data_size - non_suppressed)/total_data_size, 2)*100`%
+The total number of non-missing data points: `r non_suppressed`, resulting in missingness rate of `r round((total_data_size - non_suppressed)/total_data_size, 2)*100`%. We refer to suppressed values as missing data. @tbl-ex shows the distribution of deaths counts at the county-race-gender level. Majority of the data has no deaths. Only a small fraction has 10+ death, with a large chunk of values being suppressed. This inflation of the data with zeros can be problem in the estimation process. Our variance estimates could also be affected because of a large chunk of the data being one type of value, which is zero. 
 
 ```{r}
+#| label: tbl-ex
+#| tbl-cap: "Distribtuion of deaths values in the data"
+
 
 data %>% 
   mutate(Deaths = ifelse(Deaths != "Suppressed" & Deaths != "0", "10+", Deaths)) %>% 
   filter(Notes != "Total") %>% 
   group_by(Deaths) %>% 
-  summarize(n = n())
+  summarize(n = n()) %>% 
+  kable(booktabs = T) %>% 
+  kable_styling(latex_options = "hold_position")
 
 ```
 
@@ -112,15 +159,11 @@ data %>%
 
 ### 2.1 
 
-Iterations: 50,000 
+I ran the code for 50,000 iterations. It took  approximately 16 minutes. 
 
-Initial values for Beta: log of mean of death rates for the combination of sex and race categories 
-
-Sigma: 10 
-
-Tau: 10 
-
-Random effects: set to 0, learn from data 
+I picked initial values other parameters by running 100 iterations of sampler and see which values result in smaller number of 
+attempts to sample values. I initialized all $\beta_{0rs}$ at 0, while all $\tau^2_{rs}$ were set at 2 and $\sigma^2_{rs}$ were initialized at 10. I suspect variance of log death rates to be relatively smaller than that of spatial random effects. 
+I set all random effects to 0 to initialize the sampler. 
 
 ### 2.2 
 
@@ -139,7 +182,7 @@ hist_plot_beta <- function(which_beta){
          aes(x = i, y = beta)) + 
     theme_classic() + 
     geom_line() + 
-    geom_smooth(color = "red", linewidth = 1, se = F)
+    geom_smooth(color = "red", linewidth = 1, se = F) 
   
 }
 
@@ -151,21 +194,29 @@ for(i in 1:8){
 
 ```
 
+@fig-beta-conv shows all 8 convergence plots for parameters Beta. Overall, I would about 1,000 iterations would be enough for burnin. The samples drop down from zero to the level where convergence happens pretty fast. Racial group 4 (White population) shows the best convergence plots, likely due to higher volume of data available for this group withing each gender group. Overall, groups 1, 2, 3 show a very high degree of autocorrelation as evidenced by oscillation of samples up and down. A high degree of autocorrelation is also evident by the fact that once samples reach a high or low extreme, it takes a lot of iterations (more than, say, 10) to recover or regress back to the running average level. These are fine to show to a reviewer or a peer, but we need to acknowledge limitations that occur because of the nature of the data. 
+
 ```{r}
+#| label: fig-beta-conv
+#| fig-cap: "Reasonable but not ideal convergence for parameters Beta"
 #| fig-width: 10
 #| fig-height: 14
 
 grid.arrange(
-  beta_plots[[1]], beta_plots[[5]],
-  beta_plots[[2]], beta_plots[[6]],
-  beta_plots[[3]], beta_plots[[7]],
-  beta_plots[[4]], beta_plots[[8]], 
+  beta_plots[[1]] + ggtitle("Beta_0 r = 1 s = 1"), beta_plots[[5]] + ggtitle("Beta_0 r = 1 s = 2"),
+  beta_plots[[2]] + ggtitle("Beta_0 r = 2 s = 1"), beta_plots[[6]] + ggtitle("Beta_0 r = 2 s = 2"),
+  beta_plots[[3]] + ggtitle("Beta_0 r = 3 s = 1"), beta_plots[[7]] + ggtitle("Beta_0 r = 3 s = 2"),
+  beta_plots[[4]] + ggtitle("Beta_0 r = 4 s = 1"), beta_plots[[8]] + ggtitle("Beta_0 r = 4 s = 2"), 
   
   nrow = 4, ncol = 2
 )
 ```
 
+\newpage 
+
 ##### Sigmas
+
+@fig-sigma-conv shows some potential issues with the convergence plots. High spikes in racial groups 1, 2, 3 and slow recovery from extremes indicates very high degree of autocorrelation. I would say it would be ideal to run the code for 50,000 more iterations of the Gibbs sampler in order to see if such spikes occur again. Showing these plots to a reviewer may put this analysis under more scrutiny, and perhaps, a request to run a simpler analysis. 
 
 ```{r}
 
@@ -192,20 +243,29 @@ for(i in 1:8){
 ```
 
 ```{r}
+#| label: fig-sigma-conv
+#| fig-cap: "Suspected issues with convergence of Sigma2 parameters for all racial groups except r=4 (White)"
 #| fig-width: 10
 #| fig-height: 14
 
 grid.arrange(
-  sig2_plots[[1]], sig2_plots[[5]],
-  sig2_plots[[2]], sig2_plots[[6]],
-  sig2_plots[[3]], sig2_plots[[7]],
-  sig2_plots[[4]], sig2_plots[[8]], 
+  sig2_plots[[1]] + ggtitle("Sigma2_0 r = 1 s = 1"), sig2_plots[[5]] + ggtitle("Sigma2_0 r = 1 s = 2"),
+  sig2_plots[[2]] + ggtitle("Sigma2_0 r = 2 s = 1"), sig2_plots[[6]] + ggtitle("Sigma2_0 r = 2 s = 2"),
+  sig2_plots[[3]] + ggtitle("Sigma2_0 r = 3 s = 1"), sig2_plots[[7]] + ggtitle("Sigma2_0 r = 3 s = 2"),
+  sig2_plots[[4]] + ggtitle("Sigma2_0 r = 4 s = 1"), sig2_plots[[8]] + ggtitle("Sigma2_0 r = 4 s = 2"), 
+   
   
   nrow = 4, ncol = 2
 )
 ```
 
+\newpage
+
 ##### Taus
+
+@fig-tau-conv shows convergence plots for parameters $\tau^2_{rs}$. Like two previous sets of convergence plots, it seems that the sampled values drop down from the initial values pretty fast, and then oscillate from less to more extreme values. Convergence plots 
+looks best for White racial group once again, confirming that convergence of parameters is best for the group that has the most data.
+
 
 ```{r}
 
@@ -233,21 +293,30 @@ for(i in 1:8){
 ```
 
 ```{r}
+#| label: fig-tau-conv
+#| fig-cap: "Suspected issues with convergence of Tau2 parameters for all racial groups except r=4 (White)"
 #| fig-width: 10
 #| fig-height: 14
 
 grid.arrange(
-  tau_plots[[1]], tau_plots[[5]],
-  tau_plots[[2]], tau_plots[[6]],
-  tau_plots[[3]], tau_plots[[7]],
-  tau_plots[[4]], tau_plots[[8]], 
+  tau_plots[[1]] + ggtitle("Tau2_0 r = 1 s = 1"), tau_plots[[5]] + ggtitle("Tau2_0 r = 1 s = 2"),
+  tau_plots[[2]] + ggtitle("Tau2_0 r = 2 s = 1"), tau_plots[[6]] + ggtitle("Tau2_0 r = 2 s = 2"),
+  tau_plots[[3]] + ggtitle("Tau2_0 r = 3 s = 1"), tau_plots[[7]] + ggtitle("Tau2_0 r = 3 s = 2"),
+  tau_plots[[4]] + ggtitle("Tau2_0 r = 4 s = 1"), tau_plots[[8]] + ggtitle("Tau2_0 r = 4 s = 2"), 
   
   nrow = 4, ncol = 2
 )
 ```
+
+\newpage
+
 ### 2.3 
 
+@fig-acf-beta shows autocorrealtion plots. It seems that there is a relationship to some extent, because the white racial group has the most data, and the least degree of autocorrelation. While AN/AI group has much less data than Asian and Black racial groups, they still exhibit the same degree of autocorrelation. Meaning, that the relationship between autocorrelation and volume of available data likely does not scale linearly. 
+
 ```{r}
+#| label: fig-acf-beta
+#| fig-cap: "Autocorrelation plots show a high degree of dependence for racial groups 1, 2, 3"
 #| fig-width: 10
 #| fig-height: 14
 
@@ -255,15 +324,10 @@ MAX_LAG = 200
 
 par(mfrow = c(4, 2))
 
-acf(betas_2d[1,], lag.max = MAX_LAG)
-acf(betas_2d[2,], lag.max = MAX_LAG)
-acf(betas_2d[3,], lag.max = MAX_LAG)
-acf(betas_2d[4,], lag.max = MAX_LAG)
-
-acf(betas_2d[5,], lag.max = MAX_LAG)
-acf(betas_2d[6,], lag.max = MAX_LAG)
-acf(betas_2d[7,], lag.max = MAX_LAG)
-acf(betas_2d[8,], lag.max = MAX_LAG)
+acf(betas_2d[1,], lag.max = MAX_LAG, main = "Beta_0 r = 1 s = 1"); acf(betas_2d[5,], lag.max = MAX_LAG, main = "Beta_0 r = 1 s = 2")
+acf(betas_2d[2,], lag.max = MAX_LAG, main = "Beta_0 r = 2 s = 1"); acf(betas_2d[6,], lag.max = MAX_LAG, main = "Beta_0 r = 2 s = 2")
+acf(betas_2d[3,], lag.max = MAX_LAG, main = "Beta_0 r = 3 s = 1"); acf(betas_2d[7,], lag.max = MAX_LAG, main = "Beta_0 r = 3 s = 2")
+acf(betas_2d[4,], lag.max = MAX_LAG, main = "Beta_0 r = 4 s = 1"); acf(betas_2d[8,], lag.max = MAX_LAG, main = "Beta_0 r = 4 s = 2")
 
 # Reset the plot layout to default (1x1) after plotting
 par(mfrow = c(1, 1))
@@ -272,9 +336,16 @@ par(mfrow = c(1, 1))
 
 ```
 
+\newpage 
+
 ### 2.4 
 
-#### American Indian / Alaska Native
+#### American Indian / Alaska Native Males
+
+@fig-conv-ind shows convergence plot of death rates for American Indian / Alaska Native Males, @fig-post-1 shows the distribution of 
+posterior samples, and @fig-autocor-1 is the autorrealtion plots. 
+
+Overall, the degree of autocorrealtion is reduced when compared with the group-specific mean death rate, the posterior samples are distributed very nicely, and have a gamma-like shape. 
 
 ```{r}
 
@@ -285,34 +356,57 @@ ind_lami <- lami[69, 2, 1, ][-burnin]
 ```
 
 ```{r}
+#| label: fig-conv-ind
+#| fig-cap: "Evidence of good convergece of death rate"
 
-  
+
 ggplot(data = data.frame(l = ind_lami, 
                          i = 1:length(ind_lami)), 
        aes(x = i, y = l)) + 
   theme_classic() + 
-  geom_line() + 
-  geom_smooth(color = "red", linewidth = 1, se = F)
+  geom_line(color = "darkgrey") + 
+  geom_smooth(color = "red", linewidth = 1, se = F) + 
+  geom_hline(yintercept = mean(ind_lami), color = "blue", linetype = "dashed", linewidth = 1) + 
+  labs(x = "Iteration", y = "Lambda", 
+       title = "American Indian / Alaska Native Males Death Rate convergence")
 
 ```
 
 ```{r}
+#| label: fig-post-1
+#| fig-cap: "Crude death rate is not available in the data "
+
+# data %>% filter(Race == "American Indian or Alaska Native" & Gender == "Male" & County == "St. Louis County, MN")
 
 ggplot(data = data.frame(l = ind_lami, 
                          i = 1:length(ind_lami)), 
        aes(x = l)) + 
   theme_classic() + 
-  geom_histogram(bins = 50, color = "black", fill = "lightgrey") 
+  geom_histogram(bins = 50, color = "black", fill = "lightgrey") + 
+  geom_vline(xintercept = mean(ind_lami), color = "blue", linetype = "dashed", linewidth = 1) + 
+  labs(y = "", x = "Death Rate Samples", 
+       title = "American Indian / Alaska Native Males Death Rate Samples")
 
 ```
 
 ```{r}
+#| label: fig-autocor-1
+#| fig-cap: "Autocorrelation of samples is smaller than that of the group's average"
 
-acf(ind_lami, lag.max = 100)
+
+acf(ind_lami, lag.max = 100, main = "American Indian / Alaska Native Males Death Rate Samples Autocorrelation")
 
 ```
 
+\newpage 
+
 #### White 
+
+@fig-conv-ind-2 shows convergence plot of death rates for White Males, @fig-post-2 shows the distribution of 
+posterior samples, and @fig-autocor-2 is the autorrealtion plots. 
+
+Overall, the degree of autocorrealtion is reduced when compared with the group-specific mean death rate, the posterior samples are distributed very nicely, and have a normal-ish shape, although with a heavier right tail, which resembles a gamma distribution. 
+Crude rate and posterior median align nicely, which is something we would expect from a data point with a large number of events and population. 
 
 ```{r}
 
@@ -321,33 +415,49 @@ white_lami <- lami[69, 2, 4, ][-burnin]
 ```
 
 ```{r}
+#| label: fig-conv-ind-2
+#| fig-cap: "Evidence of good convergece of death rate"
 
-  
+
 ggplot(data = data.frame(l = white_lami, 
                          i = 1:length(white_lami)), 
        aes(x = i, y = l)) + 
   theme_classic() + 
-  geom_line() + 
-  geom_smooth(color = "red", linewidth = 1, se = F)
+  geom_line(color = "darkgrey") + 
+  geom_smooth(color = "red", linewidth = 1, se = F) + 
+  geom_hline(yintercept = mean(white_lami), color = "blue", linetype = "dashed", linewidth = 1) + 
+  labs(x = "Iteration", y = "Lambda", 
+       title = "White Males Death Rate convergence")
 
 ```
 
 ```{r}
+#| label: fig-post-2
+#| fig-cap: "Crude rate and Posterior Median Rate align close"
+
+ data %>% filter(Race == "White" & Gender == "Male" & County == "St. Louis County, MN") %>% select(Crude.Rate) %>% unlist() %>% as.numeric() %>% {./100000}-> cr
 
 ggplot(data = data.frame(l = white_lami, 
                          i = 1:length(white_lami)), 
        aes(x = l)) + 
   theme_classic() + 
-  geom_histogram(bins = 50, color = "black", fill = "lightgrey") 
+  geom_histogram(bins = 50, color = "black", fill = "lightgrey") + 
+  geom_vline(aes(xintercept = mean(white_lami), color = "Posterior Median"), linetype = "dashed", linewidth = 1) +
+  geom_vline(aes(xintercept = cr, color = "Crude Rate"), linetype = "dashed", linewidth = 1) + 
+  labs(y = "", x = "Death Rate Samples", 
+       title = "White Males Death Rate Samples")
 
 ```
-
 
 ```{r}
+#| label: fig-autocor-2
+#| fig-cap: "Autocorrelation of samples is smaller than that of the group's average"
 
-acf(white_lami, lag.max = 100)
+acf(ind_lami, lag.max = 100, main = "White Males Death Rate Samples Autocorrelation")
 
 ```
+
+\newpage 
 
 # Section 3: Bayesian Inference 
 
@@ -432,7 +542,18 @@ data %>% filter(Notes != "Total" & Race == "White" & Gender == "Male") %>%
 
 ```
 
+@tbl-3-1 shows crude and posterior median death rates for each racial group, stratified by gender groups. We obtain a 'probability' as a relative frequency of the number of posterior samples where male death rate exceeds female death rate within each group. It is evident that there is a high degree of confidence that male death rates in each racial group. 
+
+Weights for posterior median are obtained by taking the ratio of population within each county for a given race-gender group to the total population within a given race-gender group. Crude rates are a the sum of all deaths within a race-gender group over the total population within a race-gender group. 
+
+Crude rates and estimated weighted median rates are quite similar. We shall note that weighted median rates for AI/AN group are lower than crude rates. That was a surprise to me, as I expected that by 'imputing' suppressed data, we should have higher, or at least similar, rates than the crude ones. 
+
+If we were to project Bayesian inference conclusion onto crude rates, due to high similarity of two types of estimates, I suppose crude rates reveal statistically significant disparities between male and female death rates, when stratified by the racial group. 
+
 ```{r display results }
+#| label: tbl-3-1
+#| tbl-cap: "High evidence of Male Death Rates per 100,000 being consistently higher than those of Female"
+
 
 data.frame(
   race = c("American Indian or Alaska Native" , "Asian or Pacific Islander" , "Black or African American" , "White" ), 
@@ -486,13 +607,41 @@ data.frame(
         processed_crude_rates_from_data %>% 
           select(Crute_rate_f, Crute_rate_m)) %>% 
   kable(booktabs = T, 
-        digits = 2) %>% 
-  column_spec(6, border_right = T)%>% 
-  column_spec(1, width = "3cm")
+        digits = 2, 
+        align = c('l', rep('c', 7)), 
+        col.names = c("Race", "Median", "95% C.I.", "Median", "95% C.I.", "Pr(Male > Female)", "Female", "Male")) %>% 
+  
+  column_spec(1, width = "3cm") %>% 
+  column_spec(c(2:5), width = "1.75cm") %>% 
+  column_spec(6, border_right = T, width = "1.75cm")%>% 
+  column_spec(c(7:8), width = "1cm")%>% 
+  
+  add_header_above(c(" " = 1, "Female" = 2, "Male" = 2, " " = 1, "Crude Rates" = 2)) %>% 
+  add_footnote("Pr(Male > Female) is the proportion of posterior samples where Female Rate exceeds Male rate") %>% 
+  add_footnote("C.I. = Credible Interval") %>% 
+  kable_styling(latex_options = "hold_position")
+  
+  
 
 ```
 
+\newpage 
+
 ### 3.2 
+
+@fig-cap-3-2 visualizes spatial trends in the death rates. Overall, it seems that all racial groups expect for Asian/PI exhibit higher death rates per 100,000 'up-north'. Those counties are more rural, and, perhaps, each suicide related death contributes more to the death rate. Color-gradient legend also shows us that the variances of death rates within race-gender groups are notable, but not extremely variable. 
+
+White males and females have varying spacial trends, with female suicide death rates in the southern part of Minnesota are quite lower than those of males in the same geographic area. Also, white females tend to have higher rates in the north-east part, while males have higher rates in the north-west part. 
+
+```{r, eval = F}
+
+which(apply(s1r3_lami, 1, median) == max(apply(s1r3_lami, 1, median)))
+
+```
+
+Black female map is also quite interesting with one county being the absolute outlier. That county is St. Louis County, which we already looked at in the other part of analysis for different racial and gender groups. I presume this is mainly driven by the suicide death rates for black females in Duluth. 
+
+Zooming into the Twin-Cities area, it appears that each group has their own trends in this large metropolitan area. 
 
 ```{r}
 
@@ -522,13 +671,18 @@ create_rates_map <- function(rates_samples, sex, race){
   ggplot(county_f, aes(x = long, y = lat, group = group, fill = rate)) +
     geom_polygon() +
     coord_map() +
-    scale_fill_viridis(name = "Rate Breaks", option = "H") +
+    scale_fill_viridis(name = "Death Rate", option = "H", 
+                       guide = guide_colorbar(barheight = 15,barwidth = 0.5)
+                       ) +
     labs(title = paste0("Race: ", race, ".\nGender: ", sex)) +
     theme_void() 
 }
 ```
 
+
 ```{r}
+#| label: fig-cap-3-2
+#| fig-cap: "Death Rates per 100,000 at the county level stratified by race and gender groups"
 #| fig-height: 14
 #| fig-width: 10
 
@@ -568,6 +722,8 @@ grid.arrange(
 )
 ```
 
+\newpage 
+
 ### 3.3 
 
 ```{r assign urban rural counties }
@@ -590,7 +746,15 @@ data <- data %>%
 
 ```
 
+@tbl-crude-ur-rur shows rural-urban rates at stratified by the race-gender category. Note that they differ from @tbl-sum-1-1 because previous table was based on the total counts, and this table had to be recreated from the granular county level. Due to large number of suppressed data points, we are seeing a large number of zeros in the data. 
+@tbl-rur-ur-rates shows estimated weighted median death rates per 100,000. We are no longer seeing zero death rates because we are able to 'impute' suppressed values of deaths counts. Overall, it seems that rural death rates appear either slightly higher, or similar to those in the urban counties, when looking at the data on the race-gender groups. 
+
+So far, we saw that males' death rates were higher than those of females, stratified by the race groups. Stratifying by the urban rural status does not reveal any further disparities. 
+
 ```{r}
+#| label: tbl-crude-ur-rur
+#| tbl-cap: "Crude rates from raw data. Missing data (Suppressed) was discared. Rates are presetned based on complete case analysis"
+
 
 data %>% 
   filter(Notes != "Total" & Gender != "" ) %>% 
@@ -631,7 +795,8 @@ cbind(
         digits = 1, 
         col.names = c("Race", "Urban", "Rural", "Urban", "Rural")) %>% 
   add_header_above(c(" " = 1, "Female" = 2, "Male" = 2))%>% 
-  column_spec(1, width = "3cm")
+  column_spec(1, width = "3cm") %>% 
+  kable_styling(latex_options = "hold_position")
   
 
 ```
@@ -821,6 +986,9 @@ data %>%
 ```
 
 ```{r present results }
+#| label: tbl-rur-ur-rates
+#| tbl-cap: "Estiamted death rates per 100,000 stratified by the rural-urban counties and race-gender categories"
+
 
 data.frame(
   race = c("American Indian or Alaska Native", "Asian or Pacific Islander", "Black or African American", "White"), 
@@ -863,10 +1031,13 @@ data.frame(
                       "Urban", "Urban C.I.", 
                       "Rural", "Rural C.I.")) %>% 
   add_header_above(c(" " = 1, "Female" = 4, "Male" = 4)) %>% 
-  column_spec(1, width = "3cm")
+  column_spec(1, width = "3cm") %>% 
+  kable_styling(latex_options = "hold_position")
          
 
 ```
+
+\newpage 
 
 ### 3.4 
 
@@ -895,19 +1066,29 @@ create_probability_map <- function(probabilities, sex, race){
   ggplot(county_f, aes(x = long, y = lat, group = group, fill = prob)) +
     geom_polygon() +
     coord_map() +
-    scale_fill_viridis(name = "Rate Breaks", 
+    scale_fill_viridis(name = "Probability", 
                        option = "H", 
                        limits = c(0,1), 
                        breaks = seq(0, 1, by = 0.1),
                        guide = guide_colorbar(barheight = 15,
                                             barwidth = 0.5)
                        ) +
-    labs(title = paste0("Race: ", race, ".\nGender: ", sex)) +
     theme_void() 
 }
 ```
 
+@fig-pr-3-4 shows probabilities foe each county that posterior samples of death rates for a minority group exceed those of white reference group, stratified by gender. 
+
+It appears that AI/AN females and males are much more likely to have higher death rates compared with their white counterparts. Posterior probabilities for female are all extremely close to 1. This shows strong evidence that AI/AN males and females are at much higher risk of death by suicide.
+
+Asian and PI females are at slightly higher risk of suicide in the southern parts of Minnesota, about equal in the central Minnesota, and White females are at higher risk up-north. 
+Probability that Asian males' death rates are higher than those of white males is very low throughout the state. These conclusion apply  to the comparison of Black or African American males and females to their White counterparts. 
+
+Overall, these results are consistent with the conclusions we drew from @tbl-3-1. 
+
 ```{r}
+#| label: fig-pr-3-4
+#| fig-cap: "Posterior Probability Maps that Non-White Group Death Rate exceed White Group Death Rate. "
 #| fig-height: 14
 #| fig-width: 10
 
@@ -935,23 +1116,31 @@ s2r3_r4_post_prob <- apply(s2r3_r4_comp, 1, mean)
 
 ##################################################################
 grid.arrange(
-  create_probability_map(probabilities = s1r1_r4_post_prob, sex = "Female", race = "AI/AN to White"), 
-  create_probability_map(probabilities = s2r1_r4_post_prob, sex = "Male", race = "AI/AN to White"), 
+  create_probability_map(probabilities = s1r1_r4_post_prob) + ggtitle("Pr(AI/AN > White). Gender: Female"), 
+  create_probability_map(probabilities = s2r1_r4_post_prob) + ggtitle("Pr(AI/AN > White). Gender: Male"), 
   
-  create_probability_map(probabilities = s1r2_r4_post_prob, sex = "Female", race = "Asian to White"), 
-  create_probability_map(probabilities = s2r2_r4_post_prob, sex = "Male", race = "Asian to White"), 
+  create_probability_map(probabilities = s1r2_r4_post_prob) + ggtitle("Pr(Asian/PI > White). Gender: Female"), 
+  create_probability_map(probabilities = s2r2_r4_post_prob) + ggtitle("Pr(Asian/PI > White). Gender: Male"), 
   
-  create_probability_map(probabilities = s1r3_r4_post_prob, sex = "Female", race = "Black to White"), 
-  create_probability_map(probabilities = s2r3_r4_post_prob, sex = "Male", race = "Black to White"), 
+  create_probability_map(probabilities = s1r3_r4_post_prob) + ggtitle("Pr(Black > White). Gender: Female"), 
+  create_probability_map(probabilities = s2r3_r4_post_prob) + ggtitle("Pr(Black > White). Gender: Male"), 
   
   nrow = 3, ncol = 2
 )
 
 ```
 
+\newpage 
+
 ### 3.5 
 
+@fig-3-5 show that the disparities between male and female are less confident within AI/AN group. The disparities are much more concrete between white males and females. 
+These results confirm what we already saw in the previous results, that the male deaths rates are statistically significantly higher than those of females. 
+In these maps we can see these disparities at the county level, and see that the pattern in stable for each county, and not driven by some counties with extreme disparities. 
+
 ```{r}
+#| label: fig-3-5
+#| fig-cap: "High evidence of consistent high death rates for males at the county level stratified by Racial group"
 #| fig-height: 10
 #| fig-width: 10
 
@@ -975,16 +1164,35 @@ r4_s1s2_comp_post_prob <- apply(r4_s1s2_comp, 1, mean)
 
 ##################################################################
 grid.arrange(
-  create_probability_map(probabilities = r1_s1s2_comp_post_prob, sex = "Male to Female", race = "AI/AN"), 
+  create_probability_map(probabilities = r1_s1s2_comp_post_prob, sex = "Male to Female", race = "AI/AN") + ggtitle("Pr(Male > Female). Race: AI/AN"), 
   
-  create_probability_map(probabilities = r2_s1s2_comp_post_prob, sex = "Male to Female", race = "Asian"), 
+  create_probability_map(probabilities = r2_s1s2_comp_post_prob, sex = "Male to Female", race = "Asian") + ggtitle("Pr(Male > Female). Race: Asian and PI"), 
   
-  create_probability_map(probabilities = r3_s1s2_comp_post_prob, sex = "Male to Female", race = "Black"), 
+  create_probability_map(probabilities = r3_s1s2_comp_post_prob, sex = "Male to Female", race = "Black") + ggtitle("Pr(Male > Female). Race: Black and African American"), 
   
-  create_probability_map(probabilities = r4_s1s2_comp_post_prob, sex = "Male to Female", race = "White"), 
+  create_probability_map(probabilities = r4_s1s2_comp_post_prob, sex = "Male to Female", race = "White") + ggtitle("Pr(Male > Female). Race: White"), 
   
   nrow = 2, ncol = 2
 )
 
 ```
+
+\newpage 
+
+# Section 4
+
+### 4.1 
+
+By constructing the analysis in such a way, we can see that the disparities between males and females are consistent throughout the entire state within each county, something that I already touched on in section (3.5). Otherwise, there might be criticism that our analysis' results are driven by a few large counties where disparities may occur. The benefit of our analysis is that we can address this issue right away. 
+
+### 4.2 
+
+The choice between using temporal aggregation methods—like estimating time-specific death rates ($\lambda_{irst}$)—versus aggregating data over multiple years (e.g., $y_{irs} = \sum_t y_{irst}$) and estimating death rates over a period of time involves important considerations for mortality rate analyses. Estimating time-specific death rates allows for a detailed look at how mortality rates change over different time intervals. This approach is useful for understanding short-term trends, seasonal patterns, and the effects of specific events or interventions within the study period. However, analyzing time-specific rates can be complex due to increased variability caused by short-term changes and potential gaps in data during certain periods, which may require more advanced modeling techniques.
+
+On the other hand, aggregating mortality data over several years provides a more stable foundation for analysis by smoothing out short-term fluctuations and increasing sample sizes. This method can enhance the precision of estimates, especially for smaller groups or rare events, and is generally simpler to analyze and interpret compared to time-specific rates. However, aggregating data over longer periods risks losing important temporal details, which could obscure factors influencing mortality within specific time frames. It also makes it difficult to pinpoint and attribute changes in mortality to specific events or policy actions, potentially missing short-term impacts that might be overlooked in aggregated analyses.
+
+In summary, the decision to use temporal aggregation or data aggregation over multiple years should be guided by the research goals and the nature of the data. Researchers interested in understanding short-term variations and temporal dynamics in mortality rates may benefit from estimating time-specific death rates despite the analytical challenges involved. Conversely, those focusing on broader trends or seeking more stable estimates may find aggregating data over multiple years to be a practical and effective approach. Balancing the trade-offs between temporal resolution and analytical stability is key in designing mortality rate analyses that best address the research questions at hand.
+
+
+
 

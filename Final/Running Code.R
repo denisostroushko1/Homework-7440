@@ -113,80 +113,82 @@ m=num
 library(mvtnorm)
 library(MCMCpack)
 
+
+tab = read.table(file = "./Final/HQ Code/Code/Data/mn_suicide.txt", sep='\t',header=TRUE, stringsAsFactors=FALSE)
+
+
+##################
+#Get race, gender, and county labels
+##################
+rlabs=unique(tab$Race)
+R=length(rlabs)-1; rlabs=rlabs[1:R]
+slabs=unique(tab$Gender)
+S=length(slabs)-1; slabs=slabs[1:S]
+clabs=unique(tab$County)
+I=length(clabs)-1; clabs=clabs[1:I]
+
+##################
+#Throw out "extra" total rows
+##################
+tab=tab[-dim(tab)[1],]		#last row is the overall total
+tab=tab[tab$Gender!="",]	#throw out the race totals
+
+##################
+#Set up Y, n, Ytot, Yobs
+##################
+Y=array(as.numeric(tab$Deaths),dim=c(I+1,S,R))
+n=array(as.numeric(tab$Population),dim=c(I+1,S,R))
+Ytot=Y[I+1,,]; ntot=n[I+1,,]
+Y=Y[-(I+1),,]; n=n[-(I+1),,]
+Yobs=apply(Y,2:3,sum,na.rm=TRUE)
+nYmiss=Ytot-Yobs
+
+###################
+#Missing Y's
+###################
+dY=!is.na(Y)
+nsupp=apply(!dY,2:3,sum)
+Ythres=c(1,9)
+
+###################
+#prior specifications
+###################
+gam2=10000		#beta0~N(0,gam2)
+as=1; bs=1/7	#sig2~IG(as,bs)
+at=1; bt=1/100	#tau2~IG(at,bt)
+
+###################
+#candidate density variances
+###################
+
+
+qt=array(1,dim=dim(Y))
+
+nsims=50000
+
+
+tab %>% 
+  mutate(D = as.numeric(Deaths)) %>% 
+  group_by(Gender, Race) %>% 
+  summarise(mean = log(mean(D/Population, na.rm = T))) %>% 
+  ungroup() %>% 
+  select(mean) %>% unlist() -> crude_data_beta
+
+set.seed(1234)
+beta0=sig2=tau2=array(dim=c(S,R,nsims))
+lami=z=theta=array(dim=c(I,S,R,nsims))
+beta0[,,1]=	 0 #############
+Ymiss=list()
+
+if(T == F){
+  
+  s = 1; r= 1
+  s = 2; r = 1
+  
+}
+
+  
 system.time({
-  tab = read.table(file = "./Final/HQ Code/Code/Data/mn_suicide.txt", sep='\t',header=TRUE, stringsAsFactors=FALSE)
-  
-  
-  ##################
-  #Get race, gender, and county labels
-  ##################
-  rlabs=unique(tab$Race)
-  R=length(rlabs)-1; rlabs=rlabs[1:R]
-  slabs=unique(tab$Gender)
-  S=length(slabs)-1; slabs=slabs[1:S]
-  clabs=unique(tab$County)
-  I=length(clabs)-1; clabs=clabs[1:I]
-  
-  ##################
-  #Throw out "extra" total rows
-  ##################
-  tab=tab[-dim(tab)[1],]		#last row is the overall total
-  tab=tab[tab$Gender!="",]	#throw out the race totals
-  
-  ##################
-  #Set up Y, n, Ytot, Yobs
-  ##################
-  Y=array(as.numeric(tab$Deaths),dim=c(I+1,S,R))
-  n=array(as.numeric(tab$Population),dim=c(I+1,S,R))
-  Ytot=Y[I+1,,]; ntot=n[I+1,,]
-  Y=Y[-(I+1),,]; n=n[-(I+1),,]
-  Yobs=apply(Y,2:3,sum,na.rm=TRUE)
-  nYmiss=Ytot-Yobs
-  
-  ###################
-  #Missing Y's
-  ###################
-  dY=!is.na(Y)
-  nsupp=apply(!dY,2:3,sum)
-  Ythres=c(1,9)
-  
-  ###################
-  #prior specifications
-  ###################
-  gam2=10000		#beta0~N(0,gam2)
-  as=1; bs=1/7	#sig2~IG(as,bs)
-  at=1; bt=1/100	#tau2~IG(at,bt)
-  
-  ###################
-  #candidate density variances
-  ###################
-  
-  
-  qt=array(1,dim=dim(Y))
-  
-  nsims=50000
-  
-  
-  tab %>% 
-    mutate(D = as.numeric(Deaths)) %>% 
-    group_by(Race.Code, Gender.Code) %>% 
-    summarise(mean = log(mean(D, na.rm = T))) %>% 
-    ungroup() %>% 
-    select(mean) %>% unlist() -> crude_data_beta
-  
-  set.seed(1234)
-  beta0=sig2=tau2=array(dim=c(S,R,nsims))
-  lami=z=theta=array(dim=c(I,S,R,nsims))
-  beta0[,,1]=	0 #############
-  Ymiss=list()
-  
-  if(T == F){
-    
-    s = 1; r= 1
-    s = 2; r = 1
-    
-  }
-  
   count = 1
   
   for(s in 1:S){
@@ -201,7 +203,7 @@ system.time({
   }
   
   sig2[,,1]=	10 #############
-  tau2[,,1]=	10 #############
+  tau2[,,1]=	2 #############
   z[,,,1]=	0 #############
   for(i in 1:I){
     theta[i,,,1]=beta0[,,1] + z[i,,,1]
